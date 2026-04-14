@@ -1,0 +1,320 @@
+.allaccountsTable {
+    .organizationTd {
+        a {
+            color: var(--primary-color-code);
+        }
+
+    }
+
+    .subsciptionExpireTd {
+        div {
+            display: inline-flex;
+            align-items: center;
+
+            img {
+                margin-right: 12px;
+            }
+        }
+    }
+}
+
+.createNewAccountPage {
+    // min-height: calc(100vh - 110px);
+    padding: 19px 23px;
+
+    .createNewAccountInner {
+        background: #FFFFFF;
+        box-shadow: 0px 3px 8px rgba(21, 28, 53, 0.04);
+        border-radius: 5px;
+        padding: 43px;
+
+        @media (max-width: 1100px) {
+            padding: 35px 20px;
+        }
+
+        @media (max-width: 991px) {
+            padding: 35px 10px;
+        }
+
+        h1 {
+            font-style: normal;
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 40px;
+            color: #1B2733;
+            text-align: center;
+        }
+
+        form {
+            padding: 32px 0 0;
+            width: 100%;
+            max-width: 790px;
+            margin: auto;
+
+            .formGroup {
+                margin: 0 0 26px;
+
+                label {
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 16px;
+                    line-height: 24px;
+                    color: #637282;
+                    margin: 0 0 11px;
+                }
+
+                .form-control {
+                    border: 1px solid #CED4DA;
+
+                    &:focus {
+                        border-color: var(--primary-color-code);
+                    }
+                }
+
+                .btn_genaratePass {
+                    background: var(--primary-color-code);
+                    width: 100%;
+                    max-width: 180px;
+                    height: 40px;
+                    margin-top: 42px;
+                    font-size: 14px;
+                    line-height: 22px;
+                    border-radius: 5px;
+                    color: #FFFFFF;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                }
+            }
+
+            h4 {
+                font-style: normal;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 40px;
+                color: #000000;
+                margin: 0 0 4px;
+                font-family: 'Euclid Circular A SemiBold', sans-serif;
+            }
+
+            .fullBtn {
+                max-width: 346px;
+                margin: 10px auto 0;
+            }
+        }
+
+    }
+}
+
+.addSemesterPage {
+    min-height: calc(100vh - 110px);
+
+    .addSemesterInner {
+        background: #FFFFFF;
+        box-shadow: 0px 3px 8px rgba(21, 28, 53, 0.04);
+        border-radius: 5px;
+        padding: 43px;
+        margin-top: 24px;
+
+        @media (max-width: 1100px) {
+            padding: 35px 20px;
+        }
+
+        @media (max-width: 991px) {
+            padding: 35px 10px;
+        }
+        .imgViewDiv{
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            top: 10px;
+            img{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+
+        h1 {
+            font-style: normal;
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 40px;
+            color: #1B2733;
+            text-align: center;
+        }
+
+        form {
+            width: 100%;
+
+            .formGroup {
+                margin: 0 0 26px;
+
+                label {
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 16px;
+                    line-height: 24px;
+                    color: #637282;
+                    margin: 0 0 11px;
+                }
+
+                .form-control {
+                    border: 1px solid #CED4DA;
+
+                    &:focus {
+                        border-color: var(--primary-color-code);
+                    }
+                }
+
+                .btn_genaratePass {
+                    background: var(--primary-color-code);
+                    width: 100%;
+                    max-width: 180px;
+                    height: 40px;
+                    margin-top: 42px;
+                    font-size: 14px;
+                    line-height: 22px;
+                    border-radius: 5px;
+                    color: #FFFFFF;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    text-align: center;
+                }
+            }
+
+            h4 {
+                font-style: normal;
+                font-weight: 500;
+                font-size: 14px;
+                line-height: 40px;
+                color: #000000;
+                margin: 0 0 4px;
+                font-family: 'Euclid Circular A SemiBold', sans-serif;
+            }
+
+            .fullBtn {
+                max-width: 346px;
+                margin: 10px auto 0;
+            }
+        }
+
+    }
+}
+
+.admissionForm-wrapper-sec {
+    .admissionForm-wrapper {
+        .form-group-sec {
+            background: #FFFFFF;
+            box-shadow: 0px 3px 8px rgba(21, 28, 53, 0.04);
+            border-radius: 5px;
+            padding: 43px;
+            margin: 0 0 16px;
+            @media (max-width: 975px) {
+                padding: 30px;
+            }
+            @media (max-width: 600px) {
+                padding: 20px;
+            }
+            h3{
+                font-style: normal;
+                font-weight: 500;
+                font-size: 20px;
+                line-height: 40px;
+                color: #000000;
+                margin-bottom: 8px;
+            }
+            .form-group{
+                margin-bottom: 16px;
+                label{
+                    font-style: normal;
+                    font-weight: normal;
+                    font-size: 16px;
+                    line-height: 24px;
+                    color: #637282;
+                    margin: 0 0 8px;
+                }
+            }
+            .form-group-title{
+                display: flex;
+                justify-content: space-between;
+            }
+            .priview-content{
+                .priview-content-row{
+                    display: flex;
+                    flex-wrap: wrap;
+                    margin: 0 -15px;
+                    .priview-content-col{
+                        width: 25%;
+                        padding: 15px;
+                        @media (max-width: 1199px){
+                            width: 33.33%;
+                        }
+                        @media (max-width: 991px){
+                            width: 50%;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.toggle-btn-with-label {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 5px;
+
+    @media (max-width: 575px) {
+        margin-top: 4px;
+    }
+
+    .left-toggle {
+        flex: 0 0 auto;
+        padding: 8px 0 0;
+    }
+
+    .rg-toggle-text {
+        padding-left: 28px;
+        padding-top: 4.5px;
+
+        @media (max-width: 575px) {
+            padding-left: 16px;
+        }
+
+        &.pl15 {
+            padding-left: 15px;
+
+            @media (max-width: 575px) {
+                padding-left: 12px;
+            }
+        }
+
+        label {
+            font-weight: normal;
+            font-size: 14px;
+            line-height: 24px;
+            color: #000000;
+
+        }
+    }
+}
+
+.form-group-sec2 {
+       border: 1px solid #d4d4d4;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    padding: 16px 16px 10px;
+
+    h3 {
+        font-size: 18px;
+        line-height: 28px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 16px;
+    }
+}

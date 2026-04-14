@@ -1,0 +1,125 @@
+//# Scss Mixins
+@mixin css3Prefix($property, $value) {
+    -webkit-#{$property}: #{$value};
+    -moz-#{$property}: #{$value};
+    -ms-#{$property}: #{$value};
+    -o-#{$property}: #{$value};
+    #{$property}: #{$value};
+}
+
+@mixin transition($what: all, $time: 0.2s, $how: ease-in-out) {
+    -webkit-transition: $what $time $how;
+    -moz-transition: $what $time $how;
+    -ms-transition: $what $time $how;
+    -o-transition: $what $time $how;
+    transition: $what $time $how;
+}
+
+@mixin clear {
+    &::after {
+        content: '';
+        display: table;
+        clear: both;
+    }
+}
+
+// breakpoint
+@mixin mqMin($getSize) {
+
+    // If the breakpoint exists in the map.
+    @if map-has-key($min-breakpoints, $getSize) {
+
+        // Get the breakpoint value.
+        $min-breakpoint-value: map-get($min-breakpoints, $getSize);
+
+        // Write the media query.
+        @media (min-width: $min-breakpoint-value) {
+            @content;
+        }
+
+        // If the breakpoint doesn't exist in the map.
+    }
+
+    @else {
+        @media (min-width: $getSize) {
+            @content;
+        }
+    }
+}
+
+@mixin mqMax($getSize) {
+
+    // If the breakpoint exists in the map.
+    @if map-has-key($max-breakpoints, $getSize) {
+
+        // Get the breakpoint value.
+        $max-breakpoint-value: map-get($max-breakpoints, $getSize);
+
+        // Write the media query.
+        @media (max-width: $max-breakpoint-value) {
+            @content;
+        }
+
+        // If the breakpoint doesn't exist in the map.
+    }
+
+    @else {
+
+        @media (max-width: $getSize) {
+            @content;
+        }
+    }
+}
+
+// flexContainer
+
+@mixin flexContainer($direction: null, $justify: null, $align: null) {
+    display: flex;
+
+    @if $direction {
+        flex-direction: $direction;
+    }
+
+    @if $justify {
+        justify-content: $justify;
+    }
+
+    @if $align {
+        align-items: $align;
+    }
+
+}
+
+// backgroundImage
+@mixin backgroundImage($url, $name, $repeat, $position, $size) {
+    @if $url=='/' {
+        background-image: url("../images/#{$name}");
+
+        @if $repeat=='no' {
+            background-repeat: no-repeat;
+        }
+
+        @else {
+            background-repeat: $repeat;
+        }
+
+        background-position: $position;
+        background-size: $size;
+    }
+
+    @else {
+        background-image: url("#{$url}#{$name}");
+
+        @if $repeat=='no' {
+            background-repeat: no-repeat;
+        }
+
+        @else {
+            background-repeat: $repeat;
+        }
+
+        background-position: $position;
+        background-size: $size;
+    }
+
+}

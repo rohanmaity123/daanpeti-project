@@ -1,0 +1,23 @@
+//# Scss Variables
+
+// Colors
+$c-primary: #3232f4;
+$c-secondary: #161624;
+$c-danger: #f42b2b;
+$c-success: #27ea36;
+$c-light: #fff;
+$c-dark: #000;
+
+
+// breakpoints
+$min-breakpoints: (sm: 576px,
+    md: 768px,
+    lg: 992px,
+    xl: 1200px,
+    xxl: 1400px);
+
+$max-breakpoints: (sm: 575px,
+    md: 767px,
+    lg: 991px,
+    xl: 1199px,
+    xxl: 1399px);

@@ -1,0 +1,13 @@
+@mixin transition($duration:250ms){
+    transition: all $duration ease 0s;
+    -webkit-transition: all $duration ease 0s;
+    -moz-transition: all $duration ease 0s;
+    -ms-transition: all $duration ease 0s;
+    -o-transition: all $duration ease 0s;  
+}
+@mixin flex-x-y($x, $y) {
+            display: flex;
+            justify-content: $x;
+            align-items: $y;
+}
+
