@@ -1,0 +1,17 @@
+//# Main Scss File # Import all ‘-dir.scss’ files 
+@charset 'utf-8';
+
+// abstracts
+@import "abstracts/__abstracts-dir";
+
+// base
+@import "base/__base-dir";
+
+// components
+@import "components/__components-dir";
+
+// layouts
+@import "layouts/__layouts-dir";
+
+// pages
+@import "pages/__pages-dir";

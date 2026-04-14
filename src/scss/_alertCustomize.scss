@@ -1,0 +1,143 @@
+.css-cpgvjg-MuiSnackbar-root,.css-qwe366 {
+    right: 24px !important;
+    left: auto !important;
+}
+
+.css-1hcy0qv-MuiPaper-root-MuiAlert-root,.css-1r9xaly {
+    background-color: #667cff !important;
+    border-left: 5px solid var(--primary-color-code) !important;
+}
+
+// start: custom-ui-alert-popup
+.react-confirm-alert-overlay {
+    background: #667cff4a !important;
+    z-index: 999;
+}
+
+.custom-ui-alert-popup {
+    width: 100%;
+    max-width: 520px;
+    padding: 16px 34px;
+    border: 1px solid;
+    border-left: 5px solid;
+    font-family: inherit;
+    background: #fff;
+    position: relative;
+
+    .alert-popup-headerpart {
+        display: flex;
+        justify-content: space-between;
+
+        h1 {
+            font-size: 18px;
+            color: inherit;
+            font-weight: bold;
+        }
+
+        .alert-popup-close {
+            position: absolute;
+            right: 11px;
+            font-size: 13px;
+            font-family: 'Euclid Circular A SemiBold', sans-serif;
+            top: 8px;
+            color: inherit;
+            cursor: pointer;
+        }
+    }
+
+    .alert-popup-bodypart {
+        padding: 16px 0 0;
+
+        p {
+            color: inherit;
+        }
+    }
+
+
+    .alert-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin: -4px;
+        padding-top: 16px;
+
+        .alert-actions-col {
+            padding: 4px;
+        }
+
+        button {
+            border-radius: 4px;
+            background: transparent;
+            padding: 6px 15px;
+            font-size: 14px;
+        }
+
+        .alert--cancel-btn {
+            color: #000;
+        }
+
+        .alert--submit-btn {
+            background: #000;
+            color: #fff;
+        }
+    }
+
+    &.default-alert-popup {
+        border-color: var(--primary-color-code);
+        color: var(--primary-color-code);
+
+        .alert-popup-headerpart {
+            color: var(--primary-color-code);
+        }
+
+        .alert-actions {
+            .alert--cancel-btn {
+                color: var(--primary-color-code);
+            }
+
+            .alert--submit-btn {
+                background: var(--primary-color-code);
+            }
+        }
+    }
+
+    &.danger-alert-popup {
+        border-color: #db3141;
+        color: #db3141;
+
+        .alert-popup-headerpart {
+            color: #db3141;
+        }
+
+        .alert-actions {
+            .alert--cancel-btn {
+                color: #db3141;
+            }
+
+            .alert--submit-btn {
+                background: #db3141;
+            }
+        }
+    }
+
+    &.success-alert-popup {
+        border-color: #019901;
+        color: #019901;
+
+        .alert-popup-headerpart {
+            color: #019901;
+        }
+
+        .alert-actions {
+            .alert--cancel-btn {
+                color: #019901;
+            }
+
+            .alert--submit-btn {
+                background: #019901;
+            }
+        }
+    }
+}
+
+// end: custom-ui-alert-popup

@@ -1,0 +1,35 @@
+.authHeader{
+    width: 100%;
+    background-color: #fff;
+    padding: 30px 30px;
+    .authHeader-wrapper{
+        display: flex;
+        justify-content: space-between;
+        .authHeader_logo{
+            button{
+                background-color: transparent;
+            }
+        }
+        .authHeader_rg{
+            .authHeader_nav{
+                .signIn{
+                    button{
+                        background-color: transparent;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.mainDashboard-footer{
+    background-color: #fff;
+    padding: 16px 24px;
+    p{
+        text-align: center;
+        font-size: 14px;
+        @media (max-width: 575px){
+            font-size: 13px;
+        }
+    }
+}

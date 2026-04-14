@@ -1,0 +1,128 @@
+//# Custom Reset/Normalize
+
+*,
+*::after,
+*::before,
+html,
+body,
+body h1,
+body h2,
+body h3,
+body h4,
+body h5,
+body h6,
+body p,
+body ul,
+body li {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: 0;
+    font-family: "Jost", sans-serif;
+}
+
+body {
+
+    #root {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+
+    }
+}
+
+label {
+    margin: 0;
+}
+
+footer {
+    margin-top: auto;
+}
+
+ul,
+ol {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color-code);
+}
+
+a:hover,
+a:focus,
+a:active {
+    text-decoration: none;
+    outline: none;
+}
+
+address {
+    font-style: normal;
+}
+
+textarea {
+    resize: none;
+}
+
+textarea:hover,
+textarea:focus,
+textarea:active {
+    outline: none;
+    box-shadow: none;
+}
+
+input:hover,
+input:active,
+input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+select:hover,
+select:active,
+select:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+    /*For FireFox*/
+}
+
+input[type=number]::-webkit-inner-spin-button {
+    /*For Webkits like Chrome and Safari*/
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+button,
+button:hover,
+button:focus,
+button:active {
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+}
+
+img {
+    border: none;
+}
+
+a img {
+    border: 0px;
+}
+
+figure {
+    margin: 0;
+    padding: 0;
+}
+
+.slick-initialized .slick-slide {
+    outline: none;
+    border: none;
+}

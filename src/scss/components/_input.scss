@@ -1,0 +1,59 @@
+.form-group-sec {
+    box-shadow: 1px 1px 11px #d4d4d4;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    padding: 16px 16px;
+
+    h3 {
+        font-size: 18px;
+        line-height: 28px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 16px;
+    }
+}
+
+
+.form-group {
+    margin-bottom: 20px;
+
+    label {
+        margin-bottom: 4px;
+        display: block;
+        color: #555;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .checklists {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        label {
+            margin: 0 !important;
+        }
+    }
+}
+.form-control{
+    width: 100%;
+    height: 48px;
+    border-radius: 8px;
+}
+
+.form-group-submit-sec{
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin: 24px 0 0;
+    .submit-btn{
+        min-width: 180px;
+        padding: 0 24px;
+    }
+}
