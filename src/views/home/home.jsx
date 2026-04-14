@@ -67,11 +67,16 @@ export default function HomePage() {
                                 key={cat.value}
                                 onClick={() => setActiveCategory(cat.value)}
                                 className={`home-category-button w-full text-left rounded-2xl px-3 py-2.5 text-sm font-semibold transition-colors ${activeCategory === cat.value
-                                    ? 'bg-[#1D9E75]/80 text-white shadow-[0_0_24px_rgba(29,158,117,0.22)]'
+                                    ? 'bg-[#1D9E75]/88 text-white shadow-[0_0_24px_rgba(29,158,117,0.28)] ring-1 ring-[#8EF0CC]/45'
                                     : 'text-white/80 hover:text-white'
                                     }`}
                             >
-                                {cat.label}
+                                <span className="flex items-center justify-between gap-3">
+                                    <span>{cat.label}</span>
+                                    {activeCategory === cat.value && (
+                                        <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-white shadow-[0_0_14px_rgba(255,255,255,0.7)]" />
+                                    )}
+                                </span>
                             </button>
                         ))}
                     </div>

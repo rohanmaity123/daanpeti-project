@@ -207,23 +207,57 @@ export default function ItemDetailPage() {
                 </div>
             </div>
 
-            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-                <DialogTitle className="text-base px-6 pt-6">Has this item been picked up?</DialogTitle>
+            <Dialog
+                open={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                fullWidth
+                maxWidth="xs"
+                BackdropProps={{
+                    sx: {
+                        backgroundColor: 'rgba(5, 10, 20, 0.45)',
+                        backdropFilter: 'blur(12px)',
+                        WebkitBackdropFilter: 'blur(12px)',
+                    }
+                }}
+                PaperProps={{
+                    className: 'glass-dialog-paper rounded-[38px]',
+                    style: {
+                        background: 'linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06))',
+                        backdropFilter: 'blur(22px) saturate(180%)',
+                        WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+                        border: '1px solid rgba(255,255,255,0.16)',
+                        boxShadow: '0 24px 80px rgba(0,0,0,0.38)',
+                        color: 'rgba(255,255,255,0.96)',
+                        margin: '16px',
+                        width: 'calc(100% - 32px)',
+                        maxWidth: '420px'
+                    }
+                }}
+            >
+                <DialogTitle
+                    className="px-6 pt-6 text-base text-white"
+                    sx={{ color: 'rgba(255,255,255,0.98)', fontWeight: 700 }}
+                >
+                    Has this item been picked up?
+                </DialogTitle>
                 <DialogContent className="max-w-xs rounded-2xl px-6 pb-5">
-                    <DialogContentText className="text-sm text-muted-foreground">
+                    <DialogContentText
+                        className="text-sm text-white/70"
+                        sx={{ color: 'rgba(255,255,255,0.78) !important' }}
+                    >
                         Kya yeh item kisi ne le liya? Once marked, it will show as claimed.
                     </DialogContentText>
                 </DialogContent>
-                <DialogActions className="flex flex-col gap-2 px-6 pb-6 sm:flex-row">
+                <DialogActions className="flex flex-col gap-3 px-6 pb-6 sm:flex-row sm:gap-2">
                     <button
                         onClick={() => setConfirmOpen(false)}
-                        className="flex-1 rounded-xl border border-border py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                        className="w-full rounded-2xl border border-white/12 bg-white/6 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:flex-1"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleConfirmClaim}
-                        className="flex-1 rounded-xl bg-primary py-2.5 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+                        className="my-items-claim-button w-full rounded-2xl px-4 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 sm:flex-1"
                     >
                         Yes, mark as claimed
                     </button>
