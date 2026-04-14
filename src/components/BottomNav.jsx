@@ -13,7 +13,7 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card bottom-nav-shadow border-t border-border lg:hidden">
+    <nav className="bottom-nav-glass fixed bottom-0 left-0 right-0 z-50 lg:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-around py-2">
         {navItems.map((item) => {
           const isActive = item.to === '/'
@@ -25,13 +25,11 @@ export function BottomNav() {
             <Link
               key={item.to}
               to={item.to}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-colors ${isActive
-                ? 'text-primary'
-                : 'text-muted-foreground hover:text-foreground'
-                }`}
+              className={`bottom-nav-item flex flex-col items-center gap-0.5 rounded-xl px-3 py-1 transition-colors ${isActive ? 'bottom-nav-item-active' : 'hover:text-white/90'}`}
             >
-              <Icon className={`h-5 w-5 ${isActive ? 'stroke-[2.5]' : ''}`} />
+              <Icon className={`bottom-nav-icon h-5 w-5 transition-transform ${isActive ? 'stroke-[2.5]' : ''}`} />
               <span className="text-[10px] font-semibold">{item.label}</span>
+              {isActive && <span className="bottom-nav-dot" aria-hidden="true" />}
             </Link>
           );
         })}
