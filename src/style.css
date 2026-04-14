@@ -896,6 +896,10 @@
   animation: fadeUpBlur 0.45s ease forwards;
 }
 
+.glass-dialog-paper {
+  animation: fadeUpBlur 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .item-detail-donor-row {
   display: flex;
   align-items: flex-start;

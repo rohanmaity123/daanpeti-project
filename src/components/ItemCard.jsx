@@ -125,34 +125,51 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
       <Dialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
+        fullWidth
+        maxWidth="xs"
+        BackdropProps={{
+          sx: {
+            backgroundColor: 'rgba(5, 10, 20, 0.45)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }
+        }}
         PaperProps={{
-          className: 'rounded-[24px]',
+          className: 'glass-dialog-paper rounded-[38px]',
           style: {
-            background: 'rgba(8, 16, 28, 0.82)',
-            backdropFilter: 'blur(18px)',
-            WebkitBackdropFilter: 'blur(18px)',
-            border: '1px solid rgba(255,255,255,0.12)',
-            boxShadow: '0 20px 70px rgba(0,0,0,0.35)',
-            color: 'rgba(255,255,255,0.96)'
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06))',
+            backdropFilter: 'blur(22px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(22px) saturate(180%)',
+            border: '1px solid rgba(255,255,255,0.16)',
+            boxShadow: '0 24px 80px rgba(0,0,0,0.38)',
+            color: 'rgba(255,255,255,0.96)',
+            margin: '16px',
+            width: 'calc(100% - 32px)',
+            maxWidth: '420px'
           }
         }}
       >
-        <DialogTitle className="pb-2 text-lg font-bold text-white">Has this item been picked up?</DialogTitle>
-        <DialogContent className="pt-2">
+        <DialogTitle
+          className="px-6 pt-6 text-base text-white"
+          sx={{ color: 'rgba(255,255,255,0.98)', fontWeight: 700 }}
+        >
+          Has this item been picked up?
+        </DialogTitle>
+        <DialogContent className="max-w-xs rounded-2xl px-6 pb-5">
           <p className="text-sm leading-relaxed text-white/70">
             Kya yeh item kisi ne le liya? Once marked, it will show as claimed.
           </p>
         </DialogContent>
-        <DialogActions className="gap-2 p-4 pt-0">
+        <DialogActions className="flex flex-col gap-3 px-6 pb-6 sm:flex-row sm:gap-2">
           <button
             onClick={() => setConfirmOpen(false)}
-            className="flex-1 rounded-xl border border-white/12 bg-white/6 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+            className="w-full rounded-2xl border border-white/12 bg-white/6 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 sm:flex-1"
           >
             Cancel
           </button>
           <button
             onClick={handleConfirmClaim}
-            className="my-items-claim-button flex-1 rounded-xl px-4 py-2.5 text-sm font-bold text-white hover:opacity-90 transition-opacity"
+            className="my-items-claim-button w-full rounded-2xl px-4 py-3 text-sm font-bold text-white transition-opacity hover:opacity-90 sm:flex-1"
           >
             Yes, mark as claimed
           </button>
