@@ -26,14 +26,14 @@ const MainLayout = ({ children }) => {
     setShowOnboarding(false);
   };
   return (
-    <div className="mx-auto max-w-[1200px] min-h-screen bg-background">
+    <div className="app-shell min-h-screen">
       {showOnboarding && <OnboardingScreen onComplete={handleOnboardingComplete} />}
       {!isItemDetail && <AppHeader />}
       <main className="pb-20 lg:pb-6 lg:px-6">
         {children}
         <AppFooter />
       </main>
-      <BottomNav />
+      {!isItemDetail && <BottomNav />}
     </div>
   );
 };

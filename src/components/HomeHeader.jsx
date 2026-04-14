@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Heart } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -10,25 +11,36 @@ const desktopNavItems = [
 
 export function AppHeader() {
   const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > 18);
+    };
+
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg border-b border-border">
+    <header className={`glass-nav sticky top-0 z-40 ${scrolled ? 'scrolled' : ''}`}>
       <div className="mx-auto max-w-[1200px] flex items-center justify-between px-4 py-3">
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center">
-            <Heart className="h-4 w-4 text-primary-foreground fill-primary-foreground" />
+          <div className="brand-heart flex h-9 w-9 items-center justify-center rounded-full bg-[#1D9E75]/18 ring-1 ring-white/15">
+            <Heart className="h-4 w-4 fill-[#1D9E75] text-[#1D9E75]" />
           </div>
-          <div>
-            <h1 className="text-lg font-extrabold text-foreground leading-none tracking-tight">
-              DaanPeti
-            </h1>
-            <p className="text-[10px] text-muted-foreground font-medium -mt-0.5">
+          <div className="leading-none">
+            <div className="brand-mark flex items-baseline gap-0.5 text-[1.4rem] leading-none">
+              <span className="text-white">Daan</span>
+              <span className="text-[#1D9E75]">Peti</span>
+            </div>
+            <p className="mt-0.5 text-[10px] font-medium text-white/55">
               Muft mein do, muft mein lo 💚
             </p>
           </div>
         </Link>
 
-        {/* Desktop nav links */}
         <nav className="hidden lg:flex items-center gap-6">
           {desktopNavItems.map((item) => {
             const isActive = item.to === '/'
@@ -38,8 +50,7 @@ export function AppHeader() {
               <Link
                 key={item.to}
                 to={item.to}
-                className={`text-sm font-semibold transition-colors ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                  }`}
+                className={`desktop-nav-link text-sm font-semibold ${isActive ? 'desktop-nav-link-active' : ''}`}
               >
                 {item.label}
               </Link>
@@ -47,10 +58,9 @@ export function AppHeader() {
           })}
         </nav>
 
-        {/* Desktop CTA */}
         <Link
           to="/post-item"
-          className="hidden lg:inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2 text-sm font-bold text-primary-foreground hover:opacity-90 transition-opacity"
+          className="hidden lg:inline-flex items-center gap-1.5 rounded-full bg-[#1D9E75] px-4 py-2 text-sm font-bold text-white shadow-[0_0_24px_rgba(29,158,117,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_34px_rgba(29,158,117,0.44)]"
         >
           🎁 Post Item
         </Link>
