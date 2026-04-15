@@ -1,8 +1,11 @@
 import { Heart, LogIn } from 'lucide-react';
 import { useState } from 'react';
 import { LogOut, Edit3, Save, Calendar, Activity, Star, Mail, User } from 'lucide-react';
-import { Avatar, Button, Input, TextareaAutosize } from '@mui/material';
-
+import { Avatar } from '@mui/material';
+import { supabase } from "../../utils/supabaseClient";
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import LoadingScreen from '../../components/LoadingScreen';
 
 
 const MOCK_USER = {
@@ -21,9 +24,14 @@ const MOCK_REVIEWS = [
 ];
 
 const NotLoginProfilePage = () => {
+    const handleGoogleLogin = async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider: "google",
+        });
+
+        if (error) console.log(error.message);
+    };
     return (
-
-
         <div className="mt-12 flex flex-col items-center text-center">
             <div className="h-20 w-20 rounded-full bg-secondary flex items-center justify-center">
                 <Heart className="h-10 w-10 text-primary" />
@@ -36,6 +44,7 @@ const NotLoginProfilePage = () => {
             </p>
             <button
                 className="mt-6 flex items-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-bold text-background hover:opacity-90 transition-opacity"
+                onClick={handleGoogleLogin}
             >
                 <LogIn className="h-4 w-4" />
                 Sign in with Google
@@ -53,6 +62,9 @@ export default function ProfilePage() {
     const [bio, setBio] = useState('Believer in sharing. Minimalist at heart. Mumbai 🌿');
     const [tempUsername, setTempUsername] = useState(username);
     const [tempBio, setTempBio] = useState(bio);
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+
 
     const handleEdit = () => {
         setTempUsername(username);
@@ -70,6 +82,30 @@ export default function ProfilePage() {
         setIsEditing(false);
     };
 
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+    };
+
+    useEffect(() => {
+        // Get current user
+        supabase.auth.getUser().then(({ data }) => {
+            setUser(data.user);
+            setLoading(false);
+        });
+
+        // Listen for auth changes
+        const { data: listener } = supabase.auth.onAuthStateChange(
+            (event, session) => {
+                setUser(session?.user || null);
+            }
+        );
+
+        return () => {
+            listener.subscription.unsubscribe();
+        };
+    }, []);
+    if (loading) return <LoadingScreen />;
+    if (!user && !loading) return <NotLoginProfilePage />;
     return (
         <div className="mx-auto max-w-lg px-4 pt-4 pb-24">
             <h1 className="text-xl font-extrabold text-foreground">Profile 👤</h1>
@@ -77,7 +113,7 @@ export default function ProfilePage() {
                 <div className="mx-auto max-w-3xl px-4 pt-6 lg:pt-10">
                     {/* Welcome heading */}
                     <h1 className="text-2xl font-extrabold text-foreground lg:text-3xl">
-                        Welcome back, {MOCK_USER.name.split(' ')[0]} 👋
+                        Welcome back, {user.user_metadata.full_name?.split(' ')[0]} 👋
                     </h1>
                     <p className="mt-1 text-sm text-muted-foreground">Manage your DaanPeti profile</p>
 
@@ -87,10 +123,10 @@ export default function ProfilePage() {
                             {/* Avatar */}
                             <div className="relative">
                                 <div className="rounded-full bg-gradient-to-br from-[#6366f1] via-[#a855f7] to-[#ec4899] p-[3px]">
-                                    <Avatar className="h-24 w-24 border-2 border-white lg:h-28 lg:w-28" src={MOCK_USER.avatar} alt={MOCK_USER.name}>
+                                    <Avatar className="h-24 w-24 border-2 border-white lg:h-28 lg:w-28" src={user.user_metadata.avatar_url} alt={user.user_metadata.full_name}>
 
                                         <p className="text-xl font-bold bg-primary text-primary-foreground">
-                                            {MOCK_USER.name.split(' ').map(n => n[0]).join('')}
+                                            {user.user_metadata.full_name.split(' ').map(n => n[0]).join('')}
                                         </p>
                                     </Avatar>
                                 </div>
@@ -99,10 +135,10 @@ export default function ProfilePage() {
 
                             {/* Info */}
                             <div className="flex-1 text-center sm:text-left">
-                                <h2 className="text-xl font-bold text-foreground lg:text-2xl">{MOCK_USER.name}</h2>
+                                <h2 className="text-xl font-bold text-foreground lg:text-2xl">{user.user_metadata.full_name}</h2>
                                 <div className="mt-1 flex items-center justify-center gap-1.5 text-sm text-muted-foreground sm:justify-start">
                                     <Mail className="h-3.5 w-3.5" />
-                                    {MOCK_USER.email}
+                                    {user.email}
                                 </div>
 
                                 {/* Editable fields */}
@@ -173,7 +209,7 @@ export default function ProfilePage() {
                                             </button>
 
                                             <button
-                                                // onClick={handleLogout}
+                                                onClick={handleLogout}
                                                 className="flex items-center justify-center gap-2 w-full lg:w-auto px-6 py-3 rounded-xl border border-red-400/40 text-red-400 hover:bg-red-500/10 transition"
                                             >
                                                 <LogOut className="h-4 w-4" />
@@ -230,6 +266,12 @@ export default function ProfilePage() {
                                 </div>
                             ))}
                         </div>
+                    </div>
+                    <div className="text-xs text-center mt-10 opacity-70">
+                        <Link to="/about">About</Link> ·
+                        <Link to="/privacy"> Privacy</Link> ·
+                        <Link to="/terms"> Terms</Link> ·
+                        <Link to="/contact"> Contact</Link>
                     </div>
                 </div>
             </div>
