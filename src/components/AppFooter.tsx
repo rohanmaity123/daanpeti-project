@@ -13,7 +13,7 @@ export function AppFooter() {
 
       {/* Desktop footer */}
       <footer className="hidden lg:block border-t border-border bg-card mt-10">
-        <div className="mx-auto max-w-[1200px] px-6 py-10 grid grid-cols-3 gap-8">
+        <div className="mx-auto max-w-[1200px] px-6 py-10 grid grid-cols-4 gap-8">
           {/* Column 1: Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
@@ -43,7 +43,15 @@ export function AppFooter() {
               <li><Link to="/support" className="text-sm text-muted-foreground hover:text-primary transition-colors">Support Us</Link></li>
             </ul>
           </div>
-
+            <div>
+            <h4 className="text-sm font-bold text-foreground mb-3" >Legal</h4>
+            <ul className="space-y-2">
+              <li><Link to="/about" className="text-sm text-muted-foreground hover:text-primary transition-colors" >About Us</Link></li>
+              <li><Link to="/privacy" className="text-sm text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link></li>
+              <li><Link to="/terms" className="text-sm text-muted-foreground hover:text-primary transition-colors">Terms</Link></li>
+              <li><Link to="/contact" className="text-sm text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
+            </ul>
+          </div>
           {/* Column 3: Support */}
           <div>
             <h4 className="text-sm font-bold text-foreground mb-3">Support DaanPeti 💛</h4>

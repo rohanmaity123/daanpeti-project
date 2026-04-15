@@ -20,6 +20,10 @@ import MyItemsPage from "./views/home/myItems";
 import PostItemPage from "./views/home/post.item";
 import ProfilePage from "./views/home/profile";
 import SupportPage from "./views/home/support";
+import Terms from "./views/home/terms";
+import Contact from "./views/home/contactUs";
+import About from "./views/home/about";
+import Privacy from "./views/home/privacy";
 
 
 // ==================
@@ -71,6 +75,10 @@ export default function RenderRoutes() {
           <Route path="/post-item" element={<PostItemPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/support" element={<SupportPage />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/about" element={<About />} />
         </Route>
 
 
