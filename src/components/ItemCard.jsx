@@ -6,12 +6,12 @@ import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material';
 
 export function ItemCard({ item, showStatus = false, animationIndex = 0, className = '' }) {
-  const isClaimed = isItemClaimed(item.id);
+  const isClaimed = item?.status === 'available' ? false : isItemClaimed(item.id);
   const isDonor = isMyItem(item.id);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const isFeedCard = !showStatus;
 
-  const whatsappUrl = `https://wa.me/${item.whatsappNumber}?text=${encodeURIComponent(
+  const whatsappUrl = `https://wa.me/${item.whatsapp_number}?text=${encodeURIComponent(
     `Hi! Maine DaanPeti pe "${item.name}" dekha. Kya ye abhi available hai?`
   )}`;
 
@@ -39,7 +39,7 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
         )}
         <div className={`overflow-hidden relative ${isFeedCard ? 'aspect-[1.1/1] md:aspect-[1.15/0.9]' : 'h-[180px]'}`}>
           <img
-            src={item.image}
+            src={item.image_url || '/placeholder-item.png'}
             alt={item.name}
             className={`h-full w-full object-cover transition-transform duration-300 ${isClaimed ? '' : 'group-hover:scale-105'
               }`}
@@ -73,7 +73,7 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
             </span>
             <span className="flex items-center gap-1 text-xs sm:text-sm">
               <Clock className="h-3 w-3" />
-              {item.timePosted}
+              {item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Unknown'}
             </span>
           </div>
           <div className="pt-1 flex flex-wrap items-center gap-1.5">

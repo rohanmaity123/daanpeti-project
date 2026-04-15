@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { sampleItems, filterCategories } from '../../lib/sample-data';
+import { filterCategories } from '../../lib/sample-data';
 import { ItemCard } from '../../components/ItemCard';
 import { SupportBanner } from '../../components/SupportBanner';
 import { ArrowRight, Search } from 'lucide-react';
 import { useItemsClaimed, isItemClaimed } from '../../lib/items-store';
 import { TestimonialSection } from '../../components/Testimonial';
+import { supabase } from '../../utils/supabaseClient';
+import { Loader2 } from 'lucide-react';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -17,11 +19,12 @@ const heroEmojis = [
 export default function HomePage() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
-
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
     const claimedMap = useItemsClaimed();
 
     const filteredItems = useMemo(() => {
-        return sampleItems.filter((item) => {
+        return items.filter((item) => {
             if (claimedMap[item.id] || isItemClaimed(item.id)) return false;
             const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
             const matchesSearch = searchQuery === '' ||
@@ -29,7 +32,7 @@ export default function HomePage() {
                 item.location.toLowerCase().includes(searchQuery.toLowerCase());
             return matchesCategory && matchesSearch;
         });
-    }, [activeCategory, searchQuery, claimedMap]);
+    }, [activeCategory, searchQuery, claimedMap, items]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 6;
@@ -40,6 +43,25 @@ export default function HomePage() {
         setCurrentPage(1);
     }, [activeCategory, searchQuery, claimedMap]);
 
+    useEffect(() => {
+        const fetchItems = async () => {
+            setLoading(true);
+
+            const { data, error } = await supabase
+                .from("donation_items")
+                .select("*")
+                .order("created_at", { ascending: false });
+
+            if (error) {
+                console.error(error.message);
+            } else {
+                setItems(data);
+            }
+            setLoading(false);
+        };
+
+        fetchItems();
+    }, []);
     const sidebar = (
         <aside className="hidden lg:block w-[260px] shrink-0">
             <div className="sticky top-[92px] space-y-5">
@@ -183,52 +205,57 @@ export default function HomePage() {
                             {filteredItems.length} items
                         </span>
                     </div>
-
-                    {filteredItems.length > 0 ? (
-                        <>
-                            <div className="mx-4 lg:mx-0 grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-3">
-                                {paginatedItems.map((item, index) => (
-                                    <ItemCard key={item.id} item={item} animationIndex={index} />
-                                ))}
+                    {
+                        loading ? (
+                            <div className="mx-4 lg:mx-0 mt-8 text-center">
+                                <Loader2 className="mx-auto h-8 w-8 animate-spin text-white/70" />
+                                <p className="mt-2 text-sm font-medium text-white/70">Loading items...</p>
                             </div>
-                            {pageCount > 1 && (
-                                <div className="mx-4 lg:mx-0 mt-5 flex flex-wrap items-center justify-center gap-2">
-                                    <button
-                                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                                        disabled={currentPage === 1}
-                                        className="glass-surface rounded-full px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/14 disabled:cursor-not-allowed disabled:opacity-50"
-                                    >
-                                        Previous
-                                    </button>
-                                    {Array.from({ length: pageCount }, (_, index) => {
-                                        const page = index + 1;
-                                        return (
-                                            <button
-                                                key={page}
-                                                onClick={() => setCurrentPage(page)}
-                                                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${currentPage === page ? 'bg-[#1D9E75]/80 text-white shadow-[0_0_24px_rgba(29,158,117,0.25)]' : 'glass-surface text-white hover:bg-white/14'}`}
-                                            >
-                                                {page}
-                                            </button>
-                                        );
-                                    })}
-                                    <button
-                                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pageCount))}
-                                        disabled={currentPage === pageCount}
-                                        className="glass-surface rounded-full px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/14 disabled:cursor-not-allowed disabled:opacity-50"
-                                    >
-                                        Next
-                                    </button>
+                        ) : filteredItems.length > 0 ? (
+                            <>
+                                <div className="mx-4 lg:mx-0 grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-3">
+                                    {paginatedItems.map((item, index) => (
+                                        <ItemCard key={item.id} item={item} animationIndex={index} />
+                                    ))}
                                 </div>
-                            )}
-                        </>
-                    ) : (
-                        <div className="mx-4 lg:mx-0 mt-8 text-center">
-                            <p className="text-3xl">🔍</p>
-                            <p className="mt-2 text-sm font-bold text-white">Kuch nahi mila</p>
-                            <p className="mt-1 text-xs text-white/55">Try a different search or category</p>
-                        </div>
-                    )}
+                                {pageCount > 1 && (
+                                    <div className="mx-4 lg:mx-0 mt-5 flex flex-wrap items-center justify-center gap-2">
+                                        <button
+                                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                            disabled={currentPage === 1}
+                                            className="glass-surface rounded-full px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/14 disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            Previous
+                                        </button>
+                                        {Array.from({ length: pageCount }, (_, index) => {
+                                            const page = index + 1;
+                                            return (
+                                                <button
+                                                    key={page}
+                                                    onClick={() => setCurrentPage(page)}
+                                                    className={`rounded-full px-4 py-2 text-sm font-semibold transition ${currentPage === page ? 'bg-[#1D9E75]/80 text-white shadow-[0_0_24px_rgba(29,158,117,0.25)]' : 'glass-surface text-white hover:bg-white/14'}`}
+                                                >
+                                                    {page}
+                                                </button>
+                                            );
+                                        })}
+                                        <button
+                                            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, pageCount))}
+                                            disabled={currentPage === pageCount}
+                                            className="glass-surface rounded-full px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/14 disabled:cursor-not-allowed disabled:opacity-50"
+                                        >
+                                            Next
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="mx-4 lg:mx-0 mt-8 text-center">
+                                <p className="text-3xl">🔍</p>
+                                <p className="mt-2 text-sm font-bold text-white">Kuch nahi mila</p>
+                                <p className="mt-1 text-xs text-white/55">Try a different search or category</p>
+                            </div>
+                        )}
                 </div>
             </div>
             {/* Testimonials */}
