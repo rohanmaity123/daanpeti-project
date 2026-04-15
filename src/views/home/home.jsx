@@ -4,6 +4,7 @@ import { ItemCard } from '../../components/ItemCard';
 import { SupportBanner } from '../../components/SupportBanner';
 import { ArrowRight, Search } from 'lucide-react';
 import { useItemsClaimed, isItemClaimed } from '../../lib/items-store';
+import { TestimonialSection } from '../../components/Testimonial';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -230,6 +231,8 @@ export default function HomePage() {
                     )}
                 </div>
             </div>
+            {/* Testimonials */}
+            <TestimonialSection />
         </div>
     );
 }

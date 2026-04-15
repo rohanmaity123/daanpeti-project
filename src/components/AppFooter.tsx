@@ -18,7 +18,8 @@ export function AppFooter() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center">
-                <Heart className="h-4 w-4 text-primary-foreground fill-primary-foreground" />
+                {/* <Heart className="h-4 w-4 text-primary-foreground fill-primary-foreground" /> */}
+                <img src="/logo.svg" alt="DaanPeti" className="h-5 w-5" />
               </div>
               <span className="text-lg font-extrabold text-foreground">DaanPeti</span>
             </div>
