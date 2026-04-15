@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { sampleItems, categoryLabels, categoryColors } from '../../lib/sample-data';
+import { useState, useEffect } from 'react';
+import { categoryLabels, categoryColors } from '../../lib/sample-data';
 import { MapPin, Clock, ArrowLeft, MessageCircle, CheckCircle, Search, Phone, UserRound } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
@@ -8,19 +8,20 @@ import DialogTitle from '@mui/material/DialogTitle';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import { isItemClaimed, markAsClaimed, isMyItem } from '../../lib/items-store';
-
-
+import { supabase } from '../../utils/supabaseClient';
+import LoadingScreen from '../../components/LoadingScreen';
 
 
 export default function ItemDetailPage() {
     const { itemId } = useParams();
-    const item = sampleItems.find((i) => i.id === itemId);
+    const [item, setItem] = useState(null);
+    const [loading, setLoading] = useState(true);
     const isClaimed = item ? isItemClaimed(item.id) : false;
     const isDonor = item ? isMyItem(item.id) : false;
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [imageZoomOpen, setImageZoomOpen] = useState(false);
 
-    if (!item) {
+    if (!item && !loading) {
         return (
             <div className="gradient-page flex min-h-screen items-center justify-center p-4">
                 <div className="glass-card text-center p-8">
@@ -31,15 +32,38 @@ export default function ItemDetailPage() {
         );
     }
 
-    const whatsappUrl = `https://wa.me/${item.whatsappNumber}?text=${encodeURIComponent(
-        `Hi! Maine DaanPeti pe "${item.name}" dekha. Kya ye abhi available hai?`
+    const whatsappUrl = `https://wa.me/${item?.whatsapp_number}?text=${encodeURIComponent(
+        `Hi! Maine DaanPeti pe "${item?.name}" dekha. Kya ye abhi available hai?`
     )}`;
 
     const handleConfirmClaim = () => {
-        markAsClaimed(item.id);
+        markAsClaimed(item?.id);
         setConfirmOpen(false);
     };
 
+
+
+
+    useEffect(() => {
+        const fetchItem = async () => {
+            const { data, error } = await supabase
+                .from("donation_items")
+                .select("*")
+                .eq("id", itemId)
+                .single();
+
+            if (error) {
+                console.error(error.message);
+            } else {
+                setItem(data);
+            }
+            setLoading(false);
+        };
+
+        fetchItem();
+    }, [itemId]);
+
+    if (loading) return <LoadingScreen />;
     const renderCTA = () => {
         if (isClaimed) {
             return (
@@ -73,7 +97,6 @@ export default function ItemDetailPage() {
             </div>
         );
     };
-
     return (
         <div className="gradient-page pb-28 lg:pb-10">
             <div className="sticky top-0 z-40 border-b border-white/10 bg-black/20 backdrop-blur-xl lg:static lg:border-0 lg:bg-transparent">
@@ -94,7 +117,7 @@ export default function ItemDetailPage() {
                             className="glass-card item-detail-image-card group relative block w-full overflow-hidden rounded-[28px] p-2 text-left"
                         >
                             <div className="relative overflow-hidden rounded-[22px]">
-                                <img src={item.image} alt={item.name} className="h-[320px] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] sm:h-[420px] lg:h-[560px]" />
+                                <img src={item?.image_url} alt={item?.name} className="h-[320px] w-full object-cover transition-transform duration-500 group-hover:scale-[1.04] sm:h-[420px] lg:h-[560px]" />
                                 <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/55 to-transparent p-4">
                                     <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/28 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md">
                                         <Search className="h-3.5 w-3.5" />
@@ -121,22 +144,22 @@ export default function ItemDetailPage() {
                                 )}
                             </div>
 
-                            <h1 className="mt-3 text-2xl font-extrabold text-white lg:text-3xl">{item.name}</h1>
+                            <h1 className="mt-3 text-2xl font-extrabold text-white lg:text-3xl">{item?.name}</h1>
 
                             <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-white/60">
                                 <span className="flex items-center gap-1.5">
                                     <MapPin className="h-4 w-4" />
-                                    {item.location}
+                                    {item?.location}
                                 </span>
                                 <span className="flex items-center gap-1.5">
                                     <Clock className="h-4 w-4" />
-                                    {item.timePosted}
+                                    {item.created_at ? new Date(item.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Unknown'}
                                 </span>
                             </div>
 
                             <div className="mt-6 border-t border-white/10 pt-5">
                                 <h2 className="mb-2 text-sm font-bold text-white">Description</h2>
-                                <p className="text-sm leading-relaxed text-white/70">{item.description}</p>
+                                <p className="text-sm leading-relaxed text-white/70">{item?.description}</p>
                             </div>
                         </div>
                     </div>
@@ -151,7 +174,7 @@ export default function ItemDetailPage() {
                                     </span>
                                     <div className="min-w-0">
                                         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">Donated by</p>
-                                        <p className="mt-1 truncate text-sm font-bold text-white">{item.donorName}</p>
+                                        <p className="mt-1 truncate text-sm font-bold text-white">{item.donor_name}</p>
                                     </div>
                                 </div>
                                 <div className="item-detail-donor-row">
@@ -160,8 +183,8 @@ export default function ItemDetailPage() {
                                     </span>
                                     <div className="min-w-0">
                                         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">Location</p>
-                                        <p className="mt-1 text-sm font-semibold text-white/80">{item.location}</p>
-                                        <p className="text-xs text-white/55">Pincode: {item.pincode}</p>
+                                        <p className="mt-1 text-sm font-semibold text-white/80">{item?.location}</p>
+                                        <p className="text-xs text-white/55">Pincode: {item?.pincode}</p>
                                     </div>
                                 </div>
                                 <div className="item-detail-donor-row">
@@ -171,16 +194,10 @@ export default function ItemDetailPage() {
                                     <div className="min-w-0">
                                         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">Contact</p>
                                         <p className="mt-1 text-sm font-semibold text-white/80">
-                                            {isDonor ? item.whatsappNumber : 'WhatsApp se direct connect karein'}
+                                            {isDonor ? item.whatsapp_number : 'WhatsApp se direct connect karein'}
                                         </p>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div className="mt-5 border-t border-white/10 pt-5">
-                                <p className="text-sm text-white/65">
-                                    Description ke baad donor details ab glass panel me clearly visible hain, taaki dark background par sab readable rahe.
-                                </p>
                             </div>
                         </div>
 
@@ -280,8 +297,8 @@ export default function ItemDetailPage() {
             >
                 <DialogContent className="p-2 sm:p-3">
                     <img
-                        src={item.image}
-                        alt={item.name}
+                        src={item?.image_url}
+                        alt={item?.name}
                         className="max-h-[82vh] w-full rounded-[22px] object-contain"
                     />
                 </DialogContent>
