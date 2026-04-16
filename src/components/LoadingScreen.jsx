@@ -1,3 +1,4 @@
+import { Loader } from 'lucide-react';
 import React from 'react';
 
 const LoadingScreen = ({ customClass }) => {
@@ -11,12 +12,12 @@ const LoadingScreen = ({ customClass }) => {
           <div className="absolute h-40 w-40 rounded-full bg-primary/20 blur-3xl animate-pulse"></div>
 
           {/* Logo */}
-          <img
+          {/* <img
             src="/logo.svg"
             alt="DaanPeti"
             className="relative h-[110px] w-[110px] object-contain animate-float"
-          />
-
+          /> */}
+          <Loader className="relative h-12 w-12 text-primary animate-spin" />
           {/* Text */}
           <p className="mt-4 text-sm text-muted-foreground animate-fade">
             Loading your experience...

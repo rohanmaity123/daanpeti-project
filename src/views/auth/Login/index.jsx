@@ -7,7 +7,6 @@ import LoadingScreen from '../../../components/LoadingScreen';
 import TermConditionModal from '../../../components/Modals/TermConditionModal'
 import useGlobalStore from "../../../hooks/useGlobalStore";
 import { Helmet } from 'react-helmet';
-import useAuth from '../../../hooks/useAuth';
 import Loader from '../../../utils/Loader';
 import Reducer from '../../../services/Reducer';
 
@@ -41,7 +40,6 @@ const loginErrState = {
 
 
 const Login = () => {
-  const { Login } = useAuth();
   const { TOGGLE_TERM_CONDITION_MODAL, } = useGlobalStore();
   const navigator = useNavigate();
   const [state, dispatch] = useReducer(Reducer, initState);

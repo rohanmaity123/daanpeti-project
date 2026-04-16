@@ -267,11 +267,20 @@ export default function ProfilePage() {
                             ))}
                         </div>
                     </div>
-                    <div className="text-xs text-center mt-10 opacity-70">
-                        <Link to="/about">About</Link> ·
-                        <Link to="/privacy"> Privacy</Link> ·
-                        <Link to="/terms"> Terms</Link> ·
-                        <Link to="/contact"> Contact</Link>
+                    {/* Legal links */}
+                    <div className="mt-16 pt-6 border-t border-border text-center">
+                        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
+                            {[
+                                ['/about', 'About Us'],
+                                ['/privacy', 'Privacy Policy'],
+                                ['/terms', 'Terms'],
+                                ['/contact', 'Contact Us'],
+                                ['/fund-usage', 'Transparency']
+                            ].map(([to, label]) => (
+                                <Link key={to} to={to} className="text-xs text-muted-foreground hover:text-primary transition-colors">{label}</Link>
+                            ))}
+                        </div>
+                        <p className="mt-3 text-xs text-muted-foreground">Non-profit · Made with 💚 in India</p>
                     </div>
                 </div>
             </div>

@@ -13,7 +13,7 @@ export function BottomNav() {
   const location = useLocation();
 
   return (
-    <nav className="bottom-nav-glass fixed bottom-0 left-0 right-0 z-50 lg:hidden">
+    <nav className="backdrop-blur-md supports-[backdrop-filter]:bg-black/30 fixed bottom-0 left-0 right-0 z-50 lg:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-around py-2">
         {navItems.map((item) => {
           const isActive = item.to === '/'

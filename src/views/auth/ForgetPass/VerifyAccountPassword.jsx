@@ -7,7 +7,6 @@ import LoadingScreen from '../../../components/LoadingScreen';
 import TermConditionModal from '../../../components/Modals/TermConditionModal'
 import useGlobalStore from "../../../hooks/useGlobalStore";
 import { Helmet } from 'react-helmet';
-import useAuth from '../../../hooks/useAuth';
 import Loader from '../../../utils/Loader';
 import Reducer from '../../../services/Reducer';
 
@@ -22,7 +21,7 @@ import { useDispatch } from 'react-redux';
 
 const initState = {
   password: '',
-  confirmPassword:'',
+  confirmPassword: '',
   agree: '',
   loading: false,
   validate: false
@@ -36,15 +35,14 @@ const loginErrState = {
   IsBlockedEmail: false,
   IsYourLoginCredentials: false,
   passErrBlank: false,
-  confirmpassErrBlank:false,
-  passNotMatchErr:false,
+  confirmpassErrBlank: false,
+  passNotMatchErr: false,
   IsValidPass: false,
   agreeErrBlank: false
 };
 
 
 const ResetPassword = () => {
-  const { Login } = useAuth();
   const navigator = useNavigate();
   const reduxdispatch = useDispatch()
   const location = useLocation()
@@ -54,14 +52,14 @@ const ResetPassword = () => {
   const { TOGGLE_TERM_CONDITION_MODAL, toggleForModal } = useGlobalStore();
 
   const [state, dispatch] = useReducer(Reducer, initState);
-  const [stateForErr, dispatchForErr] = useReducer( Reducer , loginErrState);
-  
-  console.log('email',email,token)
+  const [stateForErr, dispatchForErr] = useReducer(Reducer, loginErrState);
+
+  console.log('email', email, token)
   useEffect(() => {
     //Page Up
     // tt.success('Here is your toast.')
     // tt.error('Here is your toast.')
-  
+
     window.scrollTo({
       top: 0,
       behavior: "smooth"
@@ -85,7 +83,7 @@ const ResetPassword = () => {
         Validation.text(state.password)
         && Validation.text(state.confirmPassword)
         &&
-        Validation.passwordConfirmCheck(state.password,state.confirmPassword) 
+        Validation.passwordConfirmCheck(state.password, state.confirmPassword)
 
       ) {
         resolve(true)
@@ -98,7 +96,7 @@ const ResetPassword = () => {
           dispatchForErr({ type: 'VALIDATECHECK', payload: { name: 'confirmpassErrBlank', value: true } });
           console.log('password')
         }
-        else if (!Validation.passwordConfirmCheck(state.password,state.confirmPassword) ) {
+        else if (!Validation.passwordConfirmCheck(state.password, state.confirmPassword)) {
           dispatchForErr({ type: 'VALIDATECHECK', payload: { name: 'passNotMatchErr', value: true } });
         }
         resolve(false)
@@ -123,9 +121,9 @@ const ResetPassword = () => {
       } else {
         dispatchForErr({ type: 'VALIDATECHECK', payload: { name: 'confirmpassErrBlank', value: false } });
       }
-      if (Validation.passwordConfirmCheck(state.password,state.confirmPassword)) {
+      if (Validation.passwordConfirmCheck(state.password, state.confirmPassword)) {
         dispatchForErr({ type: 'VALIDATECHECK', payload: { name: 'passNotMatchErr', value: true } });
-      }else{
+      } else {
         dispatchForErr({ type: 'VALIDATECHECK', payload: { name: 'passNotMatchErr', value: false } });
 
       }
@@ -152,16 +150,16 @@ const ResetPassword = () => {
       dispatch({ type: 'LOAD', payload: true });
 
       try {
-        let responce = await ResetPassWord( {confirm_password: state.confirmPassword,password: state.password,email:email,token:token} ); 
-        console.log('responce',responce)
+        let responce = await ResetPassWord({ confirm_password: state.confirmPassword, password: state.password, email: email, token: token });
+        console.log('responce', responce)
         dispatch({ type: 'LOAD', payload: false });
-        if (responce?.data?.status === 200 ) {
+        if (responce?.data?.status === 200) {
           toast.success('Password reset successfully');
           navigator('/login')
         }
         if (responce && responce?.status === 401) {
-            toast.error(responce?.data?.message);
-        }else if(responce && responce?.status === 422){
+          toast.error(responce?.data?.message);
+        } else if (responce && responce?.status === 422) {
           responce?.data?.errors?.password?.forEach(error => {
             toast.error(error);
           });
@@ -171,11 +169,11 @@ const ResetPassword = () => {
         // navigator(`/dashboard`)
         dispatch({ type: 'LOAD', payload: false });
         console.log("Inside catch block login: ---", err);
-        
+
       }
     }
   };
-  
+
   // console.log(state)
   return (
     <>
@@ -184,11 +182,11 @@ const ResetPassword = () => {
       </Helmet>
       <>
         {TOGGLE_TERM_CONDITION_MODAL && state.termConditionAcceptModalType && <TermConditionModal type={state.termConditionAcceptModalType} />}
-        
+
 
         <section className="beforeLoginSection">
           <div className="beforeLoginRow">
-            
+
             <div className="beforeLoginInner">
               <img src="https://euphoriagenx.com/wp-content/uploads/2022/03/Footer-Logo.png" />
               <h3>Reset Password</h3>
@@ -227,14 +225,14 @@ const ResetPassword = () => {
                                             </div>
                                         ) : null
                                     } */}
-                    <span className="leftSide"><HttpsIcon/></span>
+                    <span className="leftSide"><HttpsIcon /></span>
 
                     <span onClick={() => setTogglePassword(!togglePassword)} style={{ cursor: "pointer" }}
                       className="rightSide">
-                        {togglePassword ?
-                      <VisibilityOutlinedIcon/>
-                      :
-                      <VisibilityOffOutlinedIcon/>}
+                      {togglePassword ?
+                        <VisibilityOutlinedIcon />
+                        :
+                        <VisibilityOffOutlinedIcon />}
                     </span>
 
                   </div>
@@ -246,7 +244,7 @@ const ResetPassword = () => {
                       id="confirmPassword"
                       // value={state.password}
                       onChange={getData}
-                      style={(stateForErr.confirmpassErrBlank || stateForErr.passNotMatchErr )
+                      style={(stateForErr.confirmpassErrBlank || stateForErr.passNotMatchErr)
                         ? { border: "3px solid red" } : { border: "3px solid #eaeeff" }}
                       type={"text"}
                       placeholder="confirm your password" name="confirmPassword"
@@ -267,14 +265,14 @@ const ResetPassword = () => {
                                             </div>
                                         ) : null
                                     } */}
-                    <span className="leftSide"><HttpsIcon/></span>
+                    <span className="leftSide"><HttpsIcon /></span>
                   </div>
                 </div>
                 <button onClick={onLogin} className="themeBtn fullBtn">
                   {
-                    state.loading ? <Loader loaderWidth={"30px"} 
-                    loaderHeight={"30px"} 
-                    position={"relative"} /> : "Submit"
+                    state.loading ? <Loader loaderWidth={"30px"}
+                      loaderHeight={"30px"}
+                      position={"relative"} /> : "Submit"
                   }
 
                 </button>

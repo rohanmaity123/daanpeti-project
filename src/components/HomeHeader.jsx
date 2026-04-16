@@ -34,7 +34,7 @@ export function AppHeader() {
     };
   }, []);
   return (
-    <header className={`glass-nav sticky top-0 z-40 ${scrolled ? 'scrolled' : ''}`}>
+    <header className={` backdrop-blur-md supports-[backdrop-filter]:bg-black/30 sticky top-0 z-40 ${scrolled ? 'scrolled' : ''}`}>
       <div className="mx-auto max-w-[1200px] flex items-center justify-between px-4 py-3">
 
         {/* LOGO */}
@@ -60,6 +60,7 @@ export function AppHeader() {
             { to: '/', label: 'Home' },
             { to: '/post-item', label: 'Donate Item' },
             { to: '/support', label: 'Support Us' },
+            { to: '/fund-usage', label: 'Transparency' },
           ].map((item) => {
             const isActive = item.to === '/'
               ? location.pathname === '/'

@@ -47,7 +47,7 @@ const UserGuard = ({ children }) => {
         navigate('/login')
       }
     }
-    getmyData()
+    // getmyData()
   }, [])
 
   return (

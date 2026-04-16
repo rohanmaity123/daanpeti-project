@@ -7,6 +7,7 @@ import { useItemsClaimed, isItemClaimed } from '../../lib/items-store';
 import { TestimonialSection } from '../../components/Testimonial';
 import { supabase } from '../../utils/supabaseClient';
 import { Loader2 } from 'lucide-react';
+import { PartnersSection } from '../../components/PartnerSection';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -260,6 +261,9 @@ export default function HomePage() {
             </div>
             {/* Testimonials */}
             <TestimonialSection />
+
+            {/* Our Partners */}
+            <PartnersSection />
         </div>
     );
 }

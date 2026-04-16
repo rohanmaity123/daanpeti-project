@@ -4,7 +4,6 @@ import OtpInput from "react-otp-input";
 import Cookie from '../../../utils/Cookie';
 import ToastHot from 'react-hot-toast';
 import { Helmet } from 'react-helmet';
-import useAuth from '../../../hooks/useAuth';
 import Loader from '../../../utils/Loader';
 import Reducer from '../../../services/Reducer';
 
@@ -21,9 +20,6 @@ const loginErrState = {
 };
 
 export default function LoginWithOtp() {
-  const { Logout, LoginWithOTP } = useAuth();
-
-  const { user, updateUser } = useAuth();
   const navigator = useNavigate();
   const location = useLocation();
 
@@ -59,9 +55,8 @@ export default function LoginWithOtp() {
         email: Cookie.getCookie('_email'),
         otp: (OTP)
       };
-      response = await LoginWithOTP(payload);
+      response = false;
 
-      console.log("user before--", user)
       dispatch({ type: 'LOAD', payload: true });
       if (response) {
         if (response && response.data?.status === 200) {
@@ -209,7 +204,7 @@ export default function LoginWithOtp() {
   return (
     <>
       <Helmet>
-        <title>ZLS || Two factor authentication</title>
+        <title>Daanpeti || Two factor authentication</title>
       </Helmet>
       <>
         {/* <SiteHeader /> */}
@@ -219,7 +214,7 @@ export default function LoginWithOtp() {
             <div className="beforeLoginInner with-top-action-btns">
               {/* <img src="./images/otp-password.png" /> */}
               <h3 className='text-center'>SMS Authentication</h3>
-              
+
               <p className='text-center'>Please enter the 5-digit authentication code <button onClick={ReSendOtp} disabled={count !== 0}>Resend</button> ({formatTime(count)})s</p>
               {/* onSubmit={submitOtp} */}
               <form action="" >
@@ -276,7 +271,7 @@ export default function LoginWithOtp() {
                   }
                 </button>
 
-                <button onClick={() => { Logout(); navigator("/") }} className='logout-btn'>Go to Login</button>
+                <button onClick={() => { navigator("/") }} className='logout-btn'>Go to Login</button>
               </form>
               {/* <p className="infoText">Have Not Received Any Code?  |  <a className="resendBtn">{otpTimer.minutes === 0 && otpTimer.seconds === 0
                 ? <a href="javascript:;" onClick={(e) => ReSendOtp(e)}> Resend {state.resend && 'Again'}</a>
