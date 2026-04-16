@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Mail, MessageCircle, MapPin, HelpCircle, ChevronDown, ChevronUp, Send, CheckCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { supabase } from '../../utils/supabaseClient';
+import toast from 'react-hot-toast';
+import { useForm } from 'react-hook-form';
 
 const contactCards = [
     {
@@ -78,11 +81,29 @@ function FAQItem({ faq }) {
 export default function Contact() {
     const [mounted, setMounted] = useState(false);
     const [submitted, setSubmitted] = useState(false);
-    useEffect(() => { setMounted(true); }, []);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setSubmitted(true);
+    useEffect(() => { setMounted(true); }, []);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset
+    } = useForm();
+
+    const onSubmit = async (data) => {
+        const { error } = await supabase.from('contact_messages').insert({
+            name: data.name.trim(),
+            email: data.email.trim().toLowerCase(),
+            subject: data.subject,
+            message: data.message.trim(),
+        });
+
+        if (error) {
+            toast.error(error.message || 'Kuch toh gadbad hai. Please try again later.');
+        } else {
+            reset()
+            setSubmitted(true);
+        }
     };
 
     return (
@@ -138,28 +159,54 @@ export default function Contact() {
                             </button>
                         </div>
                     ) : (
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                             {[
-                                { label: 'Your Name', type: 'text', placeholder: 'e.g. Priya Sharma', required: true },
-                                { label: 'Email Address', type: 'email', placeholder: 'you@example.com', required: true },
+                                { label: 'Your Name', name: 'name', type: 'text', placeholder: 'e.g. Priya Sharma', required: true },
+                                { label: 'Email Address', name: 'email', type: 'email', placeholder: 'you@example.com', required: true },
                             ].map((f) => (
                                 <div key={f.label}>
                                     <label className="text-xs font-bold text-foreground block mb-1.5">{f.label}</label>
-                                    <input type={f.type} placeholder={f.placeholder} required={f.required}
-                                        className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow" />
+
+                                    <input
+                                        type={f.type}
+                                        placeholder={f.placeholder}
+                                        {...register(f.name, { required: f.required })}
+                                        className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring"
+                                    />
+
+                                    {errors[f.name] && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {f.label} is required
+                                        </p>
+                                    )}
                                 </div>
                             ))}
                             <div>
                                 <label className="text-xs font-bold text-foreground block mb-1.5">Subject</label>
-                                <select required className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow">
+                                <select
+                                    {...register("subject", { required: true })}
+                                    className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm"
+                                >
                                     <option value="">Select a subject...</option>
                                     {subjects.map(s => <option key={s} value={s}>{s}</option>)}
                                 </select>
+
+                                {errors.subject && (
+                                    <p className="text-red-500 text-xs mt-1">Subject is required</p>
+                                )}
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-foreground block mb-1.5">Message</label>
-                                <textarea rows={5} required placeholder="Apna sawaal ya sujhaav likhein..."
-                                    className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring resize-none transition-shadow" />
+                                <textarea
+                                    rows={5}
+                                    placeholder="Apna sawaal ya sujhaav likhein..."
+                                    {...register("message", { required: true })}
+                                    className="w-full rounded-xl border border-input px-3.5 py-2.5 text-sm"
+                                ></textarea>
+
+                                {errors.message && (
+                                    <p className="text-red-500 text-xs mt-1">Message is required</p>
+                                )}
                             </div>
                             <button type="submit"
                                 className="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white hover:opacity-90 active:scale-95 transition-all"
