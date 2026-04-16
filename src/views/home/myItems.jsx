@@ -33,12 +33,12 @@ function AnimatedCounter({ target }) {
 function SupabaseItemCard({ item, index, onMarkClaimed }) {
     const [confirming, setConfirming] = useState(false);
     const [marking, setMarking] = useState(false);
-    const isClaimed = item.status === 'claimed';
+    const isClaimed = item?.status === 'claimed';
     const { user } = useAuth();
-    const isOwner = user?.id === item.user_id;
+    const isOwner = user?.id === item?.user_id;
 
-    const whatsappUrl = `https://wa.me/91${item.whatsapp_number}?text=${encodeURIComponent(
-        `Hi! Maine DaanPeti pe "${item.name}" dekha. Kya ye abhi available hai?`
+    const whatsappUrl = `https://wa.me/91${item?.whatsapp_number}?text=${encodeURIComponent(
+        `Hi! Maine DaanPeti pe "${item?.name}" dekha. Kya ye abhi available hai?`
     )}`;
 
     const handleClaim = async () => {
@@ -46,10 +46,11 @@ function SupabaseItemCard({ item, index, onMarkClaimed }) {
         const { error } = await supabase
             .from('donation_items')
             .update({ status: 'claimed' })
-            .eq('id', item.id);
+            .eq('id', item?.id)
+            .select(); // 👈 important for debugging
         setMarking(false);
         setConfirming(false);
-        if (!error && onMarkClaimed) onMarkClaimed(item.id);
+        if (!error && onMarkClaimed) onMarkClaimed(item?.id);
     };
 
     return (
