@@ -8,6 +8,7 @@ import { TestimonialSection } from '../../components/Testimonial';
 import { supabase } from '../../utils/supabaseClient';
 import { Loader2 } from 'lucide-react';
 import { PartnersSection } from '../../components/PartnerSection';
+import { useAuth } from '../../hooks/useAuth';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -18,6 +19,7 @@ const heroEmojis = [
 ];
 
 export default function HomePage() {
+    const { user } = useAuth();
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [items, setItems] = useState([]);
@@ -216,7 +218,7 @@ export default function HomePage() {
                             <>
                                 <div className="mx-4 lg:mx-0 grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-4 xl:grid-cols-3">
                                     {paginatedItems.map((item, index) => (
-                                        <ItemCard key={item.id} item={item} animationIndex={index} />
+                                        <ItemCard key={item.id} item={item} animationIndex={index} user={user} />
                                     ))}
                                 </div>
                                 {pageCount > 1 && (

@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { categoryLabels, categoryColors } from '../lib/sample-data';
 import { MapPin, Clock, CheckCircle, MessageCircle } from 'lucide-react';
-import { isItemClaimed, markAsClaimed, isMyItem } from '../lib/items-store';
 import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material';
+import { supabase } from '../utils/supabaseClient';
 
-export function ItemCard({ item, showStatus = false, animationIndex = 0, className = '' }) {
-  const isClaimed = item?.status === 'available' ? false : isItemClaimed(item.id);
-  const isDonor = isMyItem(item.id);
+export function ItemCard({ item, showStatus = false, animationIndex = 0, className = '', user }) {
+  const isClaimed = item?.status === 'claimed' ? true : false;
+  const isDonor = item?.user_id === user?.id;
   const [confirmOpen, setConfirmOpen] = useState(false);
   const isFeedCard = !showStatus;
 
@@ -21,9 +21,15 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
     setConfirmOpen(true);
   };
 
-  const handleConfirmClaim = () => {
-    markAsClaimed(item.id);
-    setConfirmOpen(false);
+  const handleConfirmClaim = async () => {
+    const { error } = await supabase
+      .from('donation_items')
+      .update({ status: 'claimed' })
+      .eq('id', item?.id)
+      .select(); // 👈 important for debugging
+
+    if (!error) setConfirmOpen(false);;
+
   };
 
   return (

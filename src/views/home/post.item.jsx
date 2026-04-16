@@ -7,6 +7,7 @@ import { useState, useRef } from 'react';
 import { supabase } from '../../utils/supabaseClient';
 import { useAuth, signInWithGoogle } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import ShareDonationModal from '../../components/ShareDonationModal';
 
 
 const schema = z.object({
@@ -81,9 +82,11 @@ export default function PostItemPage() {
     const [imagePreview, setImagePreview] = useState(null);
     const [submitState, setSubmitState] = useState('idle');
     const [errorMsg, setErrorMsg] = useState('');
+    const [confirmOpen, setConfirmOpen] = useState(false);
     const fileInputRef = useRef(null);
+    const [afterpostdata, setAfterPostData] = useState(null)
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
         resolver: zodResolver(schema),
     });
 
@@ -131,9 +134,19 @@ export default function PostItemPage() {
                 image_url, status: 'available',
                 user_id: user.id,
             });
+            setAfterPostData({
+                name: values.name, category: values.category,
+                description: values.description ?? '', pincode: values.pincode,
+                location: values.location, donor_name: values.donor_name,
+                whatsapp_number: values.whatsapp_number,
+                image_url, status: 'available',
+                user_id: user.id,
+            });
             if (error) throw new Error(error.message);
             setSubmitState('success'); reset(); removeImage();
-            setTimeout(() => navigate('/'), 1500);
+            setConfirmOpen(true);
+
+            // setTimeout(() => navigate('/'), 1500);
         } catch (err) {
             setSubmitState('error');
             setErrorMsg(err.message ?? 'Something went wrong. Please try again.');
@@ -142,6 +155,14 @@ export default function PostItemPage() {
 
     return (
         <div className="mx-auto max-w-3xl px-4 pt-5 pb-28 lg:pb-10">
+            <ShareDonationModal
+                open={confirmOpen}
+                onClose={() => { setConfirmOpen(false); navigate('/'); setAfterPostData(null); }}
+                itemName={afterpostdata?.name}
+                category={afterpostdata?.category}
+                pincode={afterpostdata?.pincode}
+                whatsapp={afterpostdata?.whatsapp_number}
+            />
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                 <h1 className="text-2xl lg:text-3xl font-extrabold text-foreground">Daan Karo 🎁</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">Give something you no longer need — make someone's day!</p>
