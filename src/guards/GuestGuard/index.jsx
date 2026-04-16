@@ -1,13 +1,11 @@
 /* eslint-disable radix */
 import React, { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import useAuth from '../../hooks/useAuth';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { ME } from '../../actions/authAction';
 import { setAuthUserState } from '../../redux/slice/user';
 
 const GuestGuard = ({ children }) => {
-  const { isAuthenticated, user } = useAuth();
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(false)
   // const { isAuthenticated,user } = useSelector((state) => state.user);

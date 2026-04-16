@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }) => {
         if (accessToken) {
           Cookie.setCookie('_tokenAuth', accessToken, 1);
           // call user details api
-          const response = await ME();
+          const response = true //await ME();
 
           if (response?.data?.status) {
             dispatch({
