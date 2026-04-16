@@ -183,14 +183,21 @@ export default function ProfilePage() {
         await supabase.auth.signOut();
     };
     useEffect(() => {
-        const allReview = async () => {
-            const { data } = await supabase
+        const fetch = async () => {
+            const { data, error } = await supabase
                 .from('reviews')
-                .select('id')
+                .select('id, user_name, user_avatar, rating, text, created_at')
                 .eq('user_id', user?.id)
-            setReviews(data);
+                .order('created_at', { ascending: false })
+                .limit(20);
+
+            if (!error && data && data.length > 0) {
+                setReviews(data);
+            } else {
+                setReviews([]);
+            }
         };
-        allReview();
+        fetch();
     }, [user]);
     if (authLoading) return (
         <div className="flex min-h-[50vh] items-center justify-center">
@@ -317,21 +324,21 @@ export default function ProfilePage() {
                                     :
                                     reviews?.map((review) => (
                                         <div
-                                            key={review.id}
+                                            key={review?.id}
                                             className="group rounded-2xl border p-4 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl"
                                         >
                                             <div className="flex items-center justify-between">
-                                                <p className="text-sm font-bold text-foreground">{review.name}</p>
+                                                <p className="text-sm font-bold text-foreground">{review?.user_name}</p>
                                                 <div className="flex gap-0.5">
                                                     {Array.from({ length: 5 }).map((_, i) => (
                                                         <Star
                                                             key={i}
-                                                            className={`h-3.5 w-3.5 ${i < review.rating ? 'fill-[#f59e0b] text-[#f59e0b]' : 'text-muted-foreground/30'}`}
+                                                            className={`h-3.5 w-3.5 ${i < review?.rating ? 'fill-[#f59e0b] text-[#f59e0b]' : 'text-muted-foreground/30'}`}
                                                         />
                                                     ))}
                                                 </div>
                                             </div>
-                                            <p className="mt-1.5 text-sm text-muted-foreground">{review.text}</p>
+                                            <p className="mt-1.5 text-sm text-muted-foreground">{review?.text}</p>
                                         </div>
                                     ))}
                         </div>
