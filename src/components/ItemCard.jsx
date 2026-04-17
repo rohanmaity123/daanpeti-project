@@ -4,12 +4,14 @@ import { MapPin, Clock, CheckCircle, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material';
 import { supabase } from '../utils/supabaseClient';
+import useGlobalStore from '../hooks/useGlobalStore';
 
 export function ItemCard({ item, showStatus = false, animationIndex = 0, className = '', user }) {
   const isClaimed = item?.status === 'claimed' ? true : false;
   const isDonor = item?.user_id === user?.id;
   const [confirmOpen, setConfirmOpen] = useState(false);
   const isFeedCard = !showStatus;
+  const { toggleForModal } = useGlobalStore();
 
   const whatsappUrl = `https://wa.me/${item.whatsapp_number}?text=${encodeURIComponent(
     `Hi! Maine DaanGuru pe "${item.name}" dekha. Kya ye abhi available hai?`
@@ -19,6 +21,18 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
     e.preventDefault();
     e.stopPropagation();
     setConfirmOpen(true);
+  };
+
+  const handleContactDonor = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user?.id) {
+      toggleForModal('TOGGLE_LOGIN_ALERT_MODAL');
+      return;
+    }
+
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleConfirmClaim = async () => {
@@ -62,12 +76,9 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
         </div>
         <div className="p-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-bold text-sm text-white leading-tight line-clamp-2 sm:text-base">
+            <h3 title={item.name} className="font-bold text-sm text-white leading-tight sm:text-base">
               {item.name}
             </h3>
-            <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${isFeedCard ? 'border border-white/14 bg-white/10 text-white/88' : categoryColors[item.category]}`}>
-              {categoryLabels[item.category]}
-            </span>
           </div>
           <p className="text-xs text-white/70 line-clamp-2 leading-relaxed sm:text-sm">
             {item.description}
@@ -84,13 +95,21 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
           </div>
           <div className="pt-1 flex flex-wrap items-center gap-1.5">
             {isClaimed ? (
-              <span className="glass-surface inline-block rounded-full px-2.5 py-1 text-xs font-bold text-white/75">
+              <span className="glass-surface inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-bold text-white/75">
                 ✅ Kisi ko mil gaya
+                <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${categoryColors[item.category]}`}>
+                  {categoryLabels[item.category]}
+                </span>
               </span>
             ) : (
-              <span className="feed-free-badge inline-block rounded-full px-2.5 py-1 text-xs font-bold text-white">
-                🆓 Muft / FREE
-              </span>
+              <>
+                <span className="feed-free-badge inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-bold text-white">
+                  🆓 Muft / FREE
+                </span>
+                <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${categoryColors[item.category]}`}>
+                  {categoryLabels[item.category]}
+                </span>
+              </>
             )}
             {showStatus && (
               <span className={`status-badge text-[11px] font-semibold px-3 py-1 rounded-full text-white ${isClaimed ? 'status-badge-claimed' : 'status-badge-available-glow'
@@ -103,16 +122,14 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
           {/* Action buttons */}
           <div className="pt-1 flex gap-2">
             {!isClaimed && !isDonor && (
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
+              <button
+                type="button"
+                onClick={handleContactDonor}
                 className="feed-whatsapp-button flex-1 flex items-center justify-center gap-1 rounded-xl py-2.5 text-[11px] font-bold text-white transition-all duration-300 hover:opacity-95"
               >
                 <MessageCircle className="h-3 w-3" />
                 Contact Donor
-              </a>
+              </button>
             )}
             {!isClaimed && isDonor && (
               <button

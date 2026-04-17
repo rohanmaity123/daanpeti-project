@@ -145,6 +145,9 @@ export default function HomePage() {
                             <span className="home-hero-title">Apna Samaan</span>{' '}
                             <span className="text-[#1D9E75]">Baato!</span>
                         </h2>
+                        <p className="mt-2 text-sm font-medium text-[#8EF0CC] italic">
+                            “दातव्यमिति यद्दानं दीयतेऽनुपकारिणे।” ~ Bhagavad Gita
+                        </p>
                         <p className="mt-3 max-w-xl text-sm text-white/70 sm:text-base">
                             Ghar ka extra samaan kisi aur ke kaam laao. Nearby logon se connect karo, bina kisi fee ke.
                         </p>

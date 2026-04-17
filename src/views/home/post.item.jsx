@@ -86,7 +86,7 @@ export default function PostItemPage() {
     const fileInputRef = useRef(null);
     const [afterpostdata, setAfterPostData] = useState(null)
 
-    const { register, handleSubmit, formState: { errors }, reset, watch } = useForm({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: zodResolver(schema),
     });
 

@@ -118,7 +118,7 @@ export default function SupportPage() {
     <div className="px-4 pb-8 pt-2">
       {/* Header */}
       <div className="text-center mb-6">
-        <img src="/logo.svg" alt="DaanGuru" className="mx-auto mb-4 h-20 w-20 object-contain" />
+        <img src="/logo.png" alt="DaanGuru" className="mx-auto mb-4 h-20 w-20 object-contain" />
         <h1 className="text-2xl font-extrabold text-foreground">
           Keep DaanGuru Free 💛
         </h1>

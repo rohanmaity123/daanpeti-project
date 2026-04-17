@@ -7,6 +7,7 @@ import RenderRoutes from './routes';
 import { Toaster } from 'react-hot-toast';
 import { Provider } from 'react-redux';
 import { store } from './redux/store';
+import LoginAleartModal from './components/Modals/LoginAleartModal';
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
         <GlobalStoreProvider>
           <Toaster position="bottom-center" reverseOrder={false} toastOptions={{ className: 'hot-toast-opening-class', duration: 3000, success: { duration: 3000, }, }} />
           <RenderRoutes />
+          <LoginAleartModal />
         </GlobalStoreProvider>
       </AuthProvider>
     </Provider>

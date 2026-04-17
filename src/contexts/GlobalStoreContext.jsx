@@ -11,7 +11,7 @@ const initialGlobalState = {
   TOGGLE_ADD_UPDATE_CERTIFICATE_MODAL: false,
   TOGGLE_ADD_MILESTONE_MODAL: false,
   TOGGLE_CHANGE_STATUS_MODAL: false,
-
+  TOGGLE_LOGIN_ALERT_MODAL: false,
 
 };
 
@@ -67,7 +67,14 @@ const reducer = (state, action) => {
           ...state,
           [action.payload]: !state.TOGGLE_ADD_UPDATE_CERTIFICATE_MODAL,
         }
-      } else if (action.payload === 'TOGGLE_CHANGE_STATUS_MODAL') {
+      }
+      else if (action.payload === 'TOGGLE_LOGIN_ALERT_MODAL') {
+        return {
+          ...state,
+          [action.payload]: !state.TOGGLE_LOGIN_ALERT_MODAL,
+        }
+      }
+      else if (action.payload === 'TOGGLE_CHANGE_STATUS_MODAL') {
         return {
           ...state,
           [action.payload]: !state.TOGGLE_CHANGE_STATUS_MODAL,
