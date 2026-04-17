@@ -13,6 +13,7 @@ import { X } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import ShareSheet from '../../components/ShareSheet';
 import useGlobalStore from '../../hooks/useGlobalStore';
+import { LocationCard } from '../../components/MapPreviewCard';
 
 export default function ItemDetailPage() {
     const { itemId } = useParams();
@@ -218,10 +219,11 @@ export default function ItemDetailPage() {
                             </p>
                             <div className="mt-5">{renderCTA()}</div>
                         </div>
+                        <LocationCard location={item.location} pincode={item.pincode} />
+
                     </div>
                 </div>
             </div>
-
             {/* Mobile sticky CTA */}
             <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/30 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] backdrop-blur-xl lg:hidden">
                 <div className="mx-auto max-w-lg">{renderCTA()}</div>
