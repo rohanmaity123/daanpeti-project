@@ -1,8 +1,0 @@
-<svg width="160" height="160" viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-  <rect width="160" height="160" rx="32" fill="#ffffff" stroke="#1D9E75" stroke-width="3"/>
-  <text x="80" y="68" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="700" fill="#085041">Daan</text>
-  <text x="80" y="100" text-anchor="middle" font-family="Georgia, serif" font-size="26" font-weight="700" fill="#1D9E75">Peti</text>
-  <rect x="30" y="108" width="100" height="2.5" rx="1.5" fill="#1D9E75" opacity="0.3"/>
-  <path d="M70 115 Q80 110 90 115 Q95 120 80 128 Q65 120 70 115Z" fill="#EF9F27"/>
-  <circle cx="118" cy="52" r="5" fill="#EF9F27"/>
-</svg>

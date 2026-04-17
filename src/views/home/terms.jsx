@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom';
 
 const sections = [
     {
-        icon: FileText, num: '01', title: 'About DaanPeti',
-        body: 'DaanPeti is a free, non-profit community platform that connects people who want to donate unused items with people who need them. We do not buy, sell, ship, or physically handle any items. We are only a platform — all exchanges happen directly between donors and recipients.',
+        icon: FileText, num: '01', title: 'About DaanGuru',
+        body: 'DaanGuru is a free, non-profit community platform that connects people who want to donate unused items with people who need them. We do not buy, sell, ship, or physically handle any items. We are only a platform — all exchanges happen directly between donors and recipients.',
     },
     {
         icon: UserCheck, num: '02', title: 'Eligibility',
         content: [
-            'You must be 13 years of age or older to use DaanPeti',
+            'You must be 13 years of age or older to use DaanGuru',
             'You must provide accurate and truthful information',
             'Only one account per person is permitted',
             'Organisations and NGOs may register with a representative account',
@@ -35,13 +35,13 @@ const sections = [
             'Only request items you genuinely need and intend to collect',
             'Arrange pickup promptly once the donor confirms — within 48 hours',
             'Treat donors with courtesy and respect at all times',
-            'Do not resell items received from DaanPeti for commercial profit',
+            'Do not resell items received from DaanGuru for commercial profit',
             'Do not claim items on behalf of someone else without their knowledge',
         ],
     },
     {
         icon: AlertTriangle, num: '05', title: 'Prohibited Content',
-        intro: 'You must NOT post or share the following on DaanPeti:',
+        intro: 'You must NOT post or share the following on DaanGuru:',
         content: [
             'Illegal items, controlled substances, or restricted goods',
             'Weapons, ammunition, explosives, or dangerous materials',
@@ -54,12 +54,12 @@ const sections = [
         ],
     },
     {
-        icon: Scale, num: '06', title: "DaanPeti's Role & Limitations",
-        body: "DaanPeti is only a platform connecting donors and recipients. We do not inspect, verify, or guarantee the condition of any donated item. We are not responsible for: the condition or accuracy of donated item descriptions; any disputes, conflicts, or disagreements between donors and recipients; any loss, damage, injury, or harm during or after the exchange; items not being available after being listed; or any communication that takes place on WhatsApp or other external platforms.",
+        icon: Scale, num: '06', title: "DaanGuru's Role & Limitations",
+        body: "DaanGuru is only a platform connecting donors and recipients. We do not inspect, verify, or guarantee the condition of any donated item. We are not responsible for: the condition or accuracy of donated item descriptions; any disputes, conflicts, or disagreements between donors and recipients; any loss, damage, injury, or harm during or after the exchange; items not being available after being listed; or any communication that takes place on WhatsApp or other external platforms.",
     },
     {
         icon: Globe, num: '07', title: 'WhatsApp Communication',
-        body: "When you share your WhatsApp number on DaanPeti, you explicitly consent to being contacted by interested users about your listed items. DaanPeti is not a party to, and is not responsible for, any communication, agreement, or dispute that occurs on WhatsApp. Please exercise caution and follow standard safety practices when meeting strangers for item exchange.",
+        body: "When you share your WhatsApp number on DaanGuru, you explicitly consent to being contacted by interested users about your listed items. DaanGuru is not a party to, and is not responsible for, any communication, agreement, or dispute that occurs on WhatsApp. Please exercise caution and follow standard safety practices when meeting strangers for item exchange.",
     },
     {
         icon: Gavel, num: '08', title: 'Account Termination',
@@ -67,19 +67,19 @@ const sections = [
     },
     {
         icon: Copyright, num: '09', title: 'Intellectual Property',
-        body: "The DaanPeti name, logo, tagline (Muft Mein Do, Muft Mein Lo), and overall design are our property and may not be used without written permission. Content you post on DaanPeti (photos, item descriptions) remains your property. However, by posting, you grant DaanPeti a non-exclusive, royalty-free licence to display, distribute, and promote your content on the platform and in promotional materials.",
+        body: "The DaanGuru name, logo, tagline (Muft Mein Do, Muft Mein Lo), and overall design are our property and may not be used without written permission. Content you post on DaanGuru (photos, item descriptions) remains your property. However, by posting, you grant DaanGuru a non-exclusive, royalty-free licence to display, distribute, and promote your content on the platform and in promotional materials.",
     },
     {
         icon: ShieldAlert, num: '10', title: 'Limitation of Liability',
-        body: "DaanPeti is a free community service provided as-is. To the maximum extent permitted by applicable Indian law, DaanPeti and its operators shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from your use of the platform, including but not limited to losses arising from item exchanges, disputes with other users, or platform downtime.",
+        body: "DaanGuru is a free community service provided as-is. To the maximum extent permitted by applicable Indian law, DaanGuru and its operators shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from your use of the platform, including but not limited to losses arising from item exchanges, disputes with other users, or platform downtime.",
     },
     {
         icon: MapPin, num: '11', title: 'Governing Law & Jurisdiction',
-        body: "These Terms & Conditions are governed by and construed in accordance with the laws of India, including the Information Technology Act, 2000 and its amendments. Any disputes arising from these terms or your use of DaanPeti shall be subject to the exclusive jurisdiction of the courts in Siliguri, West Bengal, India.",
+        body: "These Terms & Conditions are governed by and construed in accordance with the laws of India, including the Information Technology Act, 2000 and its amendments. Any disputes arising from these terms or your use of DaanGuru shall be subject to the exclusive jurisdiction of the courts in Siliguri, West Bengal, India.",
     },
     {
         icon: Mail, num: '12', title: 'Contact for Legal Queries',
-        body: "For any questions, concerns, or notices related to these Terms & Conditions, please contact us at legal@daanpeti.in. We aim to respond to all legal correspondence within 7 business days.",
+        body: "For any questions, concerns, or notices related to these Terms & Conditions, please contact us at legal@DaanGuru.in. We aim to respond to all legal correspondence within 7 business days.",
     },
 ];
 
@@ -107,7 +107,7 @@ export default function Terms() {
                     </div>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                    By using DaanPeti, you agree to these terms. Please read them carefully. If you do not agree with any part of these terms, please do not use the platform.
+                    By using DaanGuru, you agree to these terms. Please read them carefully. If you do not agree with any part of these terms, please do not use the platform.
                 </p>
             </div>
 
@@ -140,7 +140,7 @@ export default function Terms() {
             </div>
 
             <div className="mt-8 text-center">
-                <p className="text-xs text-muted-foreground">Legal queries? Email <a href="mailto:legal@daanpeti.in" className="font-semibold hover:underline" style={{ color: '#FF9933' }}>legal@daanpeti.in</a></p>
+                <p className="text-xs text-muted-foreground">Legal queries? Email <a href="mailto:legal@DaanGuru.in" className="font-semibold hover:underline" style={{ color: '#FF9933' }}>legal@DaanGuru.in</a></p>
             </div>
         </div>
     );

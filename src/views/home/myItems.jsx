@@ -38,7 +38,7 @@ function SupabaseItemCard({ item, index, onMarkClaimed }) {
     const isOwner = user?.id === item?.user_id;
 
     const whatsappUrl = `https://wa.me/91${item?.whatsapp_number}?text=${encodeURIComponent(
-        `Hi! Maine DaanPeti pe "${item?.name}" dekha. Kya ye abhi available hai?`
+        `Hi! Maine DaanGuru pe "${item?.name}" dekha. Kya ye abhi available hai?`
     )}`;
 
     const handleClaim = async () => {

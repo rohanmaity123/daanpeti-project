@@ -65,25 +65,25 @@ const sections = [
             'Right to opt out — unsubscribe from any communications at any time',
             'Right to portability — receive your data in a readable format',
         ],
-        footer: 'To exercise any of these rights, contact us at privacy@daanpeti.in',
+        footer: 'To exercise any of these rights, contact us at privacy@daanguru.in',
     },
     {
         icon: Baby,
         num: '07',
         title: 'Children\'s Privacy',
-        body: 'DaanPeti is not intended for users under 13 years of age. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us immediately at privacy@daanpeti.in and we will delete it promptly.',
+        body: 'DaanGuru is not intended for users under 13 years of age. We do not knowingly collect personal information from children. If you believe a child has provided us with personal data, please contact us immediately at privacy@DaanGuru.in and we will delete it promptly.',
     },
     {
         icon: RefreshCw,
         num: '08',
         title: 'Changes to This Policy',
-        body: 'We may update this Privacy Policy occasionally to reflect changes in our practices or legal requirements. We will notify you of significant changes via a banner in the app at least 7 days before the change takes effect. Continued use of DaanPeti after changes means you accept the updated policy.',
+        body: 'We may update this Privacy Policy occasionally to reflect changes in our practices or legal requirements. We will notify you of significant changes via a banner in the app at least 7 days before the change takes effect. Continued use of DaanGuru after changes means you accept the updated policy.',
     },
     {
         icon: Mail,
         num: '09',
         title: 'Contact Us',
-        body: 'For any privacy concerns, data requests, or questions about this policy, please reach out to us at privacy@daanpeti.in. We aim to respond within 72 hours.',
+        body: 'For any privacy concerns, data requests, or questions about this policy, please reach out to us at privacy@DaanGuru.in. We aim to respond within 72 hours.',
     },
 ];
 
@@ -111,7 +111,7 @@ export default function Privacy() {
                     </div>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                    DaanPeti ("we", "our", "us") is committed to protecting your privacy. This policy explains how we collect, use, and protect your information when you use our platform. We believe privacy is a right, not a privilege.
+                    DaanGuru ("we", "our", "us") is committed to protecting your privacy. This policy explains how we collect, use, and protect your information when you use our platform. We believe privacy is a right, not a privilege.
                 </p>
             </div>
 
@@ -148,7 +148,7 @@ export default function Privacy() {
             </div>
 
             <div className="mt-8 text-center">
-                <p className="text-xs text-muted-foreground">Questions? Email us at <a href="mailto:privacy@daanpeti.in" className="font-semibold hover:underline" style={{ color: '#ef9f27' }}>privacy@daanpeti.in</a></p>
+                <p className="text-xs text-muted-foreground">Questions? Email us at <a href="mailto:privacy@DaanGuru.in" className="font-semibold hover:underline" style={{ color: '#ef9f27' }}>privacy@DaanGuru.in</a></p>
             </div>
         </div>
     );

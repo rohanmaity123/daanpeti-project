@@ -16,7 +16,7 @@ const buildShareUrl = (item) => {
 };
 
 const buildShareText = (item) =>
-  `🎁 "${item.name}" is available FREE on DaanPeti!\n📍 ${item.location} • ${item.pincode}\n👤 Donated by ${item.donor_name}\n\nKisi ko chahiye? DaanPeti pe dekho 👇`;
+  `🎁 "${item.name}" is available FREE on DaanGuru!\n📍 ${item.location} • ${item.pincode}\n👤 Donated by ${item.donor_name}\n\nKisi ko chahiye? DaanGuru pe dekho 👇`;
 
 /* ── Story canvas generator ──────────────────────── */
 const generateStoryCanvas = (item) =>
@@ -38,7 +38,7 @@ const generateStoryCanvas = (item) =>
     roundRect(ctx, 60, 60, W - 120, 110, 28); ctx.fill();
     ctx.fillStyle = '#1d9e75';
     ctx.font = 'bold 52px sans-serif';
-    ctx.fillText('💚 DaanPeti', 100, 130);
+    ctx.fillText('💚 DaanGuru', 100, 130);
     ctx.fillStyle = 'rgba(255,255,255,0.55)';
     ctx.font = '32px sans-serif';
     ctx.fillText('Muft mein do, muft mein lo', 100, 168);
@@ -72,7 +72,7 @@ const generateStoryCanvas = (item) =>
       ctx.fillRect(0, H - 240, W, 240);
       ctx.fillStyle = '#ffffff'; ctx.font = 'bold 52px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('daanpeti.netlify.app', W / 2, H - 110);
+      ctx.fillText('daanguru.netlify.app', W / 2, H - 110);
       ctx.font = '36px sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.7)';
       ctx.fillText('Claim this item for free →', W / 2, H - 55);
       ctx.textAlign = 'left';
@@ -162,11 +162,11 @@ export default function ShareSheet({ item, open, onClose }) {
     setStoryState('generating');
     try {
       const blob = await generateStoryCanvas(item);
-      const file = new File([blob], 'daanpeti-story.png', { type: 'image/png' });
+      const file = new File([blob], 'daanguru-story.png', { type: 'image/png' });
 
       /* Web Share API (mobile) */
       if (navigator.canShare?.({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'DaanPeti Story', text });
+        await navigator.share({ files: [file], title: 'DaanGuru Story', text });
         setStoryState('done');
         return;
       }
@@ -174,7 +174,7 @@ export default function ShareSheet({ item, open, onClose }) {
       /* Desktop fallback — download image */
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = blobUrl; a.download = 'daanpeti-story.png'; a.click();
+      a.href = blobUrl; a.download = 'daanguru-story.png'; a.click();
       URL.revokeObjectURL(blobUrl);
 
       /* open instagram.com after short delay */

@@ -52,7 +52,7 @@ export default function ItemDetailPage() {
     }
 
     const whatsappUrl = `https://wa.me/${item?.whatsapp_number}?text=${encodeURIComponent(
-        `Hi! Maine DaanPeti pe "${item?.name}" dekha. Kya ye abhi available hai?`
+        `Hi! Maine DaanGuru pe "${item?.name}" dekha. Kya ye abhi available hai?`
     )}`;
 
     const handleConfirmClaim = async () => {

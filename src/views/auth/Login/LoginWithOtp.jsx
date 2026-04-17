@@ -204,7 +204,7 @@ export default function LoginWithOtp() {
   return (
     <>
       <Helmet>
-        <title>Daanpeti || Two factor authentication</title>
+        <title>Daanguru || Two factor authentication</title>
       </Helmet>
       <>
         {/* <SiteHeader /> */}

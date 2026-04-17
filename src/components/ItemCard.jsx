@@ -12,7 +12,7 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
   const isFeedCard = !showStatus;
 
   const whatsappUrl = `https://wa.me/${item.whatsapp_number}?text=${encodeURIComponent(
-    `Hi! Maine DaanPeti pe "${item.name}" dekha. Kya ye abhi available hai?`
+    `Hi! Maine DaanGuru pe "${item.name}" dekha. Kya ye abhi available hai?`
   )}`;
 
   const handleMarkClaimed = (e) => {

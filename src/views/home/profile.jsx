@@ -123,7 +123,7 @@ function ReviewForm({ user }) {
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     rows={4}
-                    placeholder="DaanPeti ke baare mein apna anubhav share karein..."
+                    placeholder="DaanGuru ke baare mein apna anubhav share karein..."
                     className="w-full rounded-xl border border-input bg-muted/30 px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring resize-none transition-shadow"
                 />
                 <p className="text-xs text-muted-foreground mt-1">{text.length} / 300 characters</p>
@@ -216,7 +216,7 @@ export default function ProfilePage() {
                         style={{ background: 'linear-gradient(135deg,#138808,#1D9E75)' }}>
                         <User className="h-10 w-10 text-white" />
                     </div>
-                    <h1 className="text-xl font-extrabold text-foreground">DaanPeti mein aapka swagat hai! 🙏</h1>
+                    <h1 className="text-xl font-extrabold text-foreground">DaanGuru mein aapka swagat hai! 🙏</h1>
                     <p className="mt-2 text-sm text-muted-foreground">Login karein aur daan karna shuru karein</p>
                     <motion.button onClick={handleLogin} disabled={loginLoading} whileTap={{ scale: 0.97 }}
                         className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-60"
@@ -311,7 +311,7 @@ export default function ProfilePage() {
                             <h3 className="text-base font-extrabold text-foreground">Leave a Review ⭐</h3>
                         </div>
                         <p className="text-xs text-muted-foreground mb-4">
-                            DaanPeti kaisa laga? Apna anubhav share karein — it will appear on the home page!
+                            DaanGuru kaisa laga? Apna anubhav share karein — it will appear on the home page!
                         </p>
                         <ReviewForm user={user} />
                     </motion.div>

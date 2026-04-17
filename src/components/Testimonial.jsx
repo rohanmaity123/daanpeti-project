@@ -5,11 +5,11 @@ import { supabase } from '../utils/supabaseClient';
 
 /* ── Fallback reviews shown before DB has data ── */
 const FALLBACK_REVIEWS = [
-    { id: 'f1', user_name: 'Priya Sharma', user_avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face', rating: 5, text: 'DaanPeti helped me find free books for my semester. Saved so much money! Amazing community of givers.', created_at: '' },
+    { id: 'f1', user_name: 'Priya Sharma', user_avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face', rating: 5, text: 'DaanGuru helped me find free books for my semester. Saved so much money! Amazing community of givers.', created_at: '' },
     { id: 'f2', user_name: 'Rajesh Kumar', user_avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face', rating: 5, text: 'Donated my old furniture when I moved cities. Felt great knowing it went to someone who needed it.', created_at: '' },
     { id: 'f3', user_name: 'Anita Desai', user_avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face', rating: 4, text: "My kids' old toys found a new home within hours! The WhatsApp contact feature makes it so easy.", created_at: '' },
     { id: 'f4', user_name: 'Mohammed Irfan', user_avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face', rating: 5, text: 'I regularly donate old textbooks here. My students also use it to find study material for free.', created_at: '' },
-    { id: 'f5', user_name: 'Sneha Patel', user_avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face', rating: 5, text: 'Love the concept — no money involved, just pure giving. India needs more platforms like DaanPeti.', created_at: '' },
+    { id: 'f5', user_name: 'Sneha Patel', user_avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face', rating: 5, text: 'Love the concept — no money involved, just pure giving. India needs more platforms like DaanGuru.', created_at: '' },
     { id: 'f6', user_name: 'Vikram Singh', user_avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face', rating: 4, text: 'Gave away my old electronics and clothes. The process is simple and the response was instant!', created_at: '' },
 ];
 
@@ -129,7 +129,7 @@ export function TestimonialSection() {
                     What Our Users Say 💬
                 </h2>
                 <p className="mt-1 text-sm text-muted-foreground font-medium">
-                    Real stories from the DaanPeti community
+                    Real stories from the DaanGuru community
                 </p>
                 {/* Stats row */}
                 <div className="mt-3 inline-flex items-center gap-3 rounded-full px-4 py-2"

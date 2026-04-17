@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export function SupportBanner() {
   const [dismissed, setDismissed] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('daanpeti_support_dismissed') === 'true';
+      return localStorage.getItem('daanguru_support_dismissed') === 'true';
     }
     return false;
   });
@@ -15,7 +15,7 @@ export function SupportBanner() {
   const handleDismiss = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    localStorage.setItem('daanpeti_support_dismissed', 'true');
+    localStorage.setItem('daanguru_support_dismissed', 'true');
     setDismissed(true);
   };
 
@@ -24,7 +24,7 @@ export function SupportBanner() {
       <div className="home-support-banner relative flex items-center gap-2.5 rounded-2xl px-3.5 py-3">
         <Heart className="h-4 w-4 text-[#EF9F27] fill-[#EF9F27] shrink-0" />
         <p className="flex-1 text-xs font-semibold text-white/90">
-          DaanPeti is free forever. Help us stay online →
+          DaanGuru is free forever. Help us stay online →
         </p>
         <button
           onClick={handleDismiss}
