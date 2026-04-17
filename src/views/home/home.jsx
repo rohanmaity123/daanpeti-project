@@ -22,6 +22,7 @@ export default function HomePage() {
     const { user } = useAuth();
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [locationQuery, setLocationQuery] = useState('');
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const claimedMap = useItemsClaimed();
@@ -33,9 +34,12 @@ export default function HomePage() {
             const matchesSearch = searchQuery === '' ||
                 item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 item.location.toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesCategory && matchesSearch;
+            const matchesLocation = locationQuery === '' ||
+                item.pincode?.toString().includes(locationQuery.toLowerCase()) ||
+                item.location.toLowerCase().includes(locationQuery.toLowerCase());
+            return matchesCategory && matchesSearch && matchesLocation;
         });
-    }, [activeCategory, searchQuery, claimedMap, items]);
+    }, [activeCategory, searchQuery, locationQuery, claimedMap, items]);
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 6;
@@ -44,7 +48,7 @@ export default function HomePage() {
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [activeCategory, searchQuery, claimedMap]);
+    }, [activeCategory, searchQuery, locationQuery, claimedMap]);
 
     useEffect(() => {
         const fetchItems = async () => {
@@ -112,7 +116,9 @@ export default function HomePage() {
                     <h4 className="mb-3 text-sm font-bold text-white">📍 Location</h4>
                     <input
                         type="text"
-                        placeholder="Enter pincode..."
+                        value={locationQuery}
+                        onChange={(e) => setLocationQuery(e.target.value)}
+                        placeholder="Search location or pincode..."
                         className="home-search-input w-full rounded-2xl px-3 py-3 text-sm text-white placeholder:text-white/45 outline-none"
                     />
                 </div>

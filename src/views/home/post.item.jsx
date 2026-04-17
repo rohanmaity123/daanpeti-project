@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Camera, Loader2, CheckCircle2, AlertCircle, X, LogIn, Lock } from 'lucide-react';
@@ -8,15 +8,16 @@ import { supabase } from '../../utils/supabaseClient';
 import { useAuth, signInWithGoogle } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import ShareDonationModal from '../../components/ShareDonationModal';
+import { LocationAutocomplete } from '../../components/LocationAutocomplete';
 
-
+/* ── Zod schema ── */
 const schema = z.object({
     donor_name: z.string().min(2, 'Enter your name'),
     name: z.string().min(3, 'Item name must be at least 3 characters'),
     category: z.string().min(1, 'Please select a category'),
     description: z.string().optional(),
     pincode: z.string().length(6, 'Pincode must be exactly 6 digits').regex(/^\d+$/, 'Pincode must be numeric'),
-    location: z.string().min(2, 'Please provide a more specific location'),
+    location: z.string().min(2, 'Please select a location'),
     whatsapp_number: z.string().min(10, 'Enter a valid 10-digit number').max(13, 'Number too long').regex(/^\d+$/, 'Only digits allowed'),
 });
 
@@ -78,15 +79,20 @@ function LoginWall() {
 export default function PostItemPage() {
     const navigate = useNavigate();
     const { user, loading: authLoading } = useAuth();
+
     const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [submitState, setSubmitState] = useState('idle');
     const [errorMsg, setErrorMsg] = useState('');
     const [confirmOpen, setConfirmOpen] = useState(false);
-    const fileInputRef = useRef(null);
-    const [afterpostdata, setAfterPostData] = useState(null)
+    const [afterpostdata, setAfterPostData] = useState(null);
 
-    const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    /* Resolved place details (lat/lng, city, state, pincode from Google) */
+    const [resolvedPlace, setResolvedPlace] = useState(null);
+
+    const fileInputRef = useRef(null);
+
+    const { register, handleSubmit, control, setValue, formState: { errors }, reset } = useForm({
         resolver: zodResolver(schema),
     });
 
@@ -98,6 +104,7 @@ export default function PostItemPage() {
 
     if (!user) return <LoginWall />;
 
+    /* ── Image handlers ── */
     const handleImageChange = (e) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -121,40 +128,66 @@ export default function PostItemPage() {
         return data.publicUrl;
     };
 
+    /* ── When user picks a Google suggestion ── */
+    const handlePlaceSelect = (details) => {
+        setResolvedPlace(details);
+        /* Auto-fill pincode if Google returned one and pincode field is empty */
+        if (details.pincode) {
+            setValue('pincode', details.pincode, { shouldValidate: true });
+        }
+    };
+
+    /* ── Submit ── */
     const onSubmit = async (values) => {
         setSubmitState('loading'); setErrorMsg('');
         try {
             let image_url = null;
             if (imageFile) image_url = await uploadImage(imageFile);
+
             const { error } = await supabase.from('donation_items').insert({
-                name: values.name, category: values.category,
-                description: values.description ?? '', pincode: values.pincode,
-                location: values.location, donor_name: values.donor_name,
+                name: values.name,
+                category: values.category,
+                description: values.description ?? '',
+                pincode: values.pincode,
+                location: values.location,
+                /* Store resolved city/state from Google if available */
+                city: resolvedPlace?.city ?? '',
+                state: resolvedPlace?.state ?? '',
+                lat: resolvedPlace?.lat ?? null,
+                lng: resolvedPlace?.lng ?? null,
+                donor_name: values.donor_name,
                 whatsapp_number: values.whatsapp_number,
-                image_url, status: 'available',
+                image_url,
+                status: 'available',
                 user_id: user.id,
             });
+
             setAfterPostData({
                 name: values.name, category: values.category,
-                description: values.description ?? '', pincode: values.pincode,
-                location: values.location, donor_name: values.donor_name,
-                whatsapp_number: values.whatsapp_number,
-                image_url, status: 'available',
-                user_id: user.id,
+                pincode: values.pincode, location: values.location,
+                donor_name: values.donor_name, whatsapp_number: values.whatsapp_number,
+                image_url, status: 'available', user_id: user.id,
             });
-            if (error) throw new Error(error.message);
-            setSubmitState('success'); reset(); removeImage();
-            setConfirmOpen(true);
 
-            // setTimeout(() => navigate('/'), 1500);
+            if (error) throw new Error(error.message);
+
+            setSubmitState('success');
+            reset();
+            removeImage();
+            setResolvedPlace(null);
+            setConfirmOpen(true);
         } catch (err) {
             setSubmitState('error');
-            setErrorMsg(err.message ?? 'Something went wrong. Please try again.');
+            setErrorMsg(err?.message ?? 'Something went wrong. Please try again.');
         }
     };
 
+    const inputClass = "mt-1.5 w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow";
+
     return (
         <div className="mx-auto max-w-3xl px-4 pt-5 pb-28 lg:pb-10">
+
+            {/* Share modal */}
             <ShareDonationModal
                 open={confirmOpen}
                 onClose={() => { setConfirmOpen(false); navigate('/'); setAfterPostData(null); }}
@@ -163,6 +196,8 @@ export default function PostItemPage() {
                 pincode={afterpostdata?.pincode}
                 whatsapp={afterpostdata?.whatsapp_number}
             />
+
+            {/* Heading */}
             <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                 <h1 className="text-2xl lg:text-3xl font-extrabold text-foreground">Daan Karo 🎁</h1>
                 <p className="text-sm text-muted-foreground mt-0.5">Give something you no longer need — make someone's day!</p>
@@ -175,11 +210,13 @@ export default function PostItemPage() {
             <form className="mt-5" onSubmit={handleSubmit(onSubmit)} noValidate>
                 <div className="lg:grid lg:grid-cols-2 lg:gap-8 space-y-5 lg:space-y-0">
 
-                    {/* Photo */}
+                    {/* ── Photo upload ── */}
                     <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1, duration: 0.35 }}>
                         <label className="text-sm font-bold text-foreground">Photo</label>
-                        <div className="mt-1.5 relative flex lg:min-h-[360px] h-48 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors overflow-hidden"
-                            onClick={() => fileInputRef.current?.click()}>
+                        <div
+                            className="mt-1.5 relative flex lg:min-h-[360px] h-48 items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/50 cursor-pointer hover:bg-muted/70 transition-colors overflow-hidden"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
                             {imagePreview ? (
                                 <>
                                     <img src={imagePreview} alt="preview" className="h-full w-full object-cover" />
@@ -199,55 +236,107 @@ export default function PostItemPage() {
                         </div>
                     </motion.div>
 
-                    {/* Fields */}
+                    {/* ── Form fields ── */}
                     <div className="space-y-4">
-                        {[
-                            { i: 1, label: 'Your Name *', name: 'donor_name', type: 'text', placeholder: 'e.g. Rahul Sharma' },
-                            { i: 2, label: 'Item Name *', name: 'name', type: 'text', placeholder: 'e.g. Wooden Study Table' },
-                        ].map(({ i, label, name, type, placeholder }) => (
-                            <motion.div key={name} custom={i} variants={fieldVariants} initial="hidden" animate="show">
-                                <label className="text-sm font-bold text-foreground">{label}</label>
-                                <input type={type} placeholder={placeholder} {...register(name)}
-                                    className="mt-1.5 w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow" />
-                                <FieldError msg={(errors)[name]?.message} />
-                            </motion.div>
-                        ))}
 
+                        {/* Donor name */}
+                        <motion.div custom={1} variants={fieldVariants} initial="hidden" animate="show">
+                            <label className="text-sm font-bold text-foreground">Your Name *</label>
+                            <input type="text" placeholder="e.g. Rahul Sharma" {...register('donor_name')} className={inputClass} />
+                            <FieldError msg={errors.donor_name?.message} />
+                        </motion.div>
+
+                        {/* Item name */}
+                        <motion.div custom={2} variants={fieldVariants} initial="hidden" animate="show">
+                            <label className="text-sm font-bold text-foreground">Item Name *</label>
+                            <input type="text" placeholder="e.g. Wooden Study Table" {...register('name')} className={inputClass} />
+                            <FieldError msg={errors.name?.message} />
+                        </motion.div>
+
+                        {/* Category */}
                         <motion.div custom={3} variants={fieldVariants} initial="hidden" animate="show">
                             <label className="text-sm font-bold text-foreground">Category *</label>
-                            <select {...register('category')}
-                                className="mt-1.5 w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground outline-none focus:ring-2 focus:ring-ring">
+                            <select {...register('category')} className={inputClass}>
                                 <option value="">Category chuno...</option>
                                 {categories.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                             </select>
                             <FieldError msg={errors.category?.message} />
                         </motion.div>
 
+                        {/* Description */}
                         <motion.div custom={4} variants={fieldVariants} initial="hidden" animate="show">
                             <label className="text-sm font-bold text-foreground">Description</label>
                             <textarea rows={3} placeholder="Item ke baare mein thoda batao..." {...register('description')}
-                                className="mt-1.5 w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring resize-none" />
+                                className={`${inputClass} resize-none`} />
                         </motion.div>
 
+                        {/* ── LOCATION — Google Autocomplete ── */}
                         <motion.div custom={5} variants={fieldVariants} initial="hidden" animate="show">
-                            <label className="text-sm font-bold text-foreground">Pincode *</label>
-                            <input type="text" inputMode="numeric" placeholder="e.g. 734001" maxLength={6} {...register('pincode')}
-                                className="mt-1.5 w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring" />
+                            <label className="text-sm font-bold text-foreground">
+                                Pickup Location *
+                                <span className="ml-2 text-[10px] font-normal text-muted-foreground normal-case">
+                                    (Google autocomplete)
+                                </span>
+                            </label>
+                            <div className="mt-1.5">
+                                <Controller
+                                    name="location"
+                                    control={control}
+                                    defaultValue=""
+                                    render={({ field }) => (
+                                        <LocationAutocomplete
+                                            value={field.value}
+                                            onChange={(val) => {
+                                                field.onChange(val);
+                                                /* Clear resolved place if user retypes */
+                                                if (!val) setResolvedPlace(null);
+                                            }}
+                                            onPlaceSelect={handlePlaceSelect}
+                                            error={errors.location?.message}
+                                            placeholder="e.g. Salt Lake, Kolkata..."
+                                        />
+                                    )}
+                                />
+                            </div>
+                            <FieldError msg={errors.location?.message} />
+
+                            {/* Show resolved city/state badge */}
+                            {resolvedPlace?.city && (
+                                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                                    className="mt-2 flex flex-wrap gap-2">
+                                    {[
+                                        resolvedPlace.city && `🏙 ${resolvedPlace.city}`,
+                                        resolvedPlace.state && `📍 ${resolvedPlace.state}`,
+                                    ].filter(Boolean).map(tag => (
+                                        <span key={tag} className="text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                                            style={{ background: 'rgba(19,136,8,0.08)', color: '#138808' }}>
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </motion.div>
+                            )}
+                        </motion.div>
+
+                        {/* Pincode — auto-filled from Google if available */}
+                        <motion.div custom={6} variants={fieldVariants} initial="hidden" animate="show">
+                            <label className="text-sm font-bold text-foreground">
+                                Pincode *
+                                {resolvedPlace?.pincode && (
+                                    <span className="ml-2 text-[10px] font-normal text-primary">Auto-filled ✓</span>
+                                )}
+                            </label>
+                            <input type="text" inputMode="numeric" placeholder="e.g. 734001" maxLength={6}
+                                {...register('pincode')} className={inputClass} />
                             <FieldError msg={errors.pincode?.message} />
                         </motion.div>
 
-                        <motion.div custom={6} variants={fieldVariants} initial="hidden" animate="show">
-                            <label className="text-sm font-bold text-foreground">Pickup Location *</label>
-                            <textarea placeholder="e.g. Salt Lake, Kolkata, West Bengal" {...register('location')}
-                                className="mt-1.5 w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring resize-none" />
-                            <FieldError msg={errors.location?.message} />
-                        </motion.div>
-
+                        {/* WhatsApp */}
                         <motion.div custom={7} variants={fieldVariants} initial="hidden" animate="show">
                             <label className="text-sm font-bold text-foreground">WhatsApp Number *</label>
                             <div className="mt-1.5 flex items-center rounded-xl border border-input bg-card overflow-hidden focus-within:ring-2 focus-within:ring-ring">
                                 <span className="px-3 py-2.5 text-sm text-muted-foreground border-r border-input select-none bg-muted/30">+91</span>
-                                <input type="tel" inputMode="numeric" placeholder="9876543210" maxLength={10} {...register('whatsapp_number')}
+                                <input type="tel" inputMode="numeric" placeholder="9876543210" maxLength={10}
+                                    {...register('whatsapp_number')}
                                     className="flex-1 px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none bg-transparent" />
                             </div>
                             <FieldError msg={errors.whatsapp_number?.message} />
@@ -255,6 +344,7 @@ export default function PostItemPage() {
                     </div>
                 </div>
 
+                {/* Error banner */}
                 <AnimatePresence>
                     {submitState === 'error' && (
                         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
@@ -265,6 +355,7 @@ export default function PostItemPage() {
                     )}
                 </AnimatePresence>
 
+                {/* Submit */}
                 <motion.button type="submit"
                     disabled={submitState === 'loading' || submitState === 'success'}
                     initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
