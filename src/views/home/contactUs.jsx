@@ -8,12 +8,12 @@ import { useForm } from 'react-hook-form';
 const contactCards = [
     {
         emoji: '📧', icon: Mail, title: 'General Queries',
-        value: 'hello@daanpeti.in', sub: 'We reply within 24 hours',
+        value: 'hello@DaanGuru.in', sub: 'We reply within 24 hours',
         color: '#138808', bg: 'rgba(19,136,8,0.1)',
     },
     {
         emoji: '🛟', icon: HelpCircle, title: 'Report a Problem',
-        value: 'support@daanpeti.in', sub: 'For item disputes or account issues',
+        value: 'support@DaanGuru.in', sub: 'For item disputes or account issues',
         color: '#FF9933', bg: 'rgba(255,153,51,0.1)',
     },
     {
@@ -31,12 +31,12 @@ const contactCards = [
 
 const faqs = [
     {
-        q: 'Is DaanPeti really 100% free?',
-        a: 'Yes! DaanPeti is completely free for everyone — donors and recipients. There are no hidden charges, no subscriptions, and no transaction fees. Ever. We run on voluntary community support.',
+        q: 'Is DaanGuru really 100% free?',
+        a: 'Yes! DaanGuru is completely free for everyone — donors and recipients. There are no hidden charges, no subscriptions, and no transaction fees. Ever. We run on voluntary community support.',
     },
     {
         q: 'How do I contact a donor?',
-        a: 'Click on any item and tap the WhatsApp button. You will be connected directly with the donor. DaanPeti does not act as a middleman — it is a direct connection between neighbours.',
+        a: 'Click on any item and tap the WhatsApp button. You will be connected directly with the donor. DaanGuru does not act as a middleman — it is a direct connection between neighbours.',
     },
     {
         q: 'Can I donate anything?',
@@ -48,11 +48,11 @@ const faqs = [
     },
     {
         q: 'How do I delete my account?',
-        a: 'Email us at privacy@daanpeti.in with your registered email and we will delete your account and all associated data within 7 business days.',
+        a: 'Email us at privacy@DaanGuru.in with your registered email and we will delete your account and all associated data within 7 business days.',
     },
     {
-        q: 'Can NGOs use DaanPeti?',
-        a: 'Absolutely! NGOs and charitable organisations are welcome. You can post requests for items your organisation needs, or donate surplus items. Contact us at hello@daanpeti.in for a verified NGO badge.',
+        q: 'Can NGOs use DaanGuru?',
+        a: 'Absolutely! NGOs and charitable organisations are welcome. You can post requests for items your organisation needs, or donate surplus items. Contact us at hello@DaanGuru.in for a verified NGO badge.',
     },
 ];
 

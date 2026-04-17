@@ -36,7 +36,7 @@ const usageCategories = [
         color: '#3a9ae3',
         lightColor: 'rgba(58,154,227,0.18)',
         borderColor: 'rgba(58,154,227,0.35)',
-        description: 'Keeps DaanPeti online 24/7. Fast servers mean your listings load instantly, even in low-network areas.',
+        description: 'Keeps DaanGuru online 24/7. Fast servers mean your listings load instantly, even in low-network areas.',
         items: ['Cloud hosting (AWS/Vercel)', 'CDN for images', 'Database storage', 'Backups & security'],
     },
     {
@@ -614,7 +614,7 @@ export default function FundUsagePage() {
                 <div className="text-3xl mb-3">🤝</div>
                 <h3 className="text-base font-extrabold text-white">Humara Vaada</h3>
                 <p className="text-xs text-white/60 mt-2 max-w-sm mx-auto leading-relaxed">
-                    DaanPeti will always be <span className="text-green-400 font-bold">100% non-profit</span>.
+                    DaanGuru will always be <span className="text-green-400 font-bold">100% non-profit</span>.
                     We publish fund usage every quarter. No salaries, no profit — only purpose.
                 </p>
                 <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">

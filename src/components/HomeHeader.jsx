@@ -41,12 +41,12 @@ export function AppHeader() {
         <Link to="/" className="flex items-center gap-2">
           <div className="brand-heart flex h-9 w-9 items-center justify-center rounded-full bg-[#1D9E75]/18 ring-1 ring-white/15">
             {/* <Heart className="h-4 w-4 fill-[#1D9E75] text-[#1D9E75]" /> */}
-            <img src="/logo.svg" alt="DaanPeti" className="h-10 w-auto" />
+            <img src={'./logo.png'} alt="DaanGuru" className="h-10 w-auto" />
           </div>
           <div className="leading-none">
             <div className="brand-mark flex items-baseline gap-0.5 text-[1.4rem] leading-none">
               <span className="text-white">Daan</span>
-              <span className="text-[#1D9E75]">Peti</span>
+              <span className="text-[#1D9E75]">Guru</span>
             </div>
             <p className="mt-0.5 text-[10px] font-medium text-white/55">
               Muft mein do, muft mein lo 💚

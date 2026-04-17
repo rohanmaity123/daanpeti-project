@@ -16,13 +16,13 @@ const MainLayout = ({ children }) => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const seen = localStorage.getItem('daanpeti_onboarded');
+      const seen = localStorage.getItem('daanguru_onboarded');
       if (!seen) setShowOnboarding(true);
     }
   }, []);
 
   const handleOnboardingComplete = () => {
-    localStorage.setItem('daanpeti_onboarded', 'true');
+    localStorage.setItem('daanguru_onboarded', 'true');
     setShowOnboarding(false);
   };
   return (

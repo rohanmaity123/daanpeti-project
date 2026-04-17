@@ -45,9 +45,9 @@ export default function ShareDonationModal({
         year: 'numeric',
     });
 
-    const shareText = `🎁 Hey! Today I donated "${itemName}" on DaanPeti!\n\nIf you need it, claim it for FREE!\n📍 Pincode: ${pincode}\n📱 WhatsApp: ${whatsapp}\n\n#DaanPeti #FreeStuff #Donate #GiveBack`;
+    const shareText = `🎁 Hey! Today I donated "${itemName}" on DaanGuru!\n\nIf you need it, claim it for FREE!\n📍 Pincode: ${pincode}\n📱 WhatsApp: ${whatsapp}\n\n#DaanGuru #FreeStuff #Donate #GiveBack`;
 
-    const shareUrl = 'https://daan-peti-give.lovable.app';
+    const shareUrl = 'https://daanguru.netlify.app';
 
     function handleShare(platform) {
         const text = encodeURIComponent(shareText);
@@ -116,7 +116,7 @@ export default function ShareDonationModal({
                         <div className="relative z-10">
                             <div className="flex items-center gap-2 mb-4">
                                 <span className="text-2xl">🎁</span>
-                                <span className="font-extrabold text-lg tracking-tight">DaanPeti</span>
+                                <span className="font-extrabold text-lg tracking-tight">DaanGuru</span>
                             </div>
 
                             <p className="text-sm font-medium opacity-90">Hey! Today I donated</p>
@@ -140,7 +140,7 @@ export default function ShareDonationModal({
                             </div>
 
                             <p className="mt-3 text-[10px] opacity-60 text-center">
-                                #DaanPeti #FreeStuff #GiveBack #Donate
+                                #DaanGuru #FreeStuff #GiveBack #Donate
                             </p>
                         </div>
                     </div>

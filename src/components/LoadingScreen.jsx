@@ -14,7 +14,7 @@ const LoadingScreen = ({ customClass }) => {
           {/* Logo */}
           {/* <img
             src="/logo.svg"
-            alt="DaanPeti"
+            alt="DaanGuru"
             className="relative h-[110px] w-[110px] object-contain animate-float"
           /> */}
           <Loader className="relative h-12 w-12 text-primary animate-spin" />

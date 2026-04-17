@@ -11,10 +11,10 @@ export function AppFooter() {
           <div className="flex items-center gap-2 mb-3">
             <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center">
               {/* <Heart className="h-4 w-4 text-primary-foreground fill-primary-foreground" /> */}
-              <img src="/logo.svg" alt="DaanPeti" className="h-5 w-5" />
+              <img src="/logo.png" alt="DaanGuru" className="h-5 w-5" />
             </div>
             <span className="text-lg font-extrabold text-foreground">
-              DaanPeti
+              Daan Guru
             </span>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -124,14 +124,14 @@ export function AppFooter() {
         {/* Column 3: Support */}
         <div>
           <h4 className="text-sm font-bold text-foreground mb-3">
-            Support DaanPeti 💛
+            Support DaanGuru 💛
           </h4>
           <p className="text-sm text-muted-foreground leading-relaxed mb-3">
             We are a non-profit. Help us keep the platform free for everyone.
           </p>
           <div className="rounded-xl bg-saffron-light p-4 text-center">
             <p className="text-xs font-bold text-saffron-foreground mb-1">
-              UPI: daanpeti@upi
+              UPI: Q52840401@ybl
             </p>
             <Link
               to="/support"

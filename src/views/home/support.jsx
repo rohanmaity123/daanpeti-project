@@ -4,7 +4,7 @@ import { Copy, Check } from 'lucide-react';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useState } from 'react';
-
+import Qrcode from '../../assets/images/daanguruqr.png';
 
 const amounts = [
   { label: '₹10', value: 10 },
@@ -108,7 +108,7 @@ export default function SupportPage() {
   const [copied, setCopied] = useState(false);
 
   const handleCopyUPI = () => {
-    navigator.clipboard.writeText('daanpeti@upi').then(() => {
+    navigator.clipboard.writeText('Q52840401@ybl').then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
@@ -118,9 +118,9 @@ export default function SupportPage() {
     <div className="px-4 pb-8 pt-2">
       {/* Header */}
       <div className="text-center mb-6">
-        <img src="/logo.svg" alt="DaanPeti" className="mx-auto mb-4 h-20 w-20 object-contain" />
+        <img src="/logo.svg" alt="DaanGuru" className="mx-auto mb-4 h-20 w-20 object-contain" />
         <h1 className="text-2xl font-extrabold text-foreground">
-          Keep DaanPeti Free 💛
+          Keep DaanGuru Free 💛
         </h1>
         <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-xs mx-auto">
           We are a non-profit. Your small contribution helps us pay for servers, support, and growth.
@@ -132,16 +132,8 @@ export default function SupportPage() {
         <p className="text-xs font-bold text-saffron-foreground mb-3 uppercase tracking-wide">
           Scan & Pay via UPI
         </p>
-        <div className="mx-auto h-48 w-48 rounded-xl bg-card card-shadow flex items-center justify-center mb-4">
-          <div className="text-center">
-            <p className="text-4xl mb-1">📱</p>
-            <p className="text-[10px] text-muted-foreground font-medium">
-              QR Code Image
-            </p>
-            <p className="text-[9px] text-muted-foreground">
-              (Upload your UPI QR)
-            </p>
-          </div>
+        <div className="mx-auto h-52 w-52 rounded-xl bg-card card-shadow flex items-center justify-center mb-4">
+          <img src={Qrcode} alt="qr-code" className="h-40 w-40 object-contain" />
         </div>
 
         {/* UPI ID */}
@@ -149,7 +141,7 @@ export default function SupportPage() {
           onClick={handleCopyUPI}
           className="inline-flex items-center gap-1.5 rounded-lg bg-card px-3 py-1.5 text-sm font-bold text-foreground card-shadow hover:bg-secondary transition-colors"
         >
-          daanpeti@upi
+          Q52840401@ybl
           {copied ? (
             <Check className="h-3.5 w-3.5 text-primary" />
           ) : (
