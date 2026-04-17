@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { categoryLabels, categoryColors } from '../../lib/sample-data';
 import { MapPin, Clock, ArrowLeft, MessageCircle, CheckCircle, Search, Phone, UserRound, Share2 } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -12,6 +12,7 @@ import LoadingScreen from '../../components/LoadingScreen';
 import { X } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import ShareSheet from '../../components/ShareSheet';
+import useGlobalStore from '../../hooks/useGlobalStore';
 
 export default function ItemDetailPage() {
     const { itemId } = useParams();
@@ -23,6 +24,8 @@ export default function ItemDetailPage() {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [imageZoomOpen, setImageZoomOpen] = useState(false);
     const [shareOpen, setShareOpen] = useState(false);
+    const navigate = useNavigate();
+    const { toggleForModal } = useGlobalStore();
 
     useEffect(() => {
         const fetchItem = async () => {
@@ -55,6 +58,18 @@ export default function ItemDetailPage() {
         `Hi! Maine DaanGuru pe "${item?.name}" dekha. Kya ye abhi available hai?`
     )}`;
 
+    const handleContactDonor = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!user?.id) {
+            toggleForModal('TOGGLE_LOGIN_ALERT_MODAL');
+            return;
+        }
+
+        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    };
+
     const handleConfirmClaim = async () => {
         const { error } = await supabase
             .from('donation_items')
@@ -75,15 +90,14 @@ export default function ItemDetailPage() {
         return (
             <div className="flex gap-3 w-full">
                 {!isDonor && (
-                    <a
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    <button
+                        type="button"
+                        onClick={handleContactDonor}
                         className="feed-whatsapp-button flex flex-1 items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
                     >
                         <MessageCircle className="h-5 w-5" />
                         Contact Donor
-                    </a>
+                    </button>
                 )}
                 {isDonor && (
                     <button
