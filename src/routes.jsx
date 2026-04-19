@@ -25,6 +25,7 @@ import Contact from "./views/home/contactUs";
 import About from "./views/home/about";
 import Privacy from "./views/home/privacy";
 import FundUsagePage from "./views/home/fund-use";
+import RewardsPage from "./views/home/rewards";
 
 
 // ==================
@@ -81,6 +82,7 @@ export default function RenderRoutes() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
           <Route path="/fund-usage" element={<FundUsagePage />} />
+          <Route path="/rewards" element={<RewardsPage />} />
         </Route>
 
 

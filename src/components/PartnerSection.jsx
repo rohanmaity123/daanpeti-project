@@ -5,7 +5,7 @@ import Basu from '../assets/images/basu.jpeg';
 
 const partners = [
     {
-        name: 'Basudev Roy & Sons',
+        name: 'Vai Vai Shoes Center',
         description: 'Heritage-driven community welfare initiatives',
         icon: Basu,
         url: '#',
