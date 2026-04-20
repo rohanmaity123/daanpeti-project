@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Heart, Target, Users, Gift, MapPin, Sparkles, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 
 const stats = [
@@ -22,6 +23,18 @@ export default function About() {
   useEffect(() => { setMounted(true); }, []);
 
   return (
+    <>
+      <Helmet>
+        <title>About DaanGuru - Our Mission & Story</title>
+        <meta name="description" content="Learn about DaanGuru's mission to reduce waste and help communities. We connect donors with those in need, making giving and receiving free items simple and transparent." />
+        <meta name="keywords" content="about, mission, story, zero waste, community, daanguru" />
+        <meta property="og:title" content="About DaanGuru" />
+        <meta property="og:description" content="Learn about DaanGuru's mission to reduce waste and connect communities. Giving made easy." />
+        <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+        <meta property="og:url" content="https://www.daanguru.in/about" />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://www.daanguru.in/about" />
+      </Helmet>
     <div className="mx-auto max-w-4xl px-4 lg:px-6 pt-6 pb-28 lg:pb-12">
 
       {/* Back */}
@@ -117,5 +130,6 @@ export default function About() {
         <p className="mt-3 text-xs text-muted-foreground">100% free · No registration required to browse</p>
       </div>
     </div>
+    </>
   );
 }

@@ -12,6 +12,7 @@ import { Link } from 'react-router-dom';
 import { set } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { usePickup } from '../../hooks/usePickup';
+import { Helmet } from 'react-helmet';
 
 
 /* ── Animated counter ── */
@@ -252,7 +253,19 @@ export default function MyItemsPage() {
     const claimedCount = givenItems.filter(i => i.status === 'claimed').length;
 
     return (
-        <div className="mx-auto max-w-[1200px] px-4 lg:px-6 pt-5 pb-28 lg:pb-10">
+        <>
+            <Helmet>
+                <title>My Items - DaanGuru | Your Donation History</title>
+                <meta name="description" content="View and manage your donated and claimed items on DaanGuru. Track your donation history, item status, and community impact." />
+                <meta name="keywords" content="my items, donation history, claimed items, donated items" />
+                <meta property="og:title" content="My Items - DaanGuru" />
+                <meta property="og:description" content="View and manage your donated and claimed items on DaanGuru. Track your donation history and impact." />
+                <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+                <meta property="og:url" content="https://www.daanguru.in/my-items" />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://www.daanguru.in/my-items" />
+            </Helmet>
+            <div className="mx-auto max-w-[1200px] px-4 lg:px-6 pt-5 pb-28 lg:pb-10">
 
             {/* Header */}
             <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
@@ -365,5 +378,6 @@ export default function MyItemsPage() {
                 )}
             </div>
         </div>
+        </>
     );
 }

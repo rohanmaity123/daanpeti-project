@@ -9,6 +9,7 @@ import { useAuth, signInWithGoogle } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import ShareDonationModal from '../../components/ShareDonationModal';
 import { LocationAutocomplete } from '../../components/LocationAutocomplete';
+import { Helmet } from 'react-helmet';
 
 /* ── Zod schema ── */
 const schema = z.object({
@@ -185,7 +186,23 @@ export default function PostItemPage() {
     const inputClass = "mt-1.5 w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-2 focus:ring-ring transition-shadow";
 
     return (
-        <div className="mx-auto max-w-3xl px-4 pt-5 pb-28 lg:pb-10">
+        <>
+            <Helmet>
+                <title>Post Item for Donation - DaanGuru</title>
+                <meta name="description" content="Donate items you don't need anymore. Post books, clothes, furniture, electronics and more for free. Help your community by giving items to those who need them." />
+                <meta name="keywords" content="donate items, post donation, free items, charity, community help, books, clothes, furniture, electronics" />
+                <meta property="og:title" content="Post Item for Donation - DaanGuru" />
+                <meta property="og:description" content="Donate items you don't need anymore. Post books, clothes, furniture, electronics and more for free." />
+                <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+                <meta property="og:url" content="https://www.daanguru.in/post-item" />
+                <meta property="og:type" content="website" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="Post Item for Donation - DaanGuru" />
+                <meta name="twitter:description" content="Donate items you don't need anymore. Post books, clothes, furniture, electronics and more for free." />
+                <meta name="twitter:image" content="https://www.daanguru.in/images/logo.png" />
+                <link rel="canonical" href="https://www.daanguru.in/post-item" />
+            </Helmet>
+            <div className="mx-auto max-w-3xl px-4 pt-5 pb-28 lg:pb-10">
 
             {/* Share modal */}
             <ShareDonationModal
@@ -368,6 +385,7 @@ export default function PostItemPage() {
                 </motion.button>
             </form>
         </div>
+        </>
     );
 }
 

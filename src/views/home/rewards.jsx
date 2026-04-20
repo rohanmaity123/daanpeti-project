@@ -8,6 +8,7 @@ import {
 import { signInWithGoogle, useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../utils/supabaseClient';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 /* ── Tier config ── */
 const TIERS = {
@@ -278,6 +279,18 @@ export default function RewardsPage() {
   const filteredCoupons = coupons.filter(c => filterTier === 'all' || c.tier_required === filterTier);
 
   return (
+    <>
+      <Helmet>
+        <title>Rewards & Points - DaanGuru | Earn Points for Donations</title>
+        <meta name="description" content="Earn DaanGuru reward points for every donation and redemption. Unlock exclusive discounts and vouchers from your favorite brands." />
+        <meta name="keywords" content="rewards, points, vouchers, discounts, loyalty program" />
+        <meta property="og:title" content="Rewards & Points - DaanGuru" />
+        <meta property="og:description" content="Earn DaanGuru reward points for every donation. Unlock exclusive discounts from your favorite brands." />
+        <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+        <meta property="og:url" content="https://www.daanguru.in/rewards" />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://www.daanguru.in/rewards" />
+      </Helmet>
     <div className="mx-auto max-w-4xl px-4 lg:px-6 pt-5 pb-28 lg:pb-12">
 
       {/* Toast */}
@@ -528,5 +541,6 @@ export default function RewardsPage() {
         </motion.div>
       )}
     </div>
+    </>
   );
 }
