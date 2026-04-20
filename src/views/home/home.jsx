@@ -9,6 +9,7 @@ import { supabase } from '../../utils/supabaseClient';
 import { Loader2 } from 'lucide-react';
 import { PartnersSection } from '../../components/PartnerSection';
 import { useAuth } from '../../hooks/useAuth';
+import { Helmet } from 'react-helmet';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -127,8 +128,24 @@ export default function HomePage() {
     );
 
     return (
-        <div className="pb-4">
-            <SupportBanner />
+        <>
+            <Helmet>
+                <title>DaanGuru - Donate & Claim Free Items | Help Your Community</title>
+                <meta name="description" content="Donate items you don't need and claim free items from others. Join DaanGuru to help your community by giving and receiving donations of books, clothes, furniture, and more." />
+                <meta name="keywords" content="donate items, free items, charity, community help, books, clothes, furniture, electronics" />
+                <meta property="og:title" content="DaanGuru - Donate & Claim Free Items" />
+                <meta property="og:description" content="Donate items you don't need and claim free items from others. Join our community to help by giving and receiving donations." />
+                <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+                <meta property="og:url" content="https://www.daanguru.in/" />
+                <meta property="og:type" content="website" />
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content="DaanGuru - Donate & Claim Free Items" />
+                <meta name="twitter:description" content="Donate items you don't need and claim free items from others. Join our community to help by giving and receiving donations." />
+                <meta name="twitter:image" content="https://www.daanguru.in/images/logo.png" />
+                <link rel="canonical" href="https://www.daanguru.in/" />
+            </Helmet>
+            <div className="pb-4">
+                <SupportBanner />
 
             <div className="mx-4 mt-4 lg:mx-auto lg:max-w-[1200px]">
                 <section className="glass-card home-hero relative overflow-hidden px-5 py-5 sm:px-6 lg:px-7 lg:py-7">

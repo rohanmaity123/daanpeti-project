@@ -20,22 +20,6 @@
     <lastmod>2026-04-20</lastmod>
   </url>
 
-  <!-- My Items -->
-  <url>
-    <loc>https://www.daanguru.in/my-items</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.7</priority>
-    <lastmod>2026-04-20</lastmod>
-  </url>
-
-  <!-- Profile -->
-  <url>
-    <loc>https://www.daanguru.in/profile</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-    <lastmod>2026-04-20</lastmod>
-  </url>
-
   <!-- Support / Donate money -->
   <url>
     <loc>https://www.daanguru.in/support</loc>
@@ -52,11 +36,44 @@
     <lastmod>2026-04-20</lastmod>
   </url>
 
-  <!-- Fund Usage about page -->
+  <!-- About page -->
   <url>
     <loc>https://www.daanguru.in/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <lastmod>2026-04-20</lastmod>
   </url>
+
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://www.daanguru.in/privacy</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- Terms of Service -->
+  <url>
+    <loc>https://www.daanguru.in/terms</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- Contact Us -->
+  <url>
+    <loc>https://www.daanguru.in/contact</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- Rewards -->
+  <url>
+    <loc>https://www.daanguru.in/rewards</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
 </urlset>
