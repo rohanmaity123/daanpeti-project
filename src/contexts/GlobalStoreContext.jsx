@@ -12,7 +12,7 @@ const initialGlobalState = {
   TOGGLE_ADD_MILESTONE_MODAL: false,
   TOGGLE_CHANGE_STATUS_MODAL: false,
   TOGGLE_LOGIN_ALERT_MODAL: false,
-
+  TOGGLE_PICKUP_OTP_MODAL: false,
 };
 
 const reducer = (state, action) => {
@@ -57,7 +57,14 @@ const reducer = (state, action) => {
           ...state,
           [action.payload]: !state.TOGGLE_SCHEDULE_PAYMENT_MODAL,
         }
-      } else if (action.payload === 'TOGGLE_ADD_UPDATE_CV_MODAL') {
+      }
+      else if (action.payload === 'TOGGLE_PICKUP_OTP_MODAL') {
+        return {
+          ...state,
+          [action.payload]: !state.TOGGLE_PICKUP_OTP_MODAL,
+        }
+      }
+      else if (action.payload === 'TOGGLE_ADD_UPDATE_CV_MODAL') {
         return {
           ...state,
           [action.payload]: !state.TOGGLE_ADD_UPDATE_CV_MODAL,
