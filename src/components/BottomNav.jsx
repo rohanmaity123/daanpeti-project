@@ -8,7 +8,7 @@ const navItems = [
   { to: '/post-item', icon: PlusCircle, label: 'Donate', labelHi: 'दान करो' },
   { to: '/my-items', icon: Package, label: 'My Items', labelHi: 'मेरा सामान' },
   { to: '/profile', icon: User, label: 'Profile', labelHi: 'प्रोफ़ाइल' },
-  { to: '/rewards', icon: Trophy, label: 'Rewards', labelHi: 'पुरस्कार' },
+  // { to: '/rewards', icon: Trophy, label: 'Rewards', labelHi: 'पुरस्कार' },
 ];
 
 export function BottomNav() {
