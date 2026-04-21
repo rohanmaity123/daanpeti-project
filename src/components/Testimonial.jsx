@@ -45,6 +45,8 @@ function Avatar({ src, name }) {
 
 /* ── Single card ── */
 function ReviewCard({ review, index }) {
+    const [expanded, setExpanded] = useState(false);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -64,9 +66,17 @@ function ReviewCard({ review, index }) {
                 </div>
             </div>
             <StarRating rating={review.rating} />
-            <p className="text-sm text-foreground/80 leading-relaxed line-clamp-3">
+            <p className={`text-sm text-foreground/80 leading-relaxed ${expanded ? '' : 'line-clamp-3'}`}>
                 "{review.text}"
             </p>
+            {review.text.length > 150 && (
+                <button
+                    onClick={() => setExpanded(!expanded)}
+                    className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors text-left"
+                >
+                    {expanded ? 'Show less' : 'Show more'}
+                </button>
+            )}
         </motion.div>
     );
 }
