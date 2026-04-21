@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Home — item feed -->
+  <url>
+    <loc>https://www.daanguru.in/</loc>
+    <changefreq>hourly</changefreq>
+    <priority>1.0</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- Post / Donate an item -->
+  <url>
+    <loc>https://www.daanguru.in/post-item</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- My Items -->
+  <url>
+    <loc>https://www.daanguru.in/my-items</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- Profile -->
+  <url>
+    <loc>https://www.daanguru.in/profile</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- Support / Donate money -->
+  <url>
+    <loc>https://www.daanguru.in/support</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- Fund Usage transparency page -->
+  <url>
+    <loc>https://www.daanguru.in/fund-usage</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+
+  <!-- Fund Usage about page -->
+  <url>
+    <loc>https://www.daanguru.in/about</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <lastmod>2026-04-20</lastmod>
+  </url>
+</urlset>

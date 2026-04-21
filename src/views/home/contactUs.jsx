@@ -8,23 +8,23 @@ import { useForm } from 'react-hook-form';
 const contactCards = [
     {
         emoji: '📧', icon: Mail, title: 'General Queries',
-        value: 'hello@DaanGuru.in', sub: 'We reply within 24 hours',
+        value: 'info@daanguru.in', sub: 'We reply within 24 hours',
         color: '#138808', bg: 'rgba(19,136,8,0.1)',
     },
     {
         emoji: '🛟', icon: HelpCircle, title: 'Report a Problem',
-        value: 'support@DaanGuru.in', sub: 'For item disputes or account issues',
+        value: 'support@daanguru.in', sub: 'For item disputes or account issues',
         color: '#FF9933', bg: 'rgba(255,153,51,0.1)',
     },
     {
         emoji: '💬', icon: MessageCircle, title: 'WhatsApp Us',
-        value: '+91 98765 43210', sub: 'Mon–Sat, 10am–6pm IST',
+        value: '+91 7001631885', sub: 'Mon–Sat, 10am–6pm IST',
         color: '#25D366', bg: 'rgba(37,211,102,0.1)',
-        whatsapp: 'https://wa.me/919876543210',
+        whatsapp: 'https://wa.me/917001631885',
     },
     {
         emoji: '📍', icon: MapPin, title: 'Based In',
-        value: 'Siliguri, West Bengal', sub: 'Serving all of India 🇮🇳',
+        value: 'Jhargram, West Bengal', sub: 'Serving all of India 🇮🇳',
         color: '#0066CC', bg: 'rgba(0,102,204,0.1)',
     },
 ];

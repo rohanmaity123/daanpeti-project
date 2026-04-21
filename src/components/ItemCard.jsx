@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogTitle, DialogActions } from '@mui/material';
 import { supabase } from '../utils/supabaseClient';
 import useGlobalStore from '../hooks/useGlobalStore';
+import { usePickup } from '../hooks/usePickup';
+import { useNavigate } from 'react-router-dom';
 
 export function ItemCard({ item, showStatus = false, animationIndex = 0, className = '', user }) {
   const isClaimed = item?.status === 'claimed' ? true : false;
@@ -12,18 +14,19 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
   const [confirmOpen, setConfirmOpen] = useState(false);
   const isFeedCard = !showStatus;
   const { toggleForModal } = useGlobalStore();
-
-  const whatsappUrl = `https://wa.me/${item.whatsapp_number}?text=${encodeURIComponent(
-    `Hi! Maine DaanGuru pe "${item.name}" dekha. Kya ye abhi available hai?`
-  )}`;
+  const { clearMessages,
+    initiatePickup, buildWhatsappUrl,
+  } = usePickup(item, user);
+  const navigate = useNavigate();
 
   const handleMarkClaimed = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setConfirmOpen(true);
+    // setConfirmOpen(true);
+    navigate(`/items/${item.id}`);
   };
 
-  const handleContactDonor = (e) => {
+  const handleContactDonor = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -31,8 +34,12 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
       toggleForModal('TOGGLE_LOGIN_ALERT_MODAL');
       return;
     }
-
-    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    clearMessages();
+    const code = await initiatePickup();
+    console.log('Generated OTP:', code);
+    if (code) {
+      window.open(buildWhatsappUrl(code), '_blank', 'noopener,noreferrer');
+    }
   };
 
   const handleConfirmClaim = async () => {
@@ -95,12 +102,15 @@ export function ItemCard({ item, showStatus = false, animationIndex = 0, classNa
           </div>
           <div className="pt-1 flex flex-wrap items-center gap-1.5">
             {isClaimed ? (
-              <span className="glass-surface inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-bold text-white/75">
-                ✅ Kisi ko mil gaya
+              <>
+                <span className="glass-surface inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-bold text-white/75">
+                  ✅ Kisi ko mil gaya hai
+                </span>
                 <span className={`shrink-0 text-[10px] font-semibold px-2 py-0.5 rounded-full ${categoryColors[item.category]}`}>
                   {categoryLabels[item.category]}
                 </span>
-              </span>
+              </>
+
             ) : (
               <>
                 <span className="feed-free-badge inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-bold text-white">

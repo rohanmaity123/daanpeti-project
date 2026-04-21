@@ -10,6 +10,8 @@ import { categoryLabels } from '../../lib/sample-data';
 import { useAuth } from '../../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { set } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { usePickup } from '../../hooks/usePickup';
 
 
 /* ── Animated counter ── */
@@ -36,21 +38,33 @@ function SupabaseItemCard({ item, index, onMarkClaimed }) {
     const isClaimed = item?.status === 'claimed';
     const { user } = useAuth();
     const isOwner = user?.id === item?.user_id;
+    const { clearMessages,
+        initiatePickup, buildWhatsappUrl,
+    } = usePickup(item, user);
+    const navigate = useNavigate();
 
-    const whatsappUrl = `https://wa.me/91${item?.whatsapp_number}?text=${encodeURIComponent(
-        `Hi! Maine DaanGuru pe "${item?.name}" dekha. Kya ye abhi available hai?`
-    )}`;
+    const handleContactDonor = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        clearMessages();
+        const code = await initiatePickup();
+        console.log('Generated OTP:', code);
+        if (code) {
+            window.open(buildWhatsappUrl(code), '_blank', 'noopener,noreferrer');
+        }
+    };
 
     const handleClaim = async () => {
-        setMarking(true);
-        const { error } = await supabase
-            .from('donation_items')
-            .update({ status: 'claimed' })
-            .eq('id', item?.id)
-            .select(); // 👈 important for debugging
-        setMarking(false);
-        setConfirming(false);
-        if (!error && onMarkClaimed) onMarkClaimed(item?.id);
+        // setMarking(true);
+        // const { error } = await supabase
+        //     .from('donation_items')
+        //     .update({ status: 'claimed' })
+        //     .eq('id', item?.id)
+        //     .select(); // 👈 important for debugging
+        // setMarking(false);
+        // setConfirming(false);
+        // if (!error && onMarkClaimed) onMarkClaimed(item?.id);
+        navigate(`/items/${item.id}`);
     };
 
     return (
@@ -109,7 +123,7 @@ function SupabaseItemCard({ item, index, onMarkClaimed }) {
                 {/* Actions */}
                 <div className="flex gap-2 mt-auto pt-1">
                     {!isClaimed && !isOwner && (
-                        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer"
+                        <a href="#" onClick={handleContactDonor} target="_blank" rel="noopener noreferrer"
                             className="flex-1 flex items-center justify-center gap-1 rounded-lg py-2 text-[11px] font-bold text-white hover:opacity-90 transition-opacity"
                             style={{ background: 'linear-gradient(135deg,#25D366,#1DA851)' }}>
                             <MessageCircle className="h-3 w-3" />Contact
@@ -194,7 +208,7 @@ export default function MyItemsPage() {
                 const { data: posted, error: e1 } = await supabase
                     .from('donation_items')
                     .select('*')
-                    .eq('user_id', user.id)
+                    .eq('user_id', user?.id)
                     .order('created_at', { ascending: false });
 
                 if (e1) throw e1;
@@ -203,7 +217,7 @@ export default function MyItemsPage() {
                 const { data: claimed, error: e2 } = await supabase
                     .from('donation_items')
                     .select('*')
-                    .eq('claimed_by_user_id', user.id)
+                    .eq('receiver_id', user?.id)
                     .order('created_at', { ascending: false });
 
                 /* If claimed_by_user_id column doesn't exist yet, gracefully fallback */
