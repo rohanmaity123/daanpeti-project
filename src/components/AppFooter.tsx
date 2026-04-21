@@ -164,6 +164,12 @@ export function AppFooter() {
           ))}
         </div>
       </div>
+
+      <div className="text-center py-4 border-t border-border">
+        <p className="text-xs text-muted-foreground">
+          © 2026 daanguru.in. All rights reserved.
+        </p>
+      </div>
     </footer>
   );
 }
