@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FileText, UserCheck, Package, HandHeart, AlertTriangle, Scale, Globe, Gavel, Copyright, ShieldAlert, MapPin, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 const sections = [
     {
@@ -88,7 +89,19 @@ export default function Terms() {
     useEffect(() => { setMounted(true); }, []);
 
     return (
-        <div className="mx-auto max-w-3xl px-4 lg:px-6 pt-6 pb-28 lg:pb-12">
+        <>
+            <Helmet>
+                <title>Terms of Service - DaanGuru | Legal Guidelines</title>
+                <meta name="description" content="Read DaanGuru's terms of service. Understand the rules, responsibilities, and guidelines for using our free community donation platform." />
+                <meta name="keywords" content="terms of service, legal, guidelines, rules, daanguru" />
+                <meta property="og:title" content="Terms of Service - DaanGuru" />
+                <meta property="og:description" content="Read DaanGuru's terms of service. Understand how to use our platform responsibly." />
+                <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+                <meta property="og:url" content="https://www.daanguru.in/terms" />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://www.daanguru.in/terms" />
+            </Helmet>
+            <div className="mx-auto max-w-3xl px-4 lg:px-6 pt-6 pb-28 lg:pb-12">
 
             <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors mb-6">
                 ← Back to Home
@@ -143,5 +156,6 @@ export default function Terms() {
                 <p className="text-xs text-muted-foreground">Legal queries? Email <a href="mailto:legal@DaanGuru.in" className="font-semibold hover:underline" style={{ color: '#FF9933' }}>legal@DaanGuru.in</a></p>
             </div>
         </div>
+        </>
     );
 }

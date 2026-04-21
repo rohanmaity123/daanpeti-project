@@ -15,6 +15,7 @@ import ShareSheet from '../../components/ShareSheet';
 import useGlobalStore from '../../hooks/useGlobalStore';
 import { LocationCard } from '../../components/MapPreviewCard';
 import { OtpPickupFlow } from '../../components/OtpPickupFlow';
+import { Helmet } from 'react-helmet';
 
 export default function ItemDetailPage() {
     const { itemId } = useParams();
@@ -78,7 +79,19 @@ export default function ItemDetailPage() {
     }
 
     return (
-        <div className="gradient-page pb-28 lg:pb-10">
+        <>
+            <Helmet>
+                <title>{item?.name} - DaanGuru | Free Item</title>
+                <meta name="description" content={`View details of ${item?.name} available for free on DaanGuru. Location: ${item?.location}. Connect with donor directly on WhatsApp.`} />
+                <meta name="keywords" content={`${item?.name}, free ${item?.category}, donate, claim item`} />
+                <meta property="og:title" content={`${item?.name} - Available on DaanGuru`} />
+                <meta property="og:description" content={`View details of ${item?.name} available for free. Connect with donor directly on WhatsApp.`} />
+                <meta property="og:image" content={item?.image_url || 'https://www.daanguru.in/images/logo.png'} />
+                <meta property="og:url" content={`https://www.daanguru.in/items/${item?.id}`} />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href={`https://www.daanguru.in/items/${item?.id}`} />
+            </Helmet>
+            <div className="gradient-page pb-28 lg:pb-10">
 
             {/* ── Sticky header ── */}
             <div className="sticky top-0 z-40 border-b border-white/10 bg-black/20 backdrop-blur-xl lg:static lg:border-0 lg:bg-transparent">
@@ -333,5 +346,6 @@ export default function ItemDetailPage() {
                 </DialogContent>
             </Dialog>
         </div>
+        </>
     );
 }

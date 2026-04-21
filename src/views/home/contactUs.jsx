@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../../utils/supabaseClient';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
+import { Helmet } from 'react-helmet';
 
 const contactCards = [
     {
@@ -107,7 +108,19 @@ export default function Contact() {
     };
 
     return (
-        <div className="mx-auto max-w-5xl px-4 lg:px-6 pt-6 pb-28 lg:pb-12">
+        <>
+            <Helmet>
+                <title>Contact Us - DaanGuru | Get in Touch</title>
+                <meta name="description" content="Have questions about DaanGuru? Contact us via email, WhatsApp, or phone. We're here to help!" />
+                <meta name="keywords" content="contact, support, help, email, whatsapp, daanguru" />
+                <meta property="og:title" content="Contact Us - DaanGuru" />
+                <meta property="og:description" content="Have questions about DaanGuru? Contact us via email, WhatsApp, or phone. We're here to help!" />
+                <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+                <meta property="og:url" content="https://www.daanguru.in/contact" />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://www.daanguru.in/contact" />
+            </Helmet>
+            <div className="mx-auto max-w-5xl px-4 lg:px-6 pt-6 pb-28 lg:pb-12">
 
             <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors mb-6">
                 ← Back to Home
@@ -227,5 +240,6 @@ export default function Contact() {
                 </div>
             </div>
         </div>
+        </>
     );
 }

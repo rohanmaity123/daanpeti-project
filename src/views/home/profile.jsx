@@ -8,6 +8,7 @@ import { supabase } from '../../utils/supabaseClient';
 import { useAuth, signInWithGoogle } from '../../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { set } from 'react-hook-form';
+import { Helmet } from 'react-helmet';
 
 
 /* ── Star picker ── */
@@ -206,7 +207,19 @@ export default function ProfilePage() {
     );
 
     return (
-        <div className="mx-auto max-w-lg px-4 pt-5 pb-28 lg:pb-10">
+        <>
+            <Helmet>
+                <title>My Profile - DaanGuru | Your Donation Profile</title>
+                <meta name="description" content="View and manage your DaanGuru profile. Track your donations, earned rewards, and community reviews." />
+                <meta name="keywords" content="profile, user profile, donation stats, rewards" />
+                <meta property="og:title" content="My Profile - DaanGuru" />
+                <meta property="og:description" content="View and manage your DaanGuru profile. Track your donations and earned rewards." />
+                <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+                <meta property="og:url" content="https://www.daanguru.in/profile" />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://www.daanguru.in/profile" />
+            </Helmet>
+            <div className="mx-auto max-w-lg px-4 pt-5 pb-28 lg:pb-10">
 
             {!user ? (
                 /* ── Not logged in ── */
@@ -346,5 +359,6 @@ export default function ProfilePage() {
                 </div>
             )}
         </div>
+        </>
     );
 }
