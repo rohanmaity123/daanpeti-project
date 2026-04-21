@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useState } from 'react';
 import Qrcode from '../../assets/images/daanguruqr.png';
+import { Helmet } from 'react-helmet';
 
 const amounts = [
   { label: '₹10', value: 10 },
@@ -115,6 +116,18 @@ export default function SupportPage() {
   };
 
   return (
+    <>
+      <Helmet>
+        <title>Support DaanGuru - Keep It Free Forever</title>
+        <meta name="description" content="Support DaanGuru's mission by making a monetary donation. Your contribution helps us keep the platform free and improve features for the community." />
+        <meta name="keywords" content="donate, support, contribution, fund, daanguru" />
+        <meta property="og:title" content="Support DaanGuru" />
+        <meta property="og:description" content="Support DaanGuru's mission by making a monetary donation. Keep our platform free forever!" />
+        <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+        <meta property="og:url" content="https://www.daanguru.in/support" />
+        <meta property="og:type" content="website" />
+        <link rel="canonical" href="https://www.daanguru.in/support" />
+      </Helmet>
     <div className="px-4 pb-8 pt-2">
       {/* Header */}
       <div className="text-center mb-6">
@@ -190,5 +203,6 @@ export default function SupportPage() {
         </p>
       </div>
     </div>
+    </>
   );
 }

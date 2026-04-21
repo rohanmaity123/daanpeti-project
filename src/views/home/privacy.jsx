@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Shield, Eye, Lock, Trash2, Mail, Baby, RefreshCw, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
 
 const sections = [
@@ -92,7 +93,19 @@ export default function Privacy() {
     useEffect(() => { setMounted(true); }, []);
 
     return (
-        <div className="mx-auto max-w-3xl px-4 lg:px-6 pt-6 pb-28 lg:pb-12">
+        <>
+            <Helmet>
+                <title>Privacy Policy - DaanGuru | Your Data, Our Responsibility</title>
+                <meta name="description" content="Read DaanGuru's privacy policy. Learn how we collect, use, and protect your personal information when using our free donation platform." />
+                <meta name="keywords" content="privacy policy, data protection, user privacy, security, daanguru" />
+                <meta property="og:title" content="Privacy Policy - DaanGuru" />
+                <meta property="og:description" content="Learn how DaanGuru protects your privacy and data. Complete transparency in how we handle your information." />
+                <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+                <meta property="og:url" content="https://www.daanguru.in/privacy" />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://www.daanguru.in/privacy" />
+            </Helmet>
+            <div className="mx-auto max-w-3xl px-4 lg:px-6 pt-6 pb-28 lg:pb-12">
 
             <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted-foreground hover:text-foreground transition-colors mb-6">
                 ← Back to Home
@@ -151,5 +164,6 @@ export default function Privacy() {
                 <p className="text-xs text-muted-foreground">Questions? Email us at <a href="mailto:privacy@DaanGuru.in" className="font-semibold hover:underline" style={{ color: '#ef9f27' }}>privacy@DaanGuru.in</a></p>
             </div>
         </div>
+        </>
     );
 }

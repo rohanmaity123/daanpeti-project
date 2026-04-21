@@ -2,6 +2,7 @@ import { motion, useInView } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { ShieldCheck } from 'lucide-react';
 import { useRef, useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet';
 
 /* ─── Data ─── */
 const donors = [
@@ -202,7 +203,19 @@ export default function FundUsagePage() {
     const [showAll, setShowAll] = useState(false);
     const visibleTable = showAll ? tableData : tableData.slice(0, 4);
     return (
-        <div className="mx-auto max-w-3xl px-4 pt-4 pb-28 lg:pb-10 space-y-10">
+        <>
+            <Helmet>
+                <title>Fund Usage Transparency - DaanGuru</title>
+                <meta name="description" content="See complete transparency on how DaanGuru uses donations. View detailed fund allocation for platform maintenance, community initiatives, and charitable activities." />
+                <meta name="keywords" content="transparency, fund usage, allocation, charity funds, daanguru" />
+                <meta property="og:title" content="Fund Usage Transparency - DaanGuru" />
+                <meta property="og:description" content="See how DaanGuru uses donations transparently. Complete fund allocation details for platform and community initiatives." />
+                <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
+                <meta property="og:url" content="https://www.daanguru.in/fund-usage" />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://www.daanguru.in/fund-usage" />
+            </Helmet>
+            <div className="mx-auto max-w-3xl px-4 pt-4 pb-28 lg:pb-10 space-y-10">
 
             {/* ── Hero ── */}
             <motion.div
@@ -628,5 +641,6 @@ export default function FundUsagePage() {
             </motion.div>
 
         </div>
+        </>
     );
 }
