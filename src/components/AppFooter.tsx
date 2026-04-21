@@ -1,4 +1,9 @@
-import { Heart } from "lucide-react";
+import { Twitter } from "@mui/icons-material";
+import { LinkedIn } from "@mui/icons-material";
+import { X } from "@mui/icons-material";
+import { YouTube } from "@mui/icons-material";
+import { Facebook } from "@mui/icons-material";
+import { Instagram } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 
 export function AppFooter() {
@@ -26,6 +31,49 @@ export function AppFooter() {
           <p className="mt-4 text-xs text-muted-foreground">
             Non-profit · Made with 💚 in India
           </p>
+          {/* Social Links */}
+          <div className="flex gap-3 mt-5">
+            <a
+              href="https://www.instagram.com/daanguru_dot_in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-9 w-9 rounded-lg bg-secondary hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-all duration-200"
+            >
+              <Instagram className="h-4 w-4" />
+            </a>
+            <a
+              href="https://x.com/daanguru_dot_in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-9 w-9 rounded-lg bg-secondary hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-all duration-200"
+            >
+              <X className="h-4 w-4" />
+            </a>
+            <a
+              href="https://www.facebook.com/daanguru_dot_in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-9 w-9 rounded-lg bg-secondary hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-all duration-200"
+            >
+              <Facebook className="h-4 w-4" />
+            </a>
+            <a
+              href="https://www.linkedin.com/company/daanguru"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-9 w-9 rounded-lg bg-secondary hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-all duration-200"
+            >
+              <LinkedIn className="h-4 w-4" />
+            </a>
+            <a
+              href="https://www.youtube.com/daanguru"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="h-9 w-9 rounded-lg bg-secondary hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-all duration-200"
+            >
+              <YouTube className="h-4 w-4" />
+            </a>
+          </div>
         </div>
 
         {/* Column 2: Quick Links */}
@@ -163,6 +211,47 @@ export function AppFooter() {
             </Link>
           ))}
         </div>
+        {/* Mobile Social Links */}
+        <div className="flex justify-center gap-4 pt-3">
+          <a
+            href="https://www.instagram.com/daanguru_dot_in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Instagram className="h-5 w-5" />
+          </a>
+          <a
+            href="https://x.com/daanguru_dot_in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </a>
+          <a
+            href="https://www.facebook.com/daanguru_dot_in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Facebook className="h-5 w-5" />
+          </a>
+          <a
+            href="https://www.youtube.com/daanguru"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-primary transition-colors"
+          >
+            <YouTube className="h-4 w-4" />
+          </a>
+        </div>
+      </div>
+
+      <div className="text-center py-4 border-t border-border">
+        <p className="text-xs text-muted-foreground">
+          © 2026 daanguru.in. All rights reserved.
+        </p>
       </div>
     </footer>
   );

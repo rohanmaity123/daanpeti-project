@@ -9,6 +9,7 @@ import { useAuth, signInWithGoogle } from '../../hooks/useAuth';
 import { Link } from 'react-router-dom';
 import { set } from 'react-hook-form';
 import { Helmet } from 'react-helmet';
+import { Trophy } from 'lucide-react';
 
 
 /* ── Star picker ── */
@@ -221,144 +222,145 @@ export default function ProfilePage() {
             </Helmet>
             <div className="mx-auto max-w-lg px-4 pt-5 pb-28 lg:pb-10">
 
-            {!user ? (
-                /* ── Not logged in ── */
-                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-                    className="mt-8 rounded-2xl bg-card card-shadow p-8 text-center">
-                    <div className="mx-auto mb-5 h-20 w-20 rounded-full flex items-center justify-center"
-                        style={{ background: 'linear-gradient(135deg,#138808,#1D9E75)' }}>
-                        <User className="h-10 w-10 text-white" />
-                    </div>
-                    <h1 className="text-xl font-extrabold text-foreground">DaanGuru mein aapka swagat hai! 🙏</h1>
-                    <p className="mt-2 text-sm text-muted-foreground">Login karein aur daan karna shuru karein</p>
-                    <motion.button onClick={handleLogin} disabled={loginLoading} whileTap={{ scale: 0.97 }}
-                        className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-60"
-                        style={{ background: 'linear-gradient(135deg,#138808,#1D9E75)' }}>
-                        {loginLoading ? <><Loader2 className="h-4 w-4 animate-spin" />Redirecting...</> : <><LogIn className="h-4 w-4" />Sign in with Google</>}
-                    </motion.button>
-                    <p className="mt-3 text-xs text-muted-foreground">Google account se safe aur secure login</p>
-                </motion.div>
+                {!user ? (
+                    /* ── Not logged in ── */
+                    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                        className="mt-8 rounded-2xl bg-card card-shadow p-8 text-center">
+                        <div className="mx-auto mb-5 h-20 w-20 rounded-full flex items-center justify-center"
+                            style={{ background: 'linear-gradient(135deg,#138808,#1D9E75)' }}>
+                            <User className="h-10 w-10 text-white" />
+                        </div>
+                        <h1 className="text-xl font-extrabold text-foreground">DaanGuru mein aapka swagat hai! 🙏</h1>
+                        <p className="mt-2 text-sm text-muted-foreground">Login karein aur daan karna shuru karein</p>
+                        <motion.button onClick={handleLogin} disabled={loginLoading} whileTap={{ scale: 0.97 }}
+                            className="mt-6 w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-60"
+                            style={{ background: 'linear-gradient(135deg,#138808,#1D9E75)' }}>
+                            {loginLoading ? <><Loader2 className="h-4 w-4 animate-spin" />Redirecting...</> : <><LogIn className="h-4 w-4" />Sign in with Google</>}
+                        </motion.button>
+                        <p className="mt-3 text-xs text-muted-foreground">Google account se safe aur secure login</p>
+                    </motion.div>
 
-            ) : (
-                /* ── Logged in ── */
-                <div className="space-y-5">
+                ) : (
+                    /* ── Logged in ── */
+                    <div className="space-y-5">
 
-                    {/* User card */}
-                    <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
-                        className="rounded-2xl bg-card card-shadow p-5 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 right-0 h-1"
-                            style={{ background: 'linear-gradient(90deg,#FF9933,#ffffff,#138808)' }} />
-                        <div className="flex items-center gap-4">
-                            {user.user_metadata?.avatar_url ? (
-                                <img src={user.user_metadata.avatar_url} alt="avatar"
-                                    className="h-16 w-16 rounded-full ring-2 object-cover"
-                                    style={{ ringColor: '#1D9E75' }} />
-                            ) : (
-                                <div className="h-16 w-16 rounded-full flex items-center justify-center text-2xl font-bold text-white"
-                                    style={{ background: 'linear-gradient(135deg,#138808,#1D9E75)' }}>
-                                    {(user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()}
+                        {/* User card */}
+                        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
+                            className="rounded-2xl bg-card card-shadow p-5 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 right-0 h-1"
+                                style={{ background: 'linear-gradient(90deg,#FF9933,#ffffff,#138808)' }} />
+                            <div className="flex items-center gap-4">
+                                {user.user_metadata?.avatar_url ? (
+                                    <img src={user.user_metadata.avatar_url} alt="avatar"
+                                        className="h-16 w-16 rounded-full ring-2 object-cover"
+                                        style={{ ringColor: '#1D9E75' }} />
+                                ) : (
+                                    <div className="h-16 w-16 rounded-full flex items-center justify-center text-2xl font-bold text-white"
+                                        style={{ background: 'linear-gradient(135deg,#138808,#1D9E75)' }}>
+                                        {(user.user_metadata?.full_name ?? user.email ?? 'U')[0].toUpperCase()}
+                                    </div>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                    <h2 className="text-lg font-extrabold text-foreground truncate">
+                                        {user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'User'}
+                                    </h2>
+                                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                                    <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full"
+                                        style={{ background: 'rgba(19,136,8,0.1)', color: '#138808' }}>
+                                        ✅ Verified
+                                    </span>
                                 </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                                <h2 className="text-lg font-extrabold text-foreground truncate">
-                                    {user.user_metadata?.full_name ?? user.email?.split('@')[0] ?? 'User'}
-                                </h2>
-                                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                                <span className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full"
-                                    style={{ background: 'rgba(19,136,8,0.1)', color: '#138808' }}>
-                                    ✅ Verified
-                                </span>
+                            </div>
+
+                            {/* Stats */}
+                            <div className="mt-4 grid grid-cols-3 gap-3">
+                                {[
+                                    { label: 'Donated', val: stats.donated, icon: '🎁' },
+                                    { label: 'Claimed', val: stats.claimed, icon: '✅' },
+                                    { label: 'Helped', val: stats.claimed, icon: '🙏' },
+                                ].map(s => (
+                                    <div key={s.label} className="text-center rounded-xl p-3"
+                                        style={{ background: 'rgba(19,136,8,0.06)' }}>
+                                        <p className="text-lg font-extrabold text-foreground">{s.val}</p>
+                                        <p className="text-xs text-muted-foreground">{s.icon} {s.label}</p>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <button onClick={handleSignOut}
+                                className="mt-4 w-full rounded-xl border border-border py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors">
+                                Sign out
+                            </button>
+                        </motion.div>
+
+                        {/* Quick links */}
+                        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                            className="rounded-2xl bg-card card-shadow p-5">
+                            <h3 className="text-sm font-extrabold text-foreground mb-3">Quick Actions</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                                {[
+                                    { to: '/post-item', icon: '🎁', label: 'Donate Item' },
+                                    { to: '/my-items', icon: '📦', label: 'My Items' },
+                                    { to: '/support', icon: '💛', label: 'Support Us' },
+                                    { to: '/', icon: '🏠', label: 'Browse Items' },
+                                    { to: '/fund-usage', icon: '👤', label: 'Transparency' },
+                                    { to: '/rewards', icon: <Trophy />, label: 'Rewards' },
+                                ].map(({ to, icon, label }) => (
+                                    <Link key={to} to={to}
+                                        className="flex items-center gap-2 rounded-xl p-3 hover:bg-muted transition-colors"
+                                        style={{ background: 'rgba(29,158,117,0.06)', border: '1px solid rgba(0,0,0,0.06)' }}>
+                                        <span className="text-xl">{icon}</span>
+                                        <span className="text-sm font-semibold text-foreground">{label}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </motion.div>
+
+                        {/* ── REVIEW SECTION ── */}
+                        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                            className="rounded-2xl bg-card card-shadow p-5 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 right-0 h-1"
+                                style={{ background: 'linear-gradient(90deg,#EF9F27,#D85A30)' }} />
+                            <div className="flex items-center gap-2 mb-1">
+                                <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                                <h3 className="text-base font-extrabold text-foreground">Leave a Review ⭐</h3>
+                            </div>
+                            <p className="text-xs text-muted-foreground mb-4">
+                                DaanGuru kaisa laga? Apna anubhav share karein — it will appear on the home page!
+                            </p>
+                            <ReviewForm user={user} />
+                        </motion.div>
+                        {/* Reviews Section */}
+                        <div className="mt-8">
+                            <h3 className="text-lg font-bold text-foreground">Your Reviews ⭐</h3>
+                            <div className="mt-3 space-y-3">
+                                {
+                                    reviews?.length === 0 ? <p className="text-sm text-muted-foreground">Aapne abhi tak koi review nahi diya hai.</p>
+                                        :
+                                        reviews?.map((review) => (
+                                            <div
+                                                key={review?.id}
+                                                className="group rounded-2xl border p-4 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl"
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <p className="text-sm font-bold text-foreground">{review?.user_name}</p>
+                                                    <div className="flex gap-0.5">
+                                                        {Array.from({ length: 5 }).map((_, i) => (
+                                                            <Star
+                                                                key={i}
+                                                                className={`h-3.5 w-3.5 ${i < review?.rating ? 'fill-[#f59e0b] text-[#f59e0b]' : 'text-muted-foreground/30'}`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <p className="mt-1.5 text-sm text-muted-foreground">{review?.text}</p>
+                                            </div>
+                                        ))}
                             </div>
                         </div>
-
-                        {/* Stats */}
-                        <div className="mt-4 grid grid-cols-3 gap-3">
-                            {[
-                                { label: 'Donated', val: stats.donated, icon: '🎁' },
-                                { label: 'Claimed', val: stats.claimed, icon: '✅' },
-                                { label: 'Helped', val: stats.claimed, icon: '🙏' },
-                            ].map(s => (
-                                <div key={s.label} className="text-center rounded-xl p-3"
-                                    style={{ background: 'rgba(19,136,8,0.06)' }}>
-                                    <p className="text-lg font-extrabold text-foreground">{s.val}</p>
-                                    <p className="text-xs text-muted-foreground">{s.icon} {s.label}</p>
-                                </div>
-                            ))}
-                        </div>
-
-                        <button onClick={handleSignOut}
-                            className="mt-4 w-full rounded-xl border border-border py-2.5 text-sm font-semibold text-muted-foreground hover:bg-muted transition-colors">
-                            Sign out
-                        </button>
-                    </motion.div>
-
-                    {/* Quick links */}
-                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
-                        className="rounded-2xl bg-card card-shadow p-5">
-                        <h3 className="text-sm font-extrabold text-foreground mb-3">Quick Actions</h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { to: '/post-item', icon: '🎁', label: 'Donate Item' },
-                                { to: '/my-items', icon: '📦', label: 'My Items' },
-                                { to: '/support', icon: '💛', label: 'Support Us' },
-                                { to: '/', icon: '🏠', label: 'Browse Items' },
-                                { to: '/fund-usage', icon: '👤', label: 'Transparency' },
-                            ].map(({ to, icon, label }) => (
-                                <Link key={to} to={to}
-                                    className="flex items-center gap-2 rounded-xl p-3 hover:bg-muted transition-colors"
-                                    style={{ background: 'rgba(29,158,117,0.06)', border: '1px solid rgba(0,0,0,0.06)' }}>
-                                    <span className="text-xl">{icon}</span>
-                                    <span className="text-sm font-semibold text-foreground">{label}</span>
-                                </Link>
-                            ))}
-                        </div>
-                    </motion.div>
-
-                    {/* ── REVIEW SECTION ── */}
-                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                        className="rounded-2xl bg-card card-shadow p-5 relative overflow-hidden">
-                        <div className="absolute top-0 left-0 right-0 h-1"
-                            style={{ background: 'linear-gradient(90deg,#EF9F27,#D85A30)' }} />
-                        <div className="flex items-center gap-2 mb-1">
-                            <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
-                            <h3 className="text-base font-extrabold text-foreground">Leave a Review ⭐</h3>
-                        </div>
-                        <p className="text-xs text-muted-foreground mb-4">
-                            DaanGuru kaisa laga? Apna anubhav share karein — it will appear on the home page!
-                        </p>
-                        <ReviewForm user={user} />
-                    </motion.div>
-                    {/* Reviews Section */}
-                    <div className="mt-8">
-                        <h3 className="text-lg font-bold text-foreground">Your Reviews ⭐</h3>
-                        <div className="mt-3 space-y-3">
-                            {
-                                reviews?.length === 0 ? <p className="text-sm text-muted-foreground">Aapne abhi tak koi review nahi diya hai.</p>
-                                    :
-                                    reviews?.map((review) => (
-                                        <div
-                                            key={review?.id}
-                                            className="group rounded-2xl border p-4 shadow-lg backdrop-blur-xl transition-all duration-300 hover:shadow-xl"
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-sm font-bold text-foreground">{review?.user_name}</p>
-                                                <div className="flex gap-0.5">
-                                                    {Array.from({ length: 5 }).map((_, i) => (
-                                                        <Star
-                                                            key={i}
-                                                            className={`h-3.5 w-3.5 ${i < review?.rating ? 'fill-[#f59e0b] text-[#f59e0b]' : 'text-muted-foreground/30'}`}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <p className="mt-1.5 text-sm text-muted-foreground">{review?.text}</p>
-                                        </div>
-                                    ))}
-                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )}
+            </div>
         </>
     );
 }

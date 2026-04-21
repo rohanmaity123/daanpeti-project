@@ -75,6 +75,7 @@ export default function RenderRoutes() {
           <Route path="/items/:itemId" element={<ItemDetailPage />} />
           <Route path="/my-items" element={<MyItemsPage />} />
           <Route path="/post-item" element={<PostItemPage />} />
+          <Route path="/edit/:itemId" element={<PostItemPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/support" element={<SupportPage />} />
           <Route path="/privacy" element={<Privacy />} />
