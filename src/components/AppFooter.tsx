@@ -108,7 +108,7 @@ export function AppFooter() {
             </li>
             <li>
               <Link
-                to="/blogs"
+                to="/blog"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
                 Blogs
