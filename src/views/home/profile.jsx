@@ -305,6 +305,7 @@ export default function ProfilePage() {
                                     { to: '/', icon: '🏠', label: 'Browse Items' },
                                     { to: '/fund-usage', icon: '👤', label: 'Transparency' },
                                     { to: '/rewards', icon: <Trophy />, label: 'Rewards' },
+                                    { to: '/blogs', icon: '📝', label: 'Blogs' },
                                 ].map(({ to, icon, label }) => (
                                     <Link key={to} to={to}
                                         className="flex items-center gap-2 rounded-xl p-3 hover:bg-muted transition-colors"
