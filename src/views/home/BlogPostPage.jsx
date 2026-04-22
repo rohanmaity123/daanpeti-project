@@ -6,6 +6,7 @@ import { useBlogPost, useRelatedPosts } from '../../hooks/useBlog';
 import { markdownToHtml } from '../../utils/markdownToHtml';
 import { useState } from 'react';
 import { Twitter } from '@mui/icons-material';
+import { Facebook } from '@mui/icons-material';
 
 const fmt = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 const fmtISO = (d) => d ? new Date(d).toISOString() : '';
@@ -57,6 +58,12 @@ function ShareButtons({ url, title }) {
                 className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-opacity hover:opacity-80"
                 style={{ background: 'rgba(29,155,240,0.2)', border: '1px solid rgba(29,155,240,0.3)' }}>
                 <Twitter className="h-3 w-3" />Twitter
+            </a>
+            <a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-opacity hover:opacity-80"
+                style={{ background: 'rgba(59,89,152,0.2)', border: '1px solid rgba(59,89,152,0.3)' }}>
+                <Facebook className="h-3 w-3" />Facebook
             </a>
             <button onClick={copy}
                 className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold text-white transition-opacity hover:opacity-80"

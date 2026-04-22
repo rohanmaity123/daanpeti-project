@@ -238,7 +238,7 @@ export function AppFooter() {
             <X className="h-5 w-5" />
           </a>
           <a
-            href="https://www.facebook.com/daanguru_dot_in"
+            href="https://www.facebook.com/daanguru.in"
             target="_blank"
             rel="noopener noreferrer"
             className="text-muted-foreground hover:text-primary transition-colors"
