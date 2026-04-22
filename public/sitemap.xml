@@ -75,7 +75,11 @@
     <priority>0.7</priority>
     <lastmod>2026-04-20</lastmod>
   </url>
-
+   <url>
+     <loc>https://www.daanguru.in/blog</loc>
+     <changefreq>weekly</changefreq>
+     <priority>0.8</priority>
+   </url>
   <!-- City Pages - Free Items -->
   <url>
     <loc>https://www.daanguru.in/mumbai/free-items</loc>

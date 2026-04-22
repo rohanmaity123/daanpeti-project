@@ -61,6 +61,7 @@ export function AppHeader() {
             { to: '/post-item', label: 'Donate Item' },
             { to: '/support', label: 'Support Us' },
             { to: '/fund-usage', label: 'Transparency' },
+            { to: '/blog', label: 'Blogs' }
           ].map((item) => {
             const isActive = item.to === '/'
               ? location.pathname === '/'

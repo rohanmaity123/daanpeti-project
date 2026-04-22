@@ -27,6 +27,8 @@ import Privacy from "./views/home/privacy";
 import FundUsagePage from "./views/home/fund-use";
 import RewardsPage from "./views/home/rewards";
 import CityPage from "./views/home/citypage";
+import BlogPostPage from "./views/home/BlogPostPage";
+import BlogListPage from "./views/home/BlogListPage";
 
 
 // ==================
@@ -74,6 +76,8 @@ export default function RenderRoutes() {
         <Route element={<UserLayout />}>
           <Route path="/:city/free-items" element={<CityPage type="free" />} />
           <Route path="/:city/donate-items" element={<CityPage type="donate" />} />
+          <Route path="/blog" element={<BlogListPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/" element={<HomePage />} />
           <Route path="/items/:itemId" element={<ItemDetailPage />} />
           <Route path="/my-items" element={<MyItemsPage />} />
