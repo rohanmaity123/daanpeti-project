@@ -108,6 +108,14 @@ export function AppFooter() {
             </li>
             <li>
               <Link
+                to="/blogs"
+                className="text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                Blogs
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/profile"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
