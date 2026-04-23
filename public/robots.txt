@@ -1,18 +1,29 @@
 User-agent: *
 Allow: /
+Allow: /blog
+Allow: /blog/
+Allow: /items/
 Allow: /post-item
-Allow: /support
-Allow: /fund-usage
 Allow: /about
 Allow: /privacy
 Allow: /terms
 Allow: /contact
-# Don't index private/auth pages
+Allow: /support
+Allow: /fund-usage
+Allow: /rewards
+Allow: /*/free-items
+Allow: /*/donate-items
+
+# Don't index auth/login pages
+Disallow: /login
+Disallow: /register
+Disallow: /forget-pass
+Disallow: /otp-verification
+Disallow: /login-with-otp
+
+# Don't index private/user-specific pages
 Disallow: /profile
 Disallow: /my-items
-
-# Don't index individual item pages (dynamic, require auth for full UX)
-# Remove the line below if you want items indexed by Google
-# Disallow: /items/
+Disallow: /edit/
 
 Sitemap: https://www.daanguru.in/sitemap.xml
