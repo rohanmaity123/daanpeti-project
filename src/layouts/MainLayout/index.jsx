@@ -13,11 +13,13 @@ const MainLayout = ({ children }) => {
   const location = useLocation();
   const isItemDetail = location.pathname.startsWith('/items/');
   const [showOnboarding, setShowOnboarding] = useState(false);
-
+  const isBot = /googlebot|bot|crawler|spider|crawling/i.test(navigator.userAgent);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const seen = localStorage.getItem('daanguru_onboarded');
-      if (!seen) setShowOnboarding(true);
+      if (!seen && !isBot) {
+        setShowOnboarding(true)
+      }
     }
   }, []);
 
