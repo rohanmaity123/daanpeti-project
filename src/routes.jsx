@@ -29,6 +29,8 @@ import RewardsPage from "./views/home/rewards";
 import CityPage from "./views/home/citypage";
 import BlogPostPage from "./views/home/BlogPostPage";
 import BlogListPage from "./views/home/BlogListPage";
+import CertificateGenerator from "./views/home/CertificateGenerate";
+import CertificateVerify from "./views/home/CertificateVerify";
 
 
 // ==================
@@ -91,6 +93,8 @@ export default function RenderRoutes() {
           <Route path="/about" element={<About />} />
           <Route path="/fund-usage" element={<FundUsagePage />} />
           <Route path="/rewards" element={<RewardsPage />} />
+          <Route path="/certificate-generator" element={<CertificateGenerator />} />
+          <Route path="/certificate/verify/:certId" element={<CertificateVerify />} />
         </Route>
 
 

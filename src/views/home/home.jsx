@@ -10,6 +10,7 @@ import { Loader2 } from 'lucide-react';
 import { PartnersSection } from '../../components/PartnerSection';
 import { useAuth } from '../../hooks/useAuth';
 import { Helmet } from 'react-helmet';
+import CertificatesHomeWidget from '../../components/CertificateComponent';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -292,6 +293,8 @@ export default function HomePage() {
 
                 {/* Our Partners */}
                 <PartnersSection />
+
+                <CertificatesHomeWidget />
             </div>
         </>
     );
