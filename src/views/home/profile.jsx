@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { set } from 'react-hook-form';
 import { Helmet } from 'react-helmet';
 import { Trophy } from 'lucide-react';
+import { Bloodtype } from '@mui/icons-material';
 
 
 /* ── Star picker ── */
@@ -306,6 +307,7 @@ export default function ProfilePage() {
                                     { to: '/fund-usage', icon: '👤', label: 'Transparency' },
                                     { to: '/rewards', icon: <Trophy />, label: 'Rewards' },
                                     { to: '/blog', icon: '📝', label: 'Blogs' },
+                                    { to: '/digital-blood-bank/find', icon: <Bloodtype />, label: 'Digital Blood Bank' },
                                 ].map(({ to, icon, label }) => (
                                     <Link key={to} to={to}
                                         className="flex items-center gap-2 rounded-xl p-3 hover:bg-muted transition-colors"
