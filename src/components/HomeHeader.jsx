@@ -61,7 +61,8 @@ export function AppHeader() {
             { to: '/post-item', label: 'Donate Item' },
             { to: '/support', label: 'Support Us' },
             { to: '/fund-usage', label: 'Transparency' },
-            { to: '/blog', label: 'Blogs' }
+            { to: '/blog', label: 'Blogs' },
+            { to: '/digital-blood-bank/find', label: 'Digital Blood Bank' },
           ].map((item) => {
             const isActive = item.to === '/'
               ? location.pathname === '/'

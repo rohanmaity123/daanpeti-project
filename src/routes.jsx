@@ -31,6 +31,8 @@ import BlogPostPage from "./views/home/BlogPostPage";
 import BlogListPage from "./views/home/BlogListPage";
 import CertificateGenerator from "./views/home/CertificateGenerate";
 import CertificateVerify from "./views/home/CertificateVerify";
+import BloodBankPage from "./views/home/addEditBloodBank";
+import FindDonorsPage from "./views/home/findDonors";
 
 
 // ==================
@@ -95,6 +97,8 @@ export default function RenderRoutes() {
           <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/certificate-generator" element={<CertificateGenerator />} />
           <Route path="/certificate/verify/:certId" element={<CertificateVerify />} />
+          <Route path="/digital-blood-bank" element={<BloodBankPage />} />
+          <Route path="/digital-blood-bank/find" element={<FindDonorsPage />} />
         </Route>
 
 
