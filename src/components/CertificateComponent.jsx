@@ -83,14 +83,6 @@ export default function CertificatesHomeWidget() {
         return () => clearInterval(autoRef.current);
     }, [certs.length]);
 
-    // Scroll slider to activeIdx
-    useEffect(() => {
-        if (!sliderRef.current || !certs.length) return;
-        const card = sliderRef.current.children[activeIdx];
-        if (card) {
-            card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
-    }, [activeIdx, certs.length]);
 
     const fetchCerts = async () => {
         const { data } = await supabase
