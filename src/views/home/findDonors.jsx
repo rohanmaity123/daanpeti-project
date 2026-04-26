@@ -437,21 +437,21 @@ export default function FindDonorsPage() {
                 ) : null}
 
                 {/* ── Register CTA at bottom ── */}
-                {hasSearched && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                        className="mt-8 rounded-2xl p-5 flex items-center justify-between gap-4"
-                        style={{ background: 'rgba(226,75,74,0.06)', border: '1px solid rgba(226,75,74,0.15)' }}>
-                        <div>
-                            <p className="text-sm font-extrabold text-white-800">🩸 Are you a donor?</p>
-                            <p className="text-xs text-white-500 mt-0.5">Register to help people in your area find you.</p>
-                        </div>
-                        <Link to="/digital-blood-bank"
-                            className="shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold text-white whitespace-nowrap"
-                            style={{ background: 'linear-gradient(135deg,#E24B4A,#c0392b)' }}>
-                            Register Now
-                        </Link>
-                    </motion.div>
-                )}
+                {/* {hasSearched && ( */}
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                    className="mt-8 rounded-2xl p-5 flex items-center justify-between gap-4"
+                    style={{ background: 'rgba(226,75,74,0.06)', border: '1px solid rgba(226,75,74,0.15)' }}>
+                    <div>
+                        <p className="text-sm font-extrabold text-white-800">🩸 Are you a donor?</p>
+                        <p className="text-xs text-white-500 mt-0.5">Register to help people in your area find you.</p>
+                    </div>
+                    <Link to="/digital-blood-bank"
+                        className="shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold text-white whitespace-nowrap"
+                        style={{ background: 'linear-gradient(135deg,#E24B4A,#c0392b)' }}>
+                        Register Now
+                    </Link>
+                </motion.div>
+                {/* )} */}
             </div>
         </>
     );
