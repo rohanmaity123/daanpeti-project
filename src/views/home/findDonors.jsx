@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../utils/supabaseClient';
 import { Helmet } from 'react-helmet';
+import { use } from 'react';
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
 const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -198,21 +199,19 @@ export default function FindDonorsPage() {
     const getPincodeFromCoords = async (lat, lng) => {
         try {
             const res = await fetch(
-                `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
             );
             const data = await res.json();
-            if (data.results?.length) {
-                const result = data.results[0];
-                // Get pincode
-                const pcComp = result.address_components?.find(c => c.types.includes('postal_code'));
-                const cityComp = result.address_components?.find(c => c.types.includes('locality'));
-                const stateComp = result.address_components?.find(c => c.types.includes('administrative_area_level_1'));
-                const pc = pcComp?.long_name || '';
-                const city = cityComp?.long_name || stateComp?.long_name || 'your location';
-                return { pincode: pc, locationName: city };
-            }
-        } catch { /* ignore */ }
-        return { pincode: '', locationName: '' };
+
+            const address = data.address || {};
+
+            return {
+                pincode: address.postcode || '',
+                locationName: address.city || address.state || 'your location'
+            };
+        } catch {
+            return { pincode: '', locationName: '' };
+        }
     };
 
     /* ── Use device location ── */
@@ -274,6 +273,9 @@ export default function FindDonorsPage() {
         if (pincode) fetchDonors(pincode, bg);
     };
 
+    useEffect(() => {
+        useMyLocation()
+    }, []);
     return (
         <>
             <Helmet>
