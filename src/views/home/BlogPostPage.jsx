@@ -7,6 +7,7 @@ import { markdownToHtml } from '../../utils/markdownToHtml';
 import { useState } from 'react';
 import { Twitter } from '@mui/icons-material';
 import { Facebook } from '@mui/icons-material';
+import { Bloodtype } from '@mui/icons-material';
 
 const fmt = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
 const fmtISO = (d) => d ? new Date(d).toISOString() : '';
@@ -88,14 +89,8 @@ export default function BlogPostPage() {
 
     /* ── Loading skeleton ── */
     if (loading) return (
-        <div className="mx-auto max-w-3xl px-4 pt-8 pb-28 space-y-4 animate-pulse">
-            <div className="h-6 w-2/3 rounded-xl bg-white/10" />
-            <div className="h-64 w-full rounded-[28px] bg-white/08" />
-            <div className="space-y-2">
-                {[...Array(8)].map((_, i) => (
-                    <div key={i} className="h-4 rounded-lg bg-white/07" style={{ width: `${75 + (i % 3) * 8}%` }} />
-                ))}
-            </div>
+        <div className="mt-16 flex justify-center">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/20 border-t-green-400" />
         </div>
     );
 
@@ -296,12 +291,17 @@ export default function BlogPostPage() {
                         {/* Back to blog */}
                         <div className="mt-8 flex items-center justify-between">
                             <Link to="/blog"
-                                className="flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white/70 hover:text-white transition-colors"
+                                className="flex items-center gap-1 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white/70 hover:text-white transition-colors"
                                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}>
                                 <ArrowLeft className="h-4 w-4" />Back to Blog
                             </Link>
+                            <Link to="/digital-blood-bank"
+                                className="flex items-center gap-1 rounded-2xl px-4 py-2.5 text-sm font-bold text-white"
+                                style={{ background: 'linear-gradient(135deg,#E24B4A,#c0392b)' }}>
+                                Donate Blood <ArrowRight className="h-4 w-4" />
+                            </Link>
                             <Link to="/post-item"
-                                className="flex items-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-bold text-white"
+                                className="flex items-center gap-1 rounded-2xl px-4 py-2.5 text-sm font-bold text-white"
                                 style={{ background: 'linear-gradient(135deg,#138808,#1D9E75)' }}>
                                 Donate Item <ArrowRight className="h-4 w-4" />
                             </Link>
@@ -338,7 +338,19 @@ export default function BlogPostPage() {
                                     Post Item Free →
                                 </Link>
                             </div>
-
+                            <div className="rounded-[22px] p-5 text-center"
+                                style={{ background: 'linear-gradient(135deg, rgba(19,136,8,0.3), rgba(29,158,117,0.2))', border: '1px solid rgba(29,158,117,0.3)' }}>
+                                <p className="text-2xl mb-2">🩸</p>
+                                <p className="text-sm font-extrabold text-white">Blood donate karna hai?</p>
+                                <p className="text-xs text-white/55 mt-1 mb-4 leading-relaxed">
+                                    Apna naam register karo as a blood donor !!
+                                </p>
+                                <Link to="/post-item"
+                                    className="block w-full rounded-xl py-2.5 text-sm font-bold text-white text-center transition-opacity hover:opacity-85"
+                                    style={{ background: 'linear-gradient(135deg,#E24B4A,#c0392b)' }}>
+                                    Register your name →
+                                </Link>
+                            </div>
                             {/* Tags cloud */}
                             {post.tags?.length > 0 && (
                                 <div className="rounded-[22px] p-4"

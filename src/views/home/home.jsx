@@ -11,6 +11,7 @@ import { PartnersSection } from '../../components/PartnerSection';
 import { useAuth } from '../../hooks/useAuth';
 import { Helmet } from 'react-helmet';
 import CertificatesHomeWidget from '../../components/CertificateComponent';
+import { BlogWidget } from '../../components/blog/BlogWidget';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -288,13 +289,16 @@ export default function HomePage() {
                             )}
                     </div>
                 </div>
+
+
                 {/* Testimonials */}
                 <TestimonialSection />
-
                 {/* Our Partners */}
                 <PartnersSection />
 
                 <CertificatesHomeWidget />
+                <BlogWidget limit={3} />
+
             </div>
         </>
     );
