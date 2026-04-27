@@ -345,7 +345,7 @@ export default function BlogPostPage() {
                                 <p className="text-xs text-white/55 mt-1 mb-4 leading-relaxed">
                                     Apna naam register karo as a blood donor !!
                                 </p>
-                                <Link to="/post-item"
+                                <Link to="/digital-blood-bank"
                                     className="block w-full rounded-xl py-2.5 text-sm font-bold text-white text-center transition-opacity hover:opacity-85"
                                     style={{ background: 'linear-gradient(135deg,#E24B4A,#c0392b)' }}>
                                     Register your name →
