@@ -100,10 +100,10 @@ export function AppFooter() {
             </li>
             <li>
               <Link
-                to="/my-items"
+                to="/digital-blood-bank/find"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
-                My Items
+                Need Blood ?
               </Link>
             </li>
             <li>

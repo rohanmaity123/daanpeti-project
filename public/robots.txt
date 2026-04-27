@@ -13,6 +13,7 @@ Allow: /fund-usage
 Allow: /rewards
 Allow: /*/free-items
 Allow: /*/donate-items
+Allow: /digital-blood-bank/find
 
 # Don't index auth/login pages
 Disallow: /login
