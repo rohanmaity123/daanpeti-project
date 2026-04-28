@@ -50,7 +50,7 @@ export function AppFooter() {
               <X className="h-4 w-4" />
             </a>
             <a
-              href="https://www.facebook.com/daanguru_dot_in"
+              href="https://www.facebook.com/daanguru.in"
               target="_blank"
               rel="noopener noreferrer"
               className="h-9 w-9 rounded-lg bg-secondary hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-all duration-200"

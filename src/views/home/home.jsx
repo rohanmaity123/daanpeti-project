@@ -12,6 +12,9 @@ import { useAuth } from '../../hooks/useAuth';
 import { Helmet } from 'react-helmet';
 import CertificatesHomeWidget from '../../components/CertificateComponent';
 import { BlogWidget } from '../../components/blog/BlogWidget';
+import HomeScreenModal from '../../components/Modals/HomeScreenModal';
+import { AppRegistration } from '@mui/icons-material';
+import { Plus } from 'lucide-react';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -28,6 +31,7 @@ export default function HomePage() {
     const [locationQuery, setLocationQuery] = useState('');
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
     const claimedMap = useItemsClaimed();
 
     const filteredItems = useMemo(() => {
@@ -146,6 +150,7 @@ export default function HomePage() {
                 <meta name="twitter:image" content="https://www.daanguru.in/images/logo.png" />
                 <link rel="canonical" href="https://www.daanguru.in/" />
             </Helmet>
+            <HomeScreenModal isOpen={showModal} onClose={() => setShowModal(false)} />
             <div className="pb-4">
                 <SupportBanner />
 
@@ -300,6 +305,13 @@ export default function HomePage() {
                 <BlogWidget limit={3} />
 
             </div>
+            {!showModal && <button
+                onClick={() => setShowModal(true)}
+                className="fixed bottom-20 right-6 z-50 flex items-center gap-2 rounded-full bg-[#1D9E75] px-5 py-3.5 text-sm font-bold text-white shadow-[0_4px_24px_rgba(29,158,117,0.45)] transition-all hover:scale-105 hover:bg-[#17875f] active:scale-95"
+                aria-label="Open modal"
+            >
+                <Plus className="h-4 w-4" />
+            </button>}
         </>
     );
 }
