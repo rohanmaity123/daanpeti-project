@@ -34,17 +34,15 @@ export function OtpPickupFlow({ item, user, isDonor, isClaimed, onClaimed, onLog
     }
     clearMessages();
 
-    // Open a blank window IMMEDIATELY (still in user gesture context)
-    const newWindow = window.open('', '_blank', 'noopener,noreferrer');
+    // Remove 'noopener' — it blocks setting location.href on the new window
+    const newWindow = window.open('', '_blank');
 
     const code = await initiatePickup();
     console.log('Generated OTP:', code);
 
     if (code) {
-      // Now set the URL on the already-opened window
       newWindow.location.href = buildWhatsappUrl(code);
     } else {
-      // Close the blank tab if something went wrong
       newWindow?.close();
     }
   };
