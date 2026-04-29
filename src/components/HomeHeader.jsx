@@ -63,6 +63,7 @@ export function AppHeader() {
             { to: '/fund-usage', label: 'Transparency' },
             { to: '/blog', label: 'Blogs' },
             { to: '/digital-blood-bank/find', label: 'Digital Blood Bank' },
+            { to: '/find-doctor', label: 'Find Doctor' },
           ].map((item) => {
             const isActive = item.to === '/'
               ? location.pathname === '/'

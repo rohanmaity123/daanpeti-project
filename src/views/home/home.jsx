@@ -15,6 +15,7 @@ import { BlogWidget } from '../../components/blog/BlogWidget';
 import HomeScreenModal from '../../components/Modals/HomeScreenModal';
 import { AppRegistration } from '@mui/icons-material';
 import { Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const heroEmojis = [
     { emoji: '📚', top: '12%', left: '10%', duration: '5.5s' },
@@ -26,6 +27,7 @@ const heroEmojis = [
 
 export default function HomePage() {
     const { user } = useAuth();
+    const navigator = useNavigate()
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [locationQuery, setLocationQuery] = useState('');
@@ -182,15 +184,20 @@ export default function HomePage() {
                                 Ghar ka extra samaan kisi aur ke kaam laao. Nearby logon se connect karo, bina kisi fee ke.
                             </p>
                             <div className="mt-5 flex flex-wrap gap-3">
-                                <div className="glass-surface rounded-full px-4 py-2 text-sm font-semibold text-white/80">
-                                    Free forever
+                                <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#25d366cc]/80 px-4 py-2 text-sm font-bold text-white shadow-[0_0_26px_rgba(29,158,117,0.25)]"
+                                    onClick={() => navigator('/find-doctor')}
+                                >
+                                    Free helth consultation with verified doctors
+                                    <ArrowRight className="h-4 w-4" />
                                 </div>
                                 <div className="glass-surface rounded-full px-4 py-2 text-sm font-semibold text-white/80">
                                     WhatsApp direct connect
                                 </div>
                             </div>
-                            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#1D9E75]/80 px-4 py-2 text-sm font-bold text-white shadow-[0_0_26px_rgba(29,158,117,0.25)]">
-                                Explore items
+                            <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#25d366cc]/80 px-4 py-2 text-sm font-bold text-white shadow-[0_0_26px_rgba(29,158,117,0.25)]"
+                                onClick={() => navigator('/digital-blood-bank/find')}
+                            >
+                                Digital Blood Bank
                                 <ArrowRight className="h-4 w-4" />
                             </div>
                         </div>

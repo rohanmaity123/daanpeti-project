@@ -33,6 +33,7 @@ import CertificateGenerator from "./views/home/CertificateGenerate";
 import CertificateVerify from "./views/home/CertificateVerify";
 import BloodBankPage from "./views/home/addEditBloodBank";
 import FindDonorsPage from "./views/home/findDonors";
+import DoctorFinderPage from "./views/home/DoctorFinderPage";
 
 
 // ==================
@@ -99,6 +100,7 @@ export default function RenderRoutes() {
           <Route path="/certificate/verify/:certId" element={<CertificateVerify />} />
           <Route path="/digital-blood-bank" element={<BloodBankPage />} />
           <Route path="/digital-blood-bank/find" element={<FindDonorsPage />} />
+          <Route path="/find-doctor" element={<DoctorFinderPage />} />
         </Route>
 
 
