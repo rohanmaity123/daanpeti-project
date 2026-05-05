@@ -138,24 +138,117 @@ export default function HomePage() {
     return (
         <>
             <Helmet>
-                <title>DaanGuru - Donate & Claim Free Items | Help Your Community</title>
-                <meta name="description" content="Donate items you don't need and claim free items from others. Join DaanGuru to help your community by giving and receiving donations of books, clothes, furniture, and more." />
-                <meta name="keywords" content="donate items, free items, charity, community help, books, clothes, furniture, electronics" />
-                <meta property="og:title" content="DaanGuru - Donate & Claim Free Items" />
-                <meta property="og:description" content="Donate items you don't need and claim free items from others. Join our community to help by giving and receiving donations." />
+                <title>DaanGuru - Free Donations, AI Doctor Finder & Blood Bank | Jhargram, West Bengal</title>
+                <meta name="description" content="DaanGuru: Donate & claim free items, find nearby doctors with AI symptom checker, and connect with blood donors in Jhargram, West Bengal. Free community platform." />
+                <meta name="keywords" content="donate items free, AI doctor finder Jhargram, blood donation West Bengal, free items near me, doctor near me Jhargram, blood donor Jhargram, community help India" />
+                <meta property="og:title" content="DaanGuru - Free Donations, AI Doctor & Blood Bank | Jhargram" />
+                <meta property="og:description" content="Donate items, find AI-matched nearby doctors, and connect with blood donors. Free community platform in Jhargram, West Bengal." />
                 <meta property="og:image" content="https://www.daanguru.in/images/logo.png" />
                 <meta property="og:url" content="https://www.daanguru.in/" />
                 <meta property="og:type" content="website" />
                 <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content="DaanGuru - Donate & Claim Free Items" />
-                <meta name="twitter:description" content="Donate items you don't need and claim free items from others. Join our community to help by giving and receiving donations." />
+                <meta name="twitter:title" content="DaanGuru - AI Doctor Finder & Blood Bank | Jhargram" />
+                <meta name="twitter:description" content="Free platform: donate items, find doctors, connect with blood donors in West Bengal." />
                 <meta name="twitter:image" content="https://www.daanguru.in/images/logo.png" />
                 <link rel="canonical" href="https://www.daanguru.in/" />
+                {/* Structured data for Google */}
+                <script type="application/ld+json">{JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "WebSite",
+                    "name": "DaanGuru",
+                    "url": "https://www.daanguru.in",
+                    "description": "Free community platform for donations, AI doctor finder, and blood bank in Jhargram, West Bengal",
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": "https://www.daanguru.in/?search={search_term_string}",
+                        "query-input": "required name=search_term_string"
+                    }
+                })}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    "@context": "https://schema.org",
+                    "@type": "LocalBusiness",
+                    "name": "DaanGuru",
+                    "url": "https://www.daanguru.in",
+                    "areaServed": ["Jhargram", "West Bengal", "India"],
+                    "serviceType": ["Donation Platform", "AI Doctor Finder", "Blood Bank", "Community Help"],
+                    "description": "Free community platform helping people donate items, find nearby doctors, and connect with blood donors"
+                })}</script>
             </Helmet>
             <HomeScreenModal isOpen={showModal} onClose={() => setShowModal(false)} />
             <div className="pb-4">
                 <SupportBanner />
+                {/* ── FEATURE BANNERS ─────────────────────────────────────── */}
+                <div className="mx-4 mt-4 lg:mx-auto lg:max-w-[1200px]">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 
+                        {/* AI Doctor Banner */}
+                        <div
+                            onClick={() => navigator('/find-doctor')}
+                            className="glass-card relative overflow-hidden rounded-2xl px-5 py-4 cursor-pointer group transition-all hover:-translate-y-1"
+                            style={{ border: '1px solid rgba(99,102,241,0.3)', background: 'rgba(99,102,241,0.08)' }}
+                        >
+                            {/* Glow blob */}
+                            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20 blur-2xl"
+                                style={{ background: 'radial-gradient(circle,#6366f1,transparent)' }} />
+                            <div className="relative z-10 flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xl"
+                                    style={{ background: 'rgba(99,102,241,0.25)', border: '1px solid rgba(99,102,241,0.4)' }}>
+                                    🤖
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-xs font-bold uppercase tracking-wider text-indigo-400">Free Service</p>
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                                            style={{ background: 'rgba(99,102,241,0.25)', color: '#a5b4fc' }}>NEW</span>
+                                    </div>
+                                    <h3 className="text-sm font-extrabold text-white leading-tight mb-1">
+                                        AI Doctor Finder
+                                    </h3>
+                                    <p className="text-xs text-white/55 leading-relaxed">
+                                        Apne symptoms batao — Hindi, Bengali, English mein. Nearby verified doctors milenge with phone & timings.
+                                    </p>
+                                    <div className="mt-2.5 flex items-center gap-1.5 text-xs font-bold text-indigo-400 group-hover:gap-2.5 transition-all">
+                                        Abhi Try Karo <ArrowRight className="h-3.5 w-3.5" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Blood Donation Banner */}
+                        <div
+                            onClick={() => navigator('/digital-blood-bank/find')}
+                            className="glass-card relative overflow-hidden rounded-2xl px-5 py-4 cursor-pointer group transition-all hover:-translate-y-1"
+                            style={{ border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.07)' }}
+                        >
+                            {/* Glow blob */}
+                            <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20 blur-2xl"
+                                style={{ background: 'radial-gradient(circle,#ef4444,transparent)' }} />
+                            <div className="relative z-10 flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-xl"
+                                    style={{ background: 'rgba(239,68,68,0.2)', border: '1px solid rgba(239,68,68,0.4)' }}>
+                                    🩸
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <p className="text-xs font-bold uppercase tracking-wider text-red-400">Emergency Ready</p>
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                                            style={{ background: 'rgba(239,68,68,0.2)', color: '#fca5a5' }}>LIVE</span>
+                                    </div>
+                                    <h3 className="text-sm font-extrabold text-white leading-tight mb-1">
+                                        Digital Blood Bank
+                                    </h3>
+                                    <p className="text-xs text-white/55 leading-relaxed">
+                                        Emergency mein turant blood donors dhundho apne area mein. Free, fast & verified donors network.
+                                    </p>
+                                    <div className="mt-2.5 flex items-center gap-1.5 text-xs font-bold text-red-400 group-hover:gap-2.5 transition-all">
+                                        Donor Dhundho <ArrowRight className="h-3.5 w-3.5" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
                 <div className="mx-4 mt-4 lg:mx-auto lg:max-w-[1200px]">
                     <section className="glass-card home-hero relative overflow-hidden px-5 py-5 sm:px-6 lg:px-7 lg:py-7">
                         {heroEmojis.map((item) => (

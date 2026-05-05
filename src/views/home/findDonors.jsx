@@ -46,6 +46,7 @@ function DonorCard({ donor, index }) {
                 border: `1.5px solid ${bgCfg.border}`,
                 boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
             }}
+            onClick={() => setExpanded(e => !e)}
         >
             {/* Card header */}
             <div className="flex items-center gap-3 p-4">
@@ -82,7 +83,7 @@ function DonorCard({ donor, index }) {
 
                 {/* Expand button */}
                 <button
-                    onClick={() => setExpanded(e => !e)}
+
                     className="shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-all hover:bg-white-100"
                     style={{ color: bgCfg.color }}
                 >
