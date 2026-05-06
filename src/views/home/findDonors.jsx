@@ -2,19 +2,17 @@ import { useEffect, useState, useRef } from 'react';
 import {
     Droplets, MapPin, Phone, Clock, Search, Filter,
     LocateFixed, ChevronDown, RefreshCw, AlertCircle,
-    CheckCircle2, X, User, Loader2, ArrowLeft, Mail
+    CheckCircle2, X, User, Loader2, ArrowLeft, Mail,
+    ArrowRight, ChevronUp, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../utils/supabaseClient';
 import { Helmet } from 'react-helmet';
-import { use } from 'react';
-import { ArrowRight } from 'lucide-react';
-import { ChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
-// const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+const DONORS_PER_PAGE = 5; // ← change this to show more/fewer per page
 
 const WEEKDAY_LABELS = {
     mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu',
@@ -31,6 +29,7 @@ const BG_COLORS = {
     'O+': { bg: '#edfff4', color: '#138808', border: '#a8ddb8' },
     'O-': { bg: '#f0fff5', color: '#0e6e06', border: '#90cfa0' },
 };
+
 const BLOOD_GROUPS = [
     { group: 'O+', label: 'Most Common', href: '/digital-blood-bank/find?group=o-positive' },
     { group: 'O−', label: 'Universal Donor', href: '/digital-blood-bank/find?group=o-negative' },
@@ -61,7 +60,7 @@ const STEPS = [
 const FAQS = [
     {
         q: 'How to find blood donor near me in Jhargram?',
-        a: 'Visit Daanguru and select your blood group and Jhargram as your location. You\'ll see a list of registered donors in Jhargram and surrounding areas. Contact them directly — the service is completely free.',
+        a: "Visit Daanguru and select your blood group and Jhargram as your location. You'll see a list of registered donors in Jhargram and surrounding areas. Contact them directly — the service is completely free.",
     },
     {
         q: 'ঝাড়গ্রামে রক্তদাতা কিভাবে পাবো?',
@@ -69,7 +68,7 @@ const FAQS = [
     },
     {
         q: 'Is the blood donor service completely free?',
-        a: 'Yes. Daanguru\'s blood donor matching is 100% free for both donors and recipients. We never charge for emergency blood connections.',
+        a: "Yes. Daanguru's blood donor matching is 100% free for both donors and recipients. We never charge for emergency blood connections.",
     },
     {
         q: 'How do I register as a blood donor on Daanguru?',
@@ -103,6 +102,7 @@ function FaqItem({ q, a }) {
         </div>
     );
 }
+
 /* ── Donor Card ─────────────────────────────────────────────────────────── */
 function DonorCard({ donor, index }) {
     const [expanded, setExpanded] = useState(false);
@@ -114,33 +114,26 @@ function DonorCard({ donor, index }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05, duration: 0.3 }}
-            className="rounded-2xl overflow-hidden"
-            style={{
-                // background: '#fff',
-                border: `1.5px solid ${bgCfg.border}`,
-                boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-            }}
+            className="rounded-2xl overflow-hidden cursor-pointer"
+            style={{ border: `1.5px solid ${bgCfg.border}`, boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}
             onClick={() => setExpanded(e => !e)}
         >
             {/* Card header */}
             <div className="flex items-center gap-3 p-4">
-                {/* Blood group badge */}
                 <div className="h-14 w-14 shrink-0 rounded-2xl flex flex-col items-center justify-center font-black text-lg leading-none"
                     style={{ background: bgCfg.bg, color: bgCfg.color, border: `2px solid ${bgCfg.border}` }}>
                     <Droplets className="h-3 w-3 mb-0.5" style={{ color: bgCfg.color }} />
                     {donor.blood_group}
                 </div>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
-                    <p className="font-extrabold text-white-900 truncate text-base">{donor.full_name}</p>
-                    <p className="text-xs text-white-500 flex items-center gap-1 mt-0.5 truncate">
+                    <p className="font-extrabold text-white truncate text-base">{donor.full_name}</p>
+                    <p className="text-xs text-white/50 flex items-center gap-1 mt-0.5 truncate">
                         <MapPin className="h-3 w-3 shrink-0" />
                         {donor.location}
-                        {donor.pincode && <span className="font-semibold text-white-400"> · {donor.pincode}</span>}
+                        {donor.pincode && <span className="font-semibold text-white/40"> · {donor.pincode}</span>}
                     </p>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                        {/* Availability pill */}
                         <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
                             style={{ background: 'rgba(19,136,8,0.08)', color: '#138808' }}>
                             <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
@@ -148,19 +141,15 @@ function DonorCard({ donor, index }) {
                         </span>
                         {donor.city && (
                             <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full"
-                                style={{ background: '#f3f4f6', color: '#6b7280' }}>
+                                style={{ background: 'rgba(255,255,255,0.08)', color: '#9ca3af' }}>
                                 {donor.city}
                             </span>
                         )}
                     </div>
                 </div>
 
-                {/* Expand button */}
-                <button
-
-                    className="shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-all hover:bg-white-100"
-                    style={{ color: bgCfg.color }}
-                >
+                <button className="shrink-0 h-8 w-8 rounded-full flex items-center justify-center transition-all hover:bg-white/10"
+                    style={{ color: bgCfg.color }}>
                     <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
                         <ChevronDown className="h-4 w-4" />
                     </motion.div>
@@ -171,16 +160,14 @@ function DonorCard({ donor, index }) {
             <div className="px-4 pb-3 flex items-center gap-3 flex-wrap border-t" style={{ borderColor: bgCfg.border + '80' }}>
                 <div className="flex items-center gap-1.5 pt-2.5">
                     <Clock className="h-3.5 w-3.5" style={{ color: bgCfg.color }} />
-                    <span className="text-xs font-semibold text-white-600">
+                    <span className="text-xs font-semibold text-white/70">
                         {donor.start_time} – {donor.end_time}
                     </span>
                 </div>
-                {days && (
-                    <div className="pt-2.5 text-xs text-white-400 font-medium">{days}</div>
-                )}
+                {days && <div className="pt-2.5 text-xs text-white/40 font-medium">{days}</div>}
             </div>
 
-            {/* Expanded contact section */}
+            {/* Expanded contact */}
             <AnimatePresence>
                 {expanded && (
                     <motion.div
@@ -190,8 +177,7 @@ function DonorCard({ donor, index }) {
                         transition={{ duration: 0.25 }}
                         style={{ overflow: 'hidden', borderTop: `1.5px solid ${bgCfg.border}80` }}
                     >
-                        <div className="p-4 space-y-2.5" >
-                            {/* Contact info */}
+                        <div className="p-4 space-y-2.5">
                             <a href={`tel:+91${donor.phone}`}
                                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all hover:opacity-80 active:scale-98"
                                 style={{ background: bgCfg.color, color: '#fff' }}>
@@ -199,7 +185,6 @@ function DonorCard({ donor, index }) {
                                 +91 {donor.phone}
                                 <span className="ml-auto text-xs font-bold opacity-80">Tap to Call</span>
                             </a>
-
                             {donor.alt_phone && (
                                 <a href={`tel:+91${donor.alt_phone}`}
                                     className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold border transition-all hover:opacity-80"
@@ -209,18 +194,15 @@ function DonorCard({ donor, index }) {
                                     <span className="ml-auto text-xs opacity-60">Alt. Number</span>
                                 </a>
                             )}
-
                             <a href={`mailto:${donor.email}`}
                                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium border transition-all hover:opacity-80"
                                 style={{ color: '#fff', borderColor: bgCfg.border }}>
                                 <Mail className="h-4 w-4" style={{ color: bgCfg.color }} />
                                 {donor.email}
                             </a>
-
                             {donor.notes && (
-                                <div className="rounded-xl px-3 py-2.5 text-xs text-white-600 border"
-                                    style={{ borderColor: bgCfg.border }}>
-                                    <span className="font-bold text-white-800">Note: </span>{donor.notes}
+                                <div className="rounded-xl px-3 py-2.5 text-xs text-white/60 border" style={{ borderColor: bgCfg.border }}>
+                                    <span className="font-bold text-white/80">Note: </span>{donor.notes}
                                 </div>
                             )}
                         </div>
@@ -228,6 +210,75 @@ function DonorCard({ donor, index }) {
                 )}
             </AnimatePresence>
         </motion.div>
+    );
+}
+
+/* ── Pagination ─────────────────────────────────────────────────────────── */
+function Pagination({ currentPage, totalPages, onPageChange }) {
+    if (totalPages <= 1) return null;
+
+    // build page number list: always show first, last, current ±1, with ellipsis
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+        if (
+            i === 1 ||
+            i === totalPages ||
+            (i >= currentPage - 1 && i <= currentPage + 1)
+        ) {
+            pages.push(i);
+        } else if (pages[pages.length - 1] !== '...') {
+            pages.push('...');
+        }
+    }
+
+    return (
+        <div className="flex items-center justify-between gap-2 mt-6 pt-5"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+
+            {/* Prev */}
+            <button
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
+                style={{ color: '#E24B4A', border: '1px solid rgba(226,75,74,0.25)' }}
+            >
+                <ChevronLeft className="h-3.5 w-3.5" />
+                Prev
+            </button>
+
+            {/* Page numbers */}
+            <div className="flex items-center gap-1.5">
+                {pages.map((p, i) =>
+                    p === '...' ? (
+                        <span key={`ellipsis-${i}`} className="text-xs text-white/30 px-1">…</span>
+                    ) : (
+                        <button
+                            key={p}
+                            onClick={() => onPageChange(p)}
+                            className="h-8 w-8 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5"
+                            style={
+                                p === currentPage
+                                    ? { background: '#E24B4A', color: '#fff', boxShadow: '0 4px 14px rgba(226,75,74,0.4)' }
+                                    : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.5)', border: '1px solid rgba(255,255,255,0.1)' }
+                            }
+                        >
+                            {p}
+                        </button>
+                    )
+                )}
+            </div>
+
+            {/* Next */}
+            <button
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
+                style={{ color: '#E24B4A', border: '1px solid rgba(226,75,74,0.25)' }}
+            >
+                Next
+                <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+        </div>
     );
 }
 
@@ -240,8 +291,8 @@ function EmptyState({ pincode, bloodGroup }) {
                 style={{ background: 'rgba(226,75,74,0.08)' }}>
                 <Droplets className="h-10 w-10" style={{ color: '#E24B4A', opacity: 0.4 }} />
             </div>
-            <h3 className="text-lg font-extrabold text-white-800 mb-2">No Donors Found</h3>
-            <p className="text-sm text-white-500 leading-relaxed max-w-xs">
+            <h3 className="text-lg font-extrabold text-white mb-2">No Donors Found</h3>
+            <p className="text-sm text-white/50 leading-relaxed max-w-xs">
                 {pincode
                     ? `No ${bloodGroup !== 'All' ? bloodGroup : ''} donors found in pincode ${pincode}. Try a different pincode or blood group.`
                     : 'Enter a pincode or use your location to find donors near you.'}
@@ -258,6 +309,8 @@ function EmptyState({ pincode, bloodGroup }) {
 /* ── Main Page ───────────────────────────────────────────────────────────── */
 export default function FindDonorsPage() {
     const navigate = useNavigate();
+    const resultsRef = useRef(null); // ref to scroll back to results on page change
+
     const [donors, setDonors] = useState([]);
     const [loading, setLoading] = useState(false);
     const [locating, setLocating] = useState(false);
@@ -268,6 +321,22 @@ export default function FindDonorsPage() {
     const [locationError, setLocationError] = useState('');
     const [hasSearched, setHasSearched] = useState(false);
     const [mounted, setMounted] = useState(false);
+
+    // ── Pagination state ──────────────────────────────────────────────────
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = Math.ceil(donors.length / DONORS_PER_PAGE);
+    const paginatedDonors = donors.slice(
+        (currentPage - 1) * DONORS_PER_PAGE,
+        currentPage * DONORS_PER_PAGE
+    );
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        // smooth scroll back to results header
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    // ─────────────────────────────────────────────────────────────────────
+
     const SCHEMA = {
         '@context': 'https://schema.org',
         '@graph': [
@@ -294,28 +363,20 @@ export default function FindDonorsPage() {
             },
         ],
     };
+
     useEffect(() => { setMounted(true); }, []);
 
-    /* ── Reverse geocode to get pincode from lat/lng ── */
     const getPincodeFromCoords = async (lat, lng) => {
         try {
-            const res = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-            );
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
             const data = await res.json();
-
             const address = data.address || {};
-
-            return {
-                pincode: address.postcode || '',
-                locationName: address.city || address.state || 'your location'
-            };
+            return { pincode: address.postcode || '', locationName: address.city || address.state || 'your location' };
         } catch {
             return { pincode: '', locationName: '' };
         }
     };
 
-    /* ── Use device location ── */
     const useMyLocation = () => {
         setLocationError('');
         setLocating(true);
@@ -341,11 +402,11 @@ export default function FindDonorsPage() {
         );
     };
 
-    /* ── Fetch donors ── */
     const fetchDonors = async (pc, bg) => {
         if (!pc || pc.length !== 6) return;
         setLoading(true);
         setHasSearched(true);
+        setCurrentPage(1); // always reset to page 1 on new search
 
         let query = supabase
             .from('blood_donors')
@@ -354,9 +415,7 @@ export default function FindDonorsPage() {
             .eq('is_available', true)
             .order('full_name');
 
-        if (bg && bg !== 'All') {
-            query = query.eq('blood_group', bg);
-        }
+        if (bg && bg !== 'All') query = query.eq('blood_group', bg);
 
         const { data, error } = await query;
         setLoading(false);
@@ -374,9 +433,8 @@ export default function FindDonorsPage() {
         if (pincode) fetchDonors(pincode, bg);
     };
 
-    useEffect(() => {
-        useMyLocation()
-    }, []);
+    useEffect(() => { useMyLocation(); }, []);
+
     return (
         <>
             <Helmet>
@@ -394,33 +452,27 @@ export default function FindDonorsPage() {
                 <link rel="canonical" href="https://www.daanguru.in/digital-blood-bank/find" />
                 <script type="application/ld+json">{JSON.stringify(SCHEMA)}</script>
             </Helmet>
+
             <div className="min-h-screen pb-16">
 
-                {/* ── HERO ──────────────────────────────────────────────────────── */}
+                {/* ── HERO ── */}
                 <div className="mx-4 mt-4 lg:mx-auto lg:max-w-[1100px]">
                     <section className="glass-card relative overflow-hidden rounded-3xl px-6 py-10 sm:px-10 sm:py-14 text-center"
                         style={{ background: 'linear-gradient(135deg,rgba(13,0,5,0.85) 0%,rgba(60,5,15,0.85) 60%,rgba(80,10,20,0.8) 100%)', border: '1px solid rgba(239,68,68,0.25)' }}>
-
-                        {/* Glow */}
                         <div className="absolute inset-0 pointer-events-none"
                             style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 100%,rgba(230,57,70,0.22) 0%,transparent 70%)' }} />
-
-                        {/* Floating drops */}
                         {['🩸', '❤️', '💉', '🏥'].map((e, i) => (
                             <span key={i} className="absolute text-2xl opacity-10 pointer-events-none select-none"
                                 style={{ top: `${[12, 68, 18, 72][i]}%`, [i % 2 ? 'right' : 'left']: `${[7, 5, 82, 78][i]}%`, animation: `float ${[6, 7.5, 5.5, 8][i]}s ease-in-out infinite alternate` }}>
                                 {e}
                             </span>
                         ))}
-
                         <div className="relative z-10">
-                            {/* Live badge */}
                             <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-6 text-xs font-bold uppercase tracking-widest text-red-300"
                                 style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)' }}>
                                 <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
                                 Live Donors Available
                             </div>
-
                             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight mb-4">
                                 Find <span className="text-red-400">Blood Donors</span><br />Near You in West Bengal
                             </h1>
@@ -430,7 +482,6 @@ export default function FindDonorsPage() {
                             <p className="text-base text-white/35 mb-8" style={{ fontFamily: 'Noto Sans Bengali, sans-serif' }}>
                                 ঝাড়গ্রাম ও পশ্চিমবঙ্গে রক্তদাতা খুঁজুন — বিনামূল্যে
                             </p>
-
                             <div className="flex flex-wrap gap-3 justify-center">
                                 <button onClick={() => navigate('/digital-blood-bank/find')}
                                     className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
@@ -447,16 +498,10 @@ export default function FindDonorsPage() {
                     </section>
                 </div>
 
-                {/* ── STATS ─────────────────────────────────────────────────────── */}
+                {/* ── STATS ── */}
                 <div className="mx-4 mt-4 lg:mx-auto lg:max-w-[1100px]">
-                    <div className="rounded-2xl px-6 py-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center"
-                        style={{ background: '#E63946' }}>
-                        {[
-                            { num: '500+', label: 'Registered Donors' },
-                            { num: '12+', label: 'Districts Covered' },
-                            { num: '8', label: 'Blood Groups' },
-                            { num: '100%', label: 'Free Service' },
-                        ].map((s, i) => (
+                    <div className="rounded-2xl px-6 py-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center" style={{ background: '#E63946' }}>
+                        {[{ num: '500+', label: 'Registered Donors' }, { num: '12+', label: 'Districts Covered' }, { num: '8', label: 'Blood Groups' }, { num: '100%', label: 'Free Service' }].map((s, i) => (
                             <div key={i}>
                                 <div className="text-3xl font-extrabold text-white leading-none">{s.num}</div>
                                 <div className="text-xs text-white/75 mt-1 font-medium">{s.label}</div>
@@ -465,12 +510,11 @@ export default function FindDonorsPage() {
                     </div>
                 </div>
 
-                {/* ── BLOOD GROUPS ──────────────────────────────────────────────── */}
+                {/* ── BLOOD GROUPS ── */}
                 <div className="mx-4 mt-10 lg:mx-auto lg:max-w-[1100px]">
                     <p className="text-xs font-bold uppercase tracking-widest text-red-400 mb-2">Find by Blood Group</p>
                     <h2 className="text-2xl font-extrabold text-white mb-1">All Blood Groups Available</h2>
                     <p className="text-sm text-white/50 mb-6 max-w-lg">Select your required blood group to instantly see available donors near you in West Bengal.</p>
-
                     <div className="grid grid-cols-4 sm:grid-cols-8 gap-3">
                         {BLOOD_GROUPS.map((bg) => (
                             <Link key={bg.group} to={bg.href}
@@ -482,19 +526,19 @@ export default function FindDonorsPage() {
                         ))}
                     </div>
                 </div>
-                <div className="mx-auto max-w-3xl px-4 pt-5  lg:pb-10">
 
+                {/* ══════════════════════════════════════════════════════════════
+                    SEARCH + RESULTS PANEL
+                ══════════════════════════════════════════════════════════════ */}
+                <div className="mx-auto max-w-3xl px-4 pt-5 lg:pb-10">
 
-                    {/* ── Hero banner ── */}
+                    {/* ── Search card ── */}
                     <motion.div
                         initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
                         className={`glass-card p-6 lg:p-8 mb-5 relative overflow-hidden ${mounted ? '' : 'opacity-0'}`}
                     >
                         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#E24B4A] via-[#ff8a80] to-[#E24B4A]" />
-
-                        {/* Decorative drop */}
-                        <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-5"
-                            style={{ background: '#E24B4A' }} />
+                        <div className="absolute -right-6 -top-6 h-28 w-28 rounded-full opacity-5" style={{ background: '#E24B4A' }} />
 
                         <div className="flex items-center gap-3 mb-5">
                             <div className="h-12 w-12 rounded-2xl flex items-center justify-center shrink-0"
@@ -522,24 +566,19 @@ export default function FindDonorsPage() {
                                     className="flex-1 px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none bg-transparent"
                                 />
                                 {inputPincode && (
-                                    <button onClick={() => { setInputPincode(''); setPincode(''); setDonors([]); setHasSearched(false); }}
+                                    <button onClick={() => { setInputPincode(''); setPincode(''); setDonors([]); setHasSearched(false); setCurrentPage(1); }}
                                         className="mr-2 text-muted-foreground hover:text-foreground">
                                         <X className="h-4 w-4" />
                                     </button>
                                 )}
                             </div>
-
-                            {/* Search button */}
                             <button onClick={handleSearch} disabled={inputPincode.length !== 6 || loading}
                                 className="flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
                                 style={{ background: 'linear-gradient(135deg,#E24B4A,#c0392b)' }}>
                                 {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                                 Find
                             </button>
-
-                            {/* My Location button */}
-                            <button onClick={useMyLocation} disabled={locating}
-                                title="Use my location"
+                            <button onClick={useMyLocation} disabled={locating} title="Use my location"
                                 className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-sm font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-50"
                                 style={{ background: 'rgba(226,75,74,0.1)', color: '#E24B4A', border: '1px solid rgba(226,75,74,0.2)' }}>
                                 {locating ? <Loader2 className="h-4 w-4 animate-spin" /> : <LocateFixed className="h-4 w-4" />}
@@ -547,7 +586,6 @@ export default function FindDonorsPage() {
                             </button>
                         </div>
 
-                        {/* Location name tag */}
                         {locationName && (
                             <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
                                 className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full"
@@ -555,7 +593,6 @@ export default function FindDonorsPage() {
                                 <CheckCircle2 className="h-3 w-3" /> Detected: {locationName} – {pincode}
                             </motion.div>
                         )}
-
                         {locationError && (
                             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                                 className="mt-2 text-xs text-destructive flex items-center gap-1">
@@ -586,17 +623,21 @@ export default function FindDonorsPage() {
                         </div>
                     </div>
 
-                    {/* ── Results ── */}
+                    {/* ══════════════════════════════════════════
+                        RESULTS SECTION (with pagination)
+                    ══════════════════════════════════════════ */}
                     {loading ? (
                         <div className="flex flex-col items-center justify-center py-16 gap-3">
                             <Loader2 className="h-8 w-8 animate-spin" style={{ color: '#E24B4A' }} />
                             <p className="text-sm text-muted-foreground font-medium">Searching donors in {pincode}…</p>
                         </div>
+
                     ) : hasSearched && donors.length === 0 ? (
                         <EmptyState pincode={pincode} bloodGroup={selectedBG} />
+
                     ) : donors.length > 0 ? (
-                        <div>
-                            {/* Result header */}
+                        <div ref={resultsRef}>
+                            {/* ── Result header ── */}
                             <div className="flex items-center justify-between mb-3">
                                 <div>
                                     <p className="text-sm font-extrabold text-foreground">
@@ -605,6 +646,11 @@ export default function FindDonorsPage() {
                                     <p className="text-xs text-muted-foreground">
                                         Pincode: <strong>{pincode}</strong>
                                         {selectedBG !== 'All' && <> · Blood Group: <strong>{selectedBG}</strong></>}
+                                        {totalPages > 1 && (
+                                            <span className="ml-2 text-white/40">
+                                                · Page {currentPage} of {totalPages}
+                                            </span>
+                                        )}
                                     </p>
                                 </div>
                                 <button onClick={() => fetchDonors(pincode, selectedBG)}
@@ -613,35 +659,49 @@ export default function FindDonorsPage() {
                                 </button>
                             </div>
 
+                            {/* ── Donor cards (current page only) ── */}
                             <div className="space-y-3">
-                                {donors.map((donor, i) => (
+                                {paginatedDonors.map((donor, i) => (
                                     <DonorCard key={donor.id} donor={donor} index={i} />
                                 ))}
                             </div>
+
+                            {/* ── Pagination controls ── */}
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={handlePageChange}
+                            />
+
+                            {/* ── Page summary below pagination ── */}
+                            {totalPages > 1 && (
+                                <p className="text-center text-xs text-white/30 mt-3">
+                                    Showing {(currentPage - 1) * DONORS_PER_PAGE + 1}–{Math.min(currentPage * DONORS_PER_PAGE, donors.length)} of {donors.length} donors
+                                </p>
+                            )}
                         </div>
+
                     ) : !hasSearched ? (
-                        /* Initial state */
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.3 } }}
                             className="flex flex-col items-center justify-center py-16 text-center px-4">
                             <div className="h-20 w-20 rounded-3xl flex items-center justify-center mb-5"
                                 style={{ background: 'rgba(226,75,74,0.08)' }}>
                                 <LocateFixed className="h-10 w-10" style={{ color: '#E24B4A', opacity: 0.5 }} />
                             </div>
-                            <h3 className="text-lg font-extrabold text-white-800 mb-2">Find Donors Near You</h3>
-                            <p className="text-sm text-white-500 leading-relaxed max-w-xs">
+                            <h3 className="text-lg font-extrabold text-white mb-2">Find Donors Near You</h3>
+                            <p className="text-sm text-white/50 leading-relaxed max-w-xs">
                                 Enter your 6-digit pincode or tap "My Location" to instantly find verified blood donors near you.
                             </p>
                         </motion.div>
                     ) : null}
 
-                    {/* ── Register CTA at bottom ── */}
-                    {/* {hasSearched && ( */}
+                    {/* ── Register CTA ── */}
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                         className="mt-8 rounded-2xl p-5 flex items-center justify-between gap-4"
                         style={{ background: 'rgba(226,75,74,0.06)', border: '1px solid rgba(226,75,74,0.15)' }}>
                         <div>
-                            <p className="text-sm font-extrabold text-white-800">🩸 Are you a donor?</p>
-                            <p className="text-xs text-white-500 mt-0.5">Register to help people in your area find you.</p>
+                            <p className="text-sm font-extrabold text-white">🩸 Are you a donor?</p>
+                            <p className="text-xs text-white/50 mt-0.5">Register to help people in your area find you.</p>
                         </div>
                         <Link to="/digital-blood-bank"
                             className="shrink-0 rounded-xl px-4 py-2.5 text-xs font-bold text-white whitespace-nowrap"
@@ -649,15 +709,14 @@ export default function FindDonorsPage() {
                             Register Now
                         </Link>
                     </motion.div>
-                    {/* )} */}
                 </div>
-                {/* ── CITIES ────────────────────────────────────────────────────── */}
+
+                {/* ── CITIES ── */}
                 <div className="mx-4 mt-12 lg:mx-auto lg:max-w-[1100px]"
                     style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '2.5rem' }}>
                     <p className="text-xs font-bold uppercase tracking-widest text-red-400 mb-2">Find by Location</p>
                     <h2 className="text-2xl font-extrabold text-white mb-1">Blood Donors by City</h2>
                     <p className="text-sm text-white/50 mb-6 max-w-lg">We cover Jhargram, Midnapore and major cities across West Bengal. Click your nearest city.</p>
-
                     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                         {CITIES.map((city) => (
                             <Link key={city.name} to={city.href}
@@ -671,12 +730,11 @@ export default function FindDonorsPage() {
                     </div>
                 </div>
 
-                {/* ── HOW IT WORKS ──────────────────────────────────────────────── */}
+                {/* ── HOW IT WORKS ── */}
                 <div className="mx-4 mt-12 lg:mx-auto lg:max-w-[1100px]">
                     <p className="text-xs font-bold uppercase tracking-widest text-red-400 mb-2">How It Works</p>
                     <h2 className="text-2xl font-extrabold text-white mb-1">Connect with a Donor in 3 Steps</h2>
                     <p className="text-sm text-white/50 mb-6 max-w-lg">No registration needed for recipients. Find a matching donor near you instantly.</p>
-
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {STEPS.map((step) => (
                             <div key={step.num} className="glass-card rounded-2xl p-6"
@@ -689,10 +747,9 @@ export default function FindDonorsPage() {
                     </div>
                 </div>
 
-                {/* ── EMERGENCY BANNER ──────────────────────────────────────────── */}
+                {/* ── EMERGENCY BANNER ── */}
                 <div className="mx-4 mt-8 lg:mx-auto lg:max-w-[1100px]">
-                    <div className="rounded-2xl p-8 text-center relative overflow-hidden"
-                        style={{ background: '#E63946' }}>
+                    <div className="rounded-2xl p-8 text-center relative overflow-hidden" style={{ background: '#E63946' }}>
                         <div className="absolute inset-0 pointer-events-none"
                             style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 120%,rgba(0,0,0,0.3),transparent)' }} />
                         <div className="relative z-10">
@@ -711,19 +768,18 @@ export default function FindDonorsPage() {
                     </div>
                 </div>
 
-                {/* ── FAQ ───────────────────────────────────────────────────────── */}
+                {/* ── FAQ ── */}
                 <div className="mx-4 mt-12 lg:mx-auto lg:max-w-[1100px]"
                     style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '2.5rem' }}>
                     <p className="text-xs font-bold uppercase tracking-widest text-red-400 mb-2">FAQ</p>
                     <h2 className="text-2xl font-extrabold text-white mb-1">Frequently Asked Questions</h2>
                     <p className="text-sm text-white/50 mb-6 max-w-lg">Everything you need to know about finding blood donors near you in West Bengal.</p>
-
                     <div className="glass-card rounded-2xl px-5 py-2" style={{ border: '1px solid rgba(239,68,68,0.12)' }}>
                         {FAQS.map((faq, i) => <FaqItem key={i} q={faq.q} a={faq.a} />)}
                     </div>
                 </div>
 
-                {/* ── SEO CONTENT ───────────────────────────────────────────────── */}
+                {/* ── SEO CONTENT ── */}
                 <div className="mx-4 mt-12 lg:mx-auto lg:max-w-[1100px]">
                     <p className="text-xs font-bold uppercase tracking-widest text-red-400 mb-2">About This Service</p>
                     <h2 className="text-2xl font-extrabold text-white mb-4">Blood Donor Network in West Bengal</h2>
@@ -741,7 +797,7 @@ export default function FindDonorsPage() {
                     </div>
                 </div>
 
-                {/* ── REGISTER CTA ──────────────────────────────────────────────── */}
+                {/* ── REGISTER CTA ── */}
                 <div className="mx-4 mt-8 mb-4 lg:mx-auto lg:max-w-[1100px]">
                     <div className="glass-card rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4"
                         style={{ border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.06)' }}>
@@ -758,7 +814,6 @@ export default function FindDonorsPage() {
                 </div>
 
             </div>
-
         </>
     );
 }
