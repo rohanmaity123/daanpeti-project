@@ -703,7 +703,7 @@ export default function FindDonorsPage() {
                             <p className="text-sm text-white/80 mb-6 max-w-md mx-auto leading-relaxed">
                                 Don't waste time searching. Post an emergency request and our network will notify nearby donors immediately.
                             </p>
-                            <button onClick={() => navigate('/digital-blood-bank/emergency')}
+                            <button onClick={() => navigate('/digital-blood-bank')}
                                 className="inline-flex items-center gap-2 rounded-xl px-7 py-3 text-sm font-extrabold text-red-600 bg-white transition-all hover:-translate-y-0.5 hover:shadow-xl">
                                 Post Emergency Request <ArrowRight className="w-4 h-4" />
                             </button>
@@ -749,7 +749,7 @@ export default function FindDonorsPage() {
                             <p className="text-base font-extrabold text-white mb-1">Be a Hero — Register as a Blood Donor</p>
                             <p className="text-xs text-white/50">Your one donation can save up to 3 lives. Join 500+ donors across West Bengal.</p>
                         </div>
-                        <button onClick={() => navigate('/digital-blood-bank/register')}
+                        <button onClick={() => navigate('/digital-blood-bank')}
                             className="shrink-0 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
                             style={{ background: '#E63946', boxShadow: '0 4px 16px rgba(230,57,70,0.35)' }}>
                             Register Now <ArrowRight className="w-4 h-4" />
