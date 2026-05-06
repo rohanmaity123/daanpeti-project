@@ -151,8 +151,8 @@ export default function BlogListPage() {
     const categories = useBlogCategories();
     const { posts, loading, error } = useBlogPosts({ category: activeCategory });
 
-    const featured   = posts.filter(p => p.featured);
-    const regular    = posts.filter(p => !p.featured);
+    const featured = posts.filter(p => p.featured);
+    const regular = posts.filter(p => !p.featured);
 
     return (
         <>
@@ -196,17 +196,15 @@ export default function BlogListPage() {
                     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                         className="mt-5 flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
                         <button onClick={() => setActiveCategory(null)}
-                            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${
-                                !activeCategory ? 'text-white' : 'text-white/50 hover:text-white'
-                            }`}
+                            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${!activeCategory ? 'text-white' : 'text-white/50 hover:text-white'
+                                }`}
                             style={!activeCategory ? { background: 'rgba(29,158,117,0.8)' } : { background: 'rgba(255,255,255,0.07)' }}>
                             All Posts
                         </button>
                         {categories.map(cat => (
                             <button key={cat.id} onClick={() => setActiveCategory(cat.slug)}
-                                className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${
-                                    activeCategory === cat.slug ? 'text-white' : 'text-white/50 hover:text-white'
-                                }`}
+                                className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all ${activeCategory === cat.slug ? 'text-white' : 'text-white/50 hover:text-white'
+                                    }`}
                                 style={activeCategory === cat.slug
                                     ? { background: cat.color + 'cc' }
                                     : { background: 'rgba(255,255,255,0.07)' }}>
