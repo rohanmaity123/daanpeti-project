@@ -23,13 +23,13 @@ const MainLayout = ({ children }) => {
     }
   }, []);
 
-  const handleOnboardingComplete = () => {
-    localStorage.setItem('daanguru_onboarded', 'true');
-    setShowOnboarding(false);
-  };
+  // const handleOnboardingComplete = () => {
+  //   localStorage.setItem('daanguru_onboarded', 'true');
+  //   setShowOnboarding(false);
+  // };
   return (
     <div className="app-shell min-h-screen">
-      {showOnboarding && <OnboardingScreen onComplete={handleOnboardingComplete} />}
+      {/* {showOnboarding && <OnboardingScreen onComplete={handleOnboardingComplete} />} */}
       {!isItemDetail && <AppHeader />}
       <main className="pb-20 lg:pb-6 lg:px-6">
         {children}
