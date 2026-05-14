@@ -649,6 +649,7 @@ export default function DoctorFinderPage() {
   const [locating, setLocating] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
+
   // ✅ USE REACT-SPEECH-RECOGNITION HOOK
   const {
     transcript,
@@ -1057,7 +1058,7 @@ Language: Hinglish (Hindi + English mix)
           )}
 
           {/* ── EMPTY / NO RESULTS ──────────────────────────────── */}
-          {doctors.length === 0 && (
+          {hasSearched && doctors.length === 0 && (
             <div className="mt-8 text-center">
               <p className="text-3xl">🔍</p>
               <p className="mt-2 text-sm font-bold text-white">Koi doctor nahi mila</p>
