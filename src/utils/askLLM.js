@@ -33,6 +33,66 @@ export const askLLM = async (prompt) => {
 
     return "Server busy hai, thoda baad try karo.";
 };
+export const getDoctorCategoryFromSymptoms = async (symptoms) => {
+    const models = [
+        "llama-3.1-8b-instant"
+    ];
+
+    const prompt = `
+You are a medical assistant.
+
+Based on these symptoms:
+"${symptoms}"
+
+Suggest the MOST RELEVANT doctor specialization.
+
+Rules:
+- Return ONLY the doctor category name
+- No explanation
+- One category only
+
+Examples:
+- Chest pain and shortness of breath → Cardiologist
+- Tooth pain → Dentist
+- Skin rash and itching → Dermatologist
+- Pregnancy issues → Gynecologist
+- Joint pain → Orthopedic
+- Fever and cough → General Physician
+`;
+
+    for (let model of models) {
+        try {
+            const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompt,
+                        },
+                    ],
+                    temperature: 0.2,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!data.error) {
+                return data.choices?.[0]?.message?.content?.trim() || "General Physician";
+            }
+
+        } catch (err) {
+            console.warn(`Model ${model} failed, trying next...`);
+        }
+    }
+
+    return "General Physician";
+};
 export const askLLMStream = async (prompt, onChunk) => {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",

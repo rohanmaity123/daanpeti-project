@@ -35,6 +35,7 @@ import BloodBankPage from "./views/home/addEditBloodBank";
 import FindDonorsPage from "./views/home/findDonors";
 import DoctorFinderPage from "./views/home/DoctorFinderPage";
 import BloodDonorCityPage from "./views/home/BloodDonorCityPage";
+import AddDoctorPage from "./views/home/createDoctor";
 
 
 // ==================
@@ -102,6 +103,7 @@ export default function RenderRoutes() {
           <Route path="/digital-blood-bank" element={<BloodBankPage />} />
           <Route path="/digital-blood-bank/find" element={<FindDonorsPage />} />
           <Route path="/find-doctor" element={<DoctorFinderPage />} />
+          <Route path="/create-doctor" element={<AddDoctorPage />} />
           <Route path="/blood-donor/:city" element={<BloodDonorCityPage />} />
         </Route>
 

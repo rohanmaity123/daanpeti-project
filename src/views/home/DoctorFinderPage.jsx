@@ -12,348 +12,68 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import {
   Mic, MicOff, Search, MapPin, Phone, Star, Clock,
   Stethoscope, Pill, AlertCircle, ChevronDown, X,
-  Loader2, Sparkles, ToggleLeft, ToggleRight, Bot, Zap
+  Loader2, Sparkles, Bot, Zap, LocateFixed, CheckCircle2,
+  ChevronUp, RefreshCw
 } from 'lucide-react';
 import { Helmet } from 'react-helmet';
-import { askLLM, askLLMStream } from '../../utils/askLlm';
+import { askLLM, askLLMStream, getDoctorCategoryFromSymptoms } from '../../utils/askLlm';
 import { set } from 'react-hook-form';
+import { supabase } from '../../utils/supabaseClient';
+import { useRef } from 'react';
 
-// ─── SYMPTOM → SPECIALTY MAP ──────────────────────────────────────────────────
-const SYMPTOM_MAP = [
-  {
-    keywords: ['fever', 'cold', 'cough', 'headache', 'weakness', 'body pain', 'flu', 'viral', 'infection', 'stomach', 'diarrhea', 'vomiting', 'diabetes', 'bp', 'blood pressure', 'bukhaar', 'sar dard', 'pet dard'],
-    specialty: 'General Physician', urgency: 'low',
-  },
-  {
-    keywords: ['periods', 'pregnancy', 'uterus', 'pcod', 'pcos', 'white discharge', 'infertility', 'menstrual', 'gynaec', 'delivery', 'garbh', 'mahavari'],
-    specialty: 'Gynecologist', urgency: 'medium',
-  },
-  {
-    keywords: ['child', 'baby', 'infant', 'kids', 'newborn', 'vaccination', 'growth', 'bacha', 'bacche', 'shishu'],
-    specialty: 'Pediatrician', urgency: 'low',
-  },
-  {
-    keywords: ['bone', 'joint', 'knee', 'back pain', 'spine', 'fracture', 'arthritis', 'ligament', 'shoulder', 'haddi', 'ghutna'],
-    specialty: 'Orthopedic', urgency: 'medium',
-  },
-  {
-    keywords: ['skin', 'rash', 'acne', 'pimple', 'allergy', 'itching', 'eczema', 'fungal', 'hair loss', 'chamdi', 'kharish'],
-    specialty: 'Dermatologist', urgency: 'low',
-  },
-  {
-    keywords: ['heart', 'chest pain', 'palpitation', 'shortness of breath', 'cardiac', 'cholesterol', 'dil', 'seene mein dard'],
-    specialty: 'Cardiologist', urgency: 'high',
-  },
-  {
-    keywords: ['tooth', 'teeth', 'gum', 'cavity', 'dental', 'root canal', 'toothache', 'daant', 'dant'],
-    specialty: 'Dentist', urgency: 'low',
-  },
-  {
-    keywords: ['ear', 'nose', 'throat', 'hearing', 'tonsil', 'sinusitis', 'nasal', 'vertigo', 'snoring', 'kaan', 'naak', 'gala'],
-    specialty: 'ENT Specialist', urgency: 'low',
-  },
-  {
-    keywords: ['lung', 'asthma', 'breathing', 'tb', 'tuberculosis', 'pneumonia', 'bronchitis', 'saans', 'khasi'],
-    specialty: 'Pulmonologist', urgency: 'medium',
-  },
-  {
-    keywords: ['eye', 'vision', 'cataract', 'glasses', 'spectacles', 'blur', 'red eye', 'glaucoma', 'aankh', 'nazar'],
-    specialty: 'Ophthalmologist', urgency: 'low',
-  },
-  {
-    keywords: ['surgery', 'hernia', 'gallstone', 'appendix', 'piles', 'fissure', 'tumor', 'operation'],
-    specialty: 'General Surgeon', urgency: 'medium',
-  },
+const SPECIALTIES = [
+  'General Physician', 'Gynecologist', 'Pediatrician', 'Orthopedic',
+  'Dermatologist', 'Cardiologist', 'Dentist', 'ENT Specialist',
+  'Pulmonologist', 'Ophthalmologist', 'General Surgeon',
 ];
-
-// ─── LOCAL SYMPTOM MATCHER ────────────────────────────────────────────────────
-function matchSpecialtyLocally(text) {
-  const lower = text.toLowerCase();
-  for (const entry of SYMPTOM_MAP) {
-    if (entry.keywords.some(kw => lower.includes(kw))) {
-      return { specialty: entry.specialty, urgency: entry.urgency };
-    }
-  }
-  return { specialty: 'General Physician', urgency: 'low' };
-}
-
-// ─── LOCAL RESULT BUILDER ─────────────────────────────────────────────────────
-function buildLocalResult(symptomText) {
-  const { specialty, urgency } = matchSpecialtyLocally(symptomText);
-  const adviceMap = {
-    high: 'Please visit a doctor or emergency room immediately.',
-    medium: 'Book an appointment within the next 1-2 days.',
-    low: 'Schedule a consultation at your earliest convenience.',
-  };
-  return {
-    specialty,
-    urgency,
-    summary: `Based on your symptoms, a ${specialty} can best help you.`,
-    medicines: [],
-    advice: adviceMap[urgency],
-    source: 'local',
-  };
-}
-
-// ─── CLAUDE AI CALL ───────────────────────────────────────────────────────────
-async function callClaudeAI(symptomText, city) {
-  const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error('No API key');
-
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 300,
-      system: `You are a medical assistant for India. Return ONLY valid JSON (no markdown):
-{
-  "specialty": "one of: General Physician, Gynecologist, Pediatrician, Orthopedic, Dermatologist, Cardiologist, Dentist, ENT Specialist, Pulmonologist, Ophthalmologist, General Surgeon",
-  "urgency": "low or medium or high",
-  "summary": "1 sentence in simple English",
-  "medicines": ["safe OTC medicine if applicable"],
-  "advice": "1 practical tip before seeing doctor"
-}
-Keep under 120 words. Only suggest very safe OTC medicines.`,
-      messages: [{ role: 'user', content: `Patient in ${city}, India: "${symptomText}"` }],
-    }),
-  });
-
-  if (!res.ok) throw new Error('API error');
-  const data = await res.json();
-  const text = data.content?.[0]?.text || '{}';
-  const parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-  return { ...parsed, source: 'claude' };
-}
-
-// ─── SPECIALTY ALIASES ────────────────────────────────────────────────────────
+const LANG_OPTIONS = [
+  { code: 'en-IN', label: 'EN' },
+  { code: 'hi-IN', label: 'HI' },
+  { code: 'bn-IN', label: 'BN' },
+];
 const SPECIALTY_ALIASES = {
-  'General Physician': ['general physician', 'general-physician', 'physician', 'internal medicine specialist', 'general practitioner', 'doctor', 'medical clinic', 'clinic'],
-  'Gynecologist': ['gynecologist', 'gynaecologist', 'obstetrician', 'obstetrician-gynecologist'],
-  'Pediatrician': ['pediatrician', 'paediatrician', 'child specialist', 'neonatal physician'],
-  'Orthopedic': ['orthopedic', 'orthopaedic', 'orthopedic clinic', 'orthopedic surgeon'],
-  'Dermatologist': ['dermatologist', 'skin care clinic', 'skin'],
+  'General Physician': ['general physician', 'general-physician', 'physician', 'internal medicine', 'general practitioner', 'clinic', 'doctor'],
+  'Gynecologist': ['gynecologist', 'gynaecologist', 'obstetrician'],
+  'Pediatrician': ['pediatrician', 'paediatrician', 'child specialist'],
+  'Orthopedic': ['orthopedic', 'orthopaedic', 'orthopedic surgeon'],
+  'Dermatologist': ['dermatologist', 'skin'],
   'Cardiologist': ['cardiologist', 'cardiac', 'cardio'],
-  'Dentist': ['dentist', 'dental clinic', 'orthodontic'],
-  'ENT Specialist': ['ent specialist', 'otolaryngology', 'ear nose throat'],
+  'Dentist': ['dentist', 'dental'],
+  'ENT Specialist': ['ent', 'otolaryngology', 'ear nose throat'],
   'Pulmonologist': ['pulmonologist', 'respiratory'],
-  'Ophthalmologist': ['ophthalmologist', 'eye', 'vision'],
+  'Ophthalmologist': ['ophthalmologist', 'eye'],
   'General Surgeon': ['general surgeon', 'surgeon', 'surgery'],
 };
 
-function matchesSpecialty(doctorSpecialty, targetSpecialty) {
-  const ds = (doctorSpecialty || '').toLowerCase();
-  const aliases = SPECIALTY_ALIASES[targetSpecialty] || [targetSpecialty.toLowerCase()];
-  return aliases.some(alias => ds.includes(alias));
-}
+const URGENCY_CONFIG = {
+  high: { color: '#ef4444', bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.3)', label: '🚨 Urgent', text: 'See a doctor immediately' },
+  medium: { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)', label: '⚠️ Moderate', text: 'See a doctor within 1–2 days' },
+  low: { color: '#1D9E75', bg: 'rgba(29,158,117,0.15)', border: 'rgba(29,158,117,0.3)', label: '✅ Routine', text: 'Schedule an appointment soon' },
+};
 
-// ─── DOCTOR CARD ──────────────────────────────────────────────────────────────
-function DoctorCard({ doctor, index }) {
-  const todayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
-  const todayHours = (doctor.hours || []).filter(h => !h.closed).find(h => h.day?.includes(todayName));
+const WEEKDAY_LABELS = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' };
 
-  return (
-    <div
-      className="glass-card rounded-2xl p-4 border border-white/10 hover:border-[#8EF0CC]/30 transition-all"
-      style={{ animationDelay: `${index * 80}ms`, animation: 'fadeSlideUp 0.4s ease both' }}
-    >
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-lg"
-            style={{ background: 'rgba(29,158,117,0.2)', border: '1px solid rgba(29,158,117,0.4)' }}>
-            🩺
-          </div>
-          <div>
-            <p className="text-sm font-bold text-white leading-tight">{doctor.name}</p>
-            <p className="text-xs text-[#8EF0CC]/80 mt-0.5">{doctor.specialty}</p>
-          </div>
-        </div>
-        {doctor.rating && (
-          <div className="flex items-center gap-1 shrink-0 px-2 py-1 rounded-lg"
-            style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)' }}>
-            <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-            <span className="text-xs font-bold text-yellow-400">{doctor.rating}</span>
-            {doctor.reviews && <span className="text-xs text-white/40">({doctor.reviews})</span>}
-          </div>
-        )}
-      </div>
+const QUICK_SYMPTOMS = [
+  { label: '🤒 Fever', text: 'I have high fever with body pain and headache for 2 days' },
+  { label: '🤢 Stomach', text: 'Stomach pain, vomiting and loose motions since morning' },
+  { label: '💔 Chest Pain', text: 'Chest pain and shortness of breath' },
+  { label: '🦷 Toothache', text: 'Severe toothache and swollen gum' },
+  { label: '👶 Child Sick', text: 'My child has fever and is not eating anything' },
+  { label: '🩸 Periods', text: 'Irregular periods and stomach cramps with white discharge' },
+  { label: '👁️ Eye', text: 'My eyes are red and itching with blurry vision' },
+  { label: '🦴 Joint Pain', text: 'Knee pain and joint swelling since 3 days' },
+];
 
-      <div className="space-y-1.5">
-        {doctor.address && (
-          <div className="flex items-start gap-2">
-            <MapPin className="w-3.5 h-3.5 text-white/40 mt-0.5 shrink-0" />
-            <p className="text-xs text-white/60 leading-relaxed">{doctor.address}</p>
-          </div>
-        )}
-        {doctor.phone && (
-          <div className="flex items-center gap-2">
-            <Phone className="w-3.5 h-3.5 text-white/40 shrink-0" />
-            <a href={`tel:${doctor.phone}`} className="text-xs text-[#8EF0CC] hover:text-white transition-colors font-medium">
-              {doctor.phone}
-            </a>
-          </div>
-        )}
-        {(todayHours || doctor.timings) && (
-          <div className="flex items-center gap-2">
-            <Clock className="w-3.5 h-3.5 text-white/40 shrink-0" />
-            <p className="text-xs text-white/60">
-              {todayHours ? `Today: ${todayHours.raw?.split(':').slice(1).join(':').trim() || 'Open'}` : doctor.timings}
-            </p>
-          </div>
-        )}
-        {doctor.experience && (
-          <div className="flex items-center gap-2">
-            <Stethoscope className="w-3.5 h-3.5 text-white/40 shrink-0" />
-            <p className="text-xs text-white/60">{doctor.experience}</p>
-          </div>
-        )}
-        {doctor.fees && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-white/40 font-bold ml-0.5">₹</span>
-            <p className="text-xs text-white/60">Fees: ₹{doctor.fees}</p>
-          </div>
-        )}
-      </div>
+const FAQS = [
+  { q: 'Is Daanguru AI Doctor free?', a: 'Yes — completely free. No sign-up, no subscription. Available 24/7 in Bengali, Hindi and English.' },
+  { q: 'বাংলায় AI ডাক্তারের সাথে কথা বলতে পারব?', a: 'হ্যাঁ। আপনি বাংলায় লক্ষণ বলুন এবং বাংলায় পরামর্শ পান।' },
+  { q: 'How does it find doctors near me?', a: 'We use your GPS or pincode to search our database of verified doctors in your area.' },
+  { q: 'Is AI Doctor advice safe?', a: 'It provides general guidance only — not diagnosis. For any serious symptom, consult a real doctor. Emergency: call 108.' },
+  { q: 'Is my health data private?', a: 'Yes. Health queries are not linked to your identity. We do not sell or share data.' },
+];
 
-      <div className="flex gap-2 mt-3">
-        {doctor.phone && (
-          <a href={`tel:${doctor.phone}`}
-            className="flex-1 text-center py-2 rounded-xl text-xs font-bold text-white transition-all hover:-translate-y-0.5"
-            style={{ background: 'linear-gradient(135deg,#1D9E75,#0f6e56)', boxShadow: '0 3px 12px rgba(29,158,117,0.3)' }}>
-            📞 Call Now
-          </a>
-        )}
-        {doctor.maps_url && (
-          <a href={doctor.maps_url} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-center py-2 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.8)' }}>
-            🗺️ Maps
-          </a>
-        )}
-        {doctor.profile_url && (
-          <a href={doctor.profile_url} target="_blank" rel="noopener noreferrer"
-            className="flex-1 text-center py-2 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5"
-            style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.8)' }}>
-            👤 Profile
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
 
-// ─── AI RESULT CARD ───────────────────────────────────────────────────────────
-function AIResultCard({ result }) {
-  const urgencyConfig = {
-    high: { color: '#ef4444', bg: 'rgba(239,68,68,0.15)', border: 'rgba(239,68,68,0.3)', label: '🚨 Urgent', text: 'See a doctor immediately' },
-    medium: { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', border: 'rgba(245,158,11,0.3)', label: '⚠️ Moderate', text: 'See a doctor within 1-2 days' },
-    low: { color: '#1D9E75', bg: 'rgba(29,158,117,0.15)', border: 'rgba(29,158,117,0.3)', label: '✅ Routine', text: 'Schedule an appointment soon' },
-  };
-  const u = urgencyConfig[result.urgency] || urgencyConfig.low;
 
-  return (
-    <div className="rounded-2xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(142,240,204,0.15)' }}>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: u.bg, border: `1px solid ${u.border}`, color: u.color }}>
-          {u.label}
-        </span>
-        <div className="flex items-center gap-1.5">
-          {result.source === 'claude' ? (
-            <span className="text-xs px-2 py-0.5 rounded-full flex items-center gap-1"
-              style={{ background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.35)', color: '#a5b4fc' }}>
-              <Sparkles className="w-3 h-3" /> Claude AI
-            </span>
-          ) : (
-            <span className="text-xs px-2 py-0.5 rounded-full flex items-center gap-1"
-              style={{ background: 'rgba(29,158,117,0.15)', border: '1px solid rgba(29,158,117,0.3)', color: '#8EF0CC' }}>
-              <Zap className="w-3 h-3" /> Local Match
-            </span>
-          )}
-          <span className="text-xs text-white/50">{u.text}</span>
-        </div>
-      </div>
-
-      {result.summary && (
-        <p className="text-sm text-white/80 leading-relaxed mb-3">{result.summary}</p>
-      )}
-
-      <div className="flex items-center gap-2 p-2.5 rounded-xl mb-3"
-        style={{ background: 'rgba(29,158,117,0.12)', border: '1px solid rgba(29,158,117,0.25)' }}>
-        <Stethoscope className="w-4 h-4 text-[#8EF0CC]" />
-        <div>
-          <p className="text-xs text-[#8EF0CC]/70">Recommended Doctor</p>
-          <p className="text-sm font-bold text-white">{result.specialty}</p>
-        </div>
-      </div>
-
-      {result.medicines?.length > 0 && (
-        <div className="mb-3">
-          <div className="flex items-center gap-1.5 mb-2">
-            <Pill className="w-3.5 h-3.5 text-white/50" />
-            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider">OTC Medicines (Safe to Try)</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {result.medicines.map((m, i) => (
-              <span key={i} className="text-xs px-2.5 py-1 rounded-lg font-medium"
-                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.75)' }}>
-                💊 {m}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {result.advice && (
-        <div className="flex gap-2 p-2.5 rounded-xl text-xs text-white/65 leading-relaxed"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-yellow-400" />
-          {result.advice}
-        </div>
-      )}
-
-      <p className="text-xs text-white/30 mt-3 text-center">⚠️ Suggestion only. Always consult a qualified doctor.</p>
-    </div>
-  );
-}
-
-// ─── CLAUDE TOGGLE ────────────────────────────────────────────────────────────
-function ClaudeToggle({ enabled, onToggle }) {
-  const hasKey = !!import.meta.env.VITE_ANTHROPIC_API_KEY;
-
-  return (
-    <div className="flex items-center justify-between px-4 py-3 rounded-2xl mb-4"
-      style={{ background: 'rgba(99,102,241,0.08)', border: `1px solid ${enabled ? 'rgba(99,102,241,0.4)' : 'rgba(255,255,255,0.08)'}`, transition: 'border-color 0.3s' }}>
-      <div className="flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-xl flex items-center justify-center"
-          style={{ background: enabled ? 'rgba(99,102,241,0.25)' : 'rgba(255,255,255,0.06)', transition: 'background 0.3s' }}>
-          <Bot className="w-4 h-4" style={{ color: enabled ? '#a5b4fc' : 'rgba(255,255,255,0.4)' }} />
-        </div>
-        <div>
-          <p className="text-xs font-bold text-white">Claude AI Analysis</p>
-          <p className="text-xs text-white/45">
-            {!hasKey ? '⚠️ Add API key to enable' : enabled ? 'Smarter symptom detection' : 'Using local matching'}
-          </p>
-        </div>
-      </div>
-      <button
-        onClick={() => hasKey && onToggle(!enabled)}
-        className="transition-all"
-        style={{ opacity: hasKey ? 1 : 0.4, cursor: hasKey ? 'pointer' : 'not-allowed' }}
-        title={!hasKey ? 'Add VITE_ANTHROPIC_API_KEY to .env to enable' : ''}
-      >
-        {enabled
-          ? <ToggleRight className="w-8 h-8" style={{ color: '#a5b4fc' }} />
-          : <ToggleLeft className="w-8 h-8 text-white/30" />
-        }
-      </button>
-    </div>
-  );
-}
 function useNetworkStatus() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSlowConnection, setIsSlowConnection] = useState(false);
@@ -529,6 +249,38 @@ function useSpeechRecognitionWithRetry() {
 
   return { transcript, listening, error, startListening, stopListening, resetTranscript };
 }
+// ─── HELPERS ───────────────────────────────────────────────────────────────
+function matchesSpecialty(doctorSpecialty, target) {
+  const ds = (doctorSpecialty || '').toLowerCase();
+  return (SPECIALTY_ALIASES[target] || [target.toLowerCase()]).some(a => ds.includes(a));
+}
+
+// ─── SUPABASE QUERY ────────────────────────────────────────────────────────
+async function fetchDoctorsFromSupabase(specialty, pincode) {
+  // Build query: specialty match + pincode match
+  // We use ilike on specialty for fuzzy match
+  const aliases = SPECIALTY_ALIASES[specialty] || [specialty.toLowerCase()];
+
+  let query = supabase
+    .from('doctors_master')
+    .select('id, name, specialty, city, state, address, phone, fees, rating, reviews, experience, timings, hours, lat, lng, website, maps_url, profile_url, pincode')
+    .order('rating', { ascending: false })
+    .limit(12);
+
+  // Pincode filter (primary)
+  if (pincode && pincode.length === 6) {
+    query = query.eq('pincode', pincode);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  // Client-side specialty filter (since Supabase OR + ilike is complex)
+  const filtered = (data || []).filter(d => matchesSpecialty(d.specialty, specialty));
+
+  // If pincode gave results, return them; else return all specialty matches
+  return filtered.length > 0 ? filtered : (data || []).filter(d => matchesSpecialty(d.specialty, specialty));
+}
 // ─── NETWORK STATUS BANNER ───────────────────────────────────────────────────
 function NetworkStatusBanner({ isOnline, isSlowConnection }) {
   if (!isOnline) {
@@ -673,6 +425,214 @@ export function MicButton({ listening, error, onStart, onStop, isOnline, disable
     </>
   );
 }
+// ─── SUB-COMPONENTS ────────────────────────────────────────────────────────
+
+function FaqItem({ q, a }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-b border-white/10 last:border-0">
+      <button onClick={() => setOpen(v => !v)}
+        className="w-full flex items-center justify-between gap-4 py-4 text-left text-sm font-semibold text-white hover:text-[#8EF0CC] transition-colors">
+        <span>{q}</span>
+        {open ? <ChevronUp className="w-4 h-4 text-[#8EF0CC] shrink-0" /> : <ChevronDown className="w-4 h-4 text-white/40 shrink-0" />}
+      </button>
+      {open && <p className="pb-4 text-sm text-white/55 leading-relaxed">{a}</p>}
+    </div>
+  );
+}
+
+function DoctorCard({ doctor, index }) {
+  const [expanded, setExpanded] = useState(false);
+  const todayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][new Date().getDay()];
+  const hours = typeof doctor.hours === 'string' ? JSON.parse(doctor.hours || '[]') : (doctor.hours || []);
+  const todayHours = hours.filter(h => !h.closed).find(h => h.day?.includes(todayName));
+
+  return (
+    <div
+      className="glass-card rounded-2xl overflow-hidden border border-white/10 hover:border-[#8EF0CC]/40 transition-all cursor-pointer"
+      style={{ animation: `fadeSlideUp 0.4s ease ${index * 60}ms both` }}
+      onClick={() => setExpanded(e => !e)}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3 p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 text-xl"
+            style={{ background: 'rgba(29,158,117,0.18)', border: '1px solid rgba(29,158,117,0.35)' }}>
+            🩺
+          </div>
+          <div>
+            <p className="text-sm font-bold text-white leading-tight">{doctor.name}</p>
+            <p className="text-xs text-[#8EF0CC]/80 mt-0.5">{doctor.specialty}</p>
+            {doctor.pincode && (
+              <p className="text-[10px] text-white/35 mt-0.5 flex items-center gap-1">
+                <MapPin className="w-2.5 h-2.5" /> PIN: {doctor.pincode}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1.5 shrink-0">
+          {doctor.rating && (
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg"
+              style={{ background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.3)' }}>
+              <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+              <span className="text-xs font-bold text-yellow-400">{doctor.rating}</span>
+              {doctor.reviews && <span className="text-[10px] text-white/40">({doctor.reviews})</span>}
+            </div>
+          )}
+          <div className="animate-bounce-gentle" style={{ transition: 'transform .2s', transform: expanded ? 'rotate(180deg)' : 'rotate(0)' }}>
+            <ChevronDown className="w-4 h-4 text-[#8EF0CC]/60" />
+          </div>
+        </div>
+      </div>
+
+      {/* Quick info */}
+      <div className="px-4 pb-3 space-y-1">
+        {doctor.address && (
+          <div className="flex items-start gap-2">
+            <MapPin className="w-3 h-3 text-white/35 mt-0.5 shrink-0" />
+            <p className="text-xs text-white/55 leading-snug line-clamp-2">{doctor.address}</p>
+          </div>
+        )}
+        {(todayHours || doctor.timings) && (
+          <div className="flex items-center gap-2">
+            <Clock className="w-3 h-3 text-white/35 shrink-0" />
+            <p className="text-xs text-white/55">
+              {todayHours ? `Today: ${todayHours.raw?.split(':').slice(1).join(':').trim() || 'Open'}` : doctor.timings}
+            </p>
+          </div>
+        )}
+        {doctor.experience && (
+          <div className="flex items-center gap-2">
+            <Stethoscope className="w-3 h-3 text-white/35 shrink-0" />
+            <p className="text-xs text-white/55">{doctor.experience}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Expanded contact */}
+      {expanded && (
+        <div className="border-t border-white/10 p-4 space-y-2" onClick={e => e.stopPropagation()}>
+          {doctor.phone && (
+            <a href={`tel:${doctor.phone}`}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all hover:opacity-80"
+              style={{ background: 'linear-gradient(135deg,#1D9E75,#0f6e56)', color: '#fff' }}>
+              <Phone className="w-4 h-4" /> {doctor.phone}
+              <span className="ml-auto text-xs opacity-80">Tap to Call</span>
+            </a>
+          )}
+          {doctor.fees && (
+            <p className="text-xs text-white/50 px-1">Consultation Fees: <strong className="text-white/80">₹{doctor.fees}</strong></p>
+          )}
+          <div className="flex gap-2">
+            {doctor.maps_url && (
+              <a href={doctor.maps_url} target="_blank" rel="noopener noreferrer"
+                className="flex-1 text-center py-2 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5"
+                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.75)' }}>
+                🗺️ Maps
+              </a>
+            )}
+            {doctor.profile_url && (
+              <a href={doctor.profile_url} target="_blank" rel="noopener noreferrer"
+                className="flex-1 text-center py-2 rounded-xl text-xs font-bold transition-all hover:-translate-y-0.5"
+                style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.75)' }}>
+                👤 Profile
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AIResultCard({ result }) {
+  const u = URGENCY_CONFIG[result.urgency] || URGENCY_CONFIG.low;
+  return (
+    <div className="rounded-2xl p-4 mb-4" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(142,240,204,0.15)' }}>
+      <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: u.bg, border: `1px solid ${u.border}`, color: u.color }}>
+          {u.label}
+        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-2 py-0.5 rounded-full flex items-center gap-1"
+            style={{ background: 'rgba(99,102,241,0.2)', border: '1px solid rgba(99,102,241,0.35)', color: '#a5b4fc' }}>
+            <Sparkles className="w-3 h-3" /> Claude AI
+          </span>
+          <span className="text-xs text-white/50">{u.text}</span>
+        </div>
+      </div>
+
+      {result.summary && <p className="text-sm text-white/80 leading-relaxed mb-3">{result.summary}</p>}
+
+      <div className="flex items-center gap-2 p-2.5 rounded-xl mb-3"
+        style={{ background: 'rgba(29,158,117,0.12)', border: '1px solid rgba(29,158,117,0.25)' }}>
+        <Stethoscope className="w-4 h-4 text-[#8EF0CC]" />
+        <div>
+          <p className="text-[10px] text-[#8EF0CC]/70">Recommended Specialist</p>
+          <p className="text-sm font-bold text-white">{result.specialty}</p>
+        </div>
+      </div>
+
+      {result.advice && (
+        <div className="flex gap-2 p-2.5 rounded-xl text-xs text-white/65 leading-relaxed"
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+          <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5 text-yellow-400" />
+          {result.advice}
+        </div>
+      )}
+      <p className="text-[10px] text-white/30 mt-3 text-center">⚕️ Guidance only. Always consult a qualified doctor. Emergency: 108</p>
+    </div>
+  );
+}
+
+function LocationBar({ pincode, city, locating, onDetect, onManualChange }) {
+  return (
+    <div className="flex gap-2 mb-4">
+      {/* Pincode input */}
+      <div className="flex-1 flex items-center rounded-xl border border-white/15 overflow-hidden focus-within:border-[#8EF0CC]/50 transition-colors"
+        style={{ background: 'rgba(255,255,255,0.06)' }}>
+        <MapPin className="w-3.5 h-3.5 ml-3 text-[#8EF0CC]/60 shrink-0" />
+        <input
+          type="text"
+          inputMode="numeric"
+          maxLength={6}
+          placeholder="Enter pincode (e.g. 721507)"
+          value={pincode}
+          onChange={e => onManualChange(e.target.value.replace(/\D/g, ''))}
+          className="flex-1 px-2 py-2.5 text-sm text-white placeholder:text-white/30 outline-none bg-transparent"
+        />
+        {city && <span className="text-[10px] text-[#8EF0CC]/60 mr-2 font-medium whitespace-nowrap">{city}</span>}
+      </div>
+
+      {/* GPS button */}
+      <button
+        onClick={onDetect}
+        disabled={locating}
+        title="Detect my location"
+        className="flex items-center gap-1.5 rounded-xl px-3 py-2.5 text-xs font-bold transition-all disabled:opacity-50 hover:scale-105"
+        style={{ background: 'rgba(29,158,117,0.18)', color: '#8EF0CC', border: '1px solid rgba(29,158,117,0.35)' }}>
+        {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <LocateFixed className="w-4 h-4" />}
+        <span className="hidden sm:inline">{locating ? 'Locating…' : 'Auto'}</span>
+      </button>
+    </div>
+  );
+}
+
+// ─── STREAMING CHAT BOX ────────────────────────────────────────────────────
+function ChatBox({ text }) {
+  if (!text) return null;
+  return (
+    <div className="mb-4 p-4 rounded-2xl text-sm text-white/80 leading-relaxed whitespace-pre-wrap"
+      style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(142,240,204,0.15)', fontFamily: 'inherit' }}>
+      <div className="flex items-center gap-2 mb-2">
+        <Bot className="w-4 h-4 text-[#8EF0CC]" />
+        <span className="text-[10px] font-bold text-[#8EF0CC] uppercase tracking-widest">AI Doctor</span>
+      </div>
+      {text}
+    </div>
+  );
+}
+
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 export default function DoctorFinderPage() {
   const [symptomText, setSymptomText] = useState('');
@@ -681,15 +641,13 @@ export default function DoctorFinderPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [aiResult, setAiResult] = useState(null);
   const [doctors, setDoctors] = useState([]);
-  const [allDoctors, setAllDoctors] = useState([]);
-  const [showLangMenu, setShowLangMenu] = useState(false);
-  const [showCityMenu, setShowCityMenu] = useState(false);
   const [error, setError] = useState('');
   const [step, setStep] = useState(0);
-  const [useClaudeAI, setUseClaudeAI] = useState(false);
   const [chat, setChat] = useState('');
-  const { isOnline, isSlowConnection } = useNetworkStatus();
-
+  const [pincode, setPincode] = useState('');
+  const [city, setCity] = useState('');
+  const [locating, setLocating] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   // ✅ USE REACT-SPEECH-RECOGNITION HOOK
   const {
@@ -701,14 +659,6 @@ export default function DoctorFinderPage() {
     resetTranscript
   } = useSpeechRecognitionWithRetry();
 
-  useEffect(() => {
-    fetch('/doctors_master.json')
-      .then(r => r.json())
-      .then(data => setAllDoctors(data))
-      .catch(() => setAllDoctors([]));
-  }, []);
-
-  const cities = [...new Set(allDoctors.map(d => d.city).filter(Boolean))].sort();
 
   // ✅ UPDATE symptomText when transcript changes
   useEffect(() => {
@@ -716,9 +666,35 @@ export default function DoctorFinderPage() {
       setSymptomText(transcript);
     }
   }, [transcript]);
+  useEffect(() => {
+    handleDetectLocation();
+  }, []);
 
+  // ─── PINCODE DETECTOR ─────────────────────────────────────────────────────
+  async function getPincodeFromCoords(lat, lng) {
+    try {
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+      const d = await r.json();
+      return { pincode: d.address?.postcode || '', city: d.address?.city || d.address?.town || d.address?.village || '' };
+    } catch { return { pincode: '', city: '' }; }
+  }
+  // ── DETECT LOCATION ───────────────────────────────────────────────────────
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) return;
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { pincode: pc, city: ct } = await getPincodeFromCoords(pos.coords.latitude, pos.coords.longitude);
+        setLocating(false);
+        if (pc) { setPincode(pc); setCity(ct); }
+      },
+      () => setLocating(false),
+      { timeout: 8000 }
+    );
+  };
   // ─── SEARCH ────────────────────────────────────────────────────────────────
-  const extractData = async (userText) => {
+
+  const extractData = async () => {
     const prompt = `
       User input: "${symptomText}"
 
@@ -736,7 +712,11 @@ export default function DoctorFinderPage() {
       `;
 
     const res = await askLLM(prompt);
-
+    const category = await getDoctorCategoryFromSymptoms(symptomText);
+    console.log('category', category)
+    const doctors = await fetchDoctorsFromSupabase(category, pincode);
+    console.log('Doctors fetched:', doctors);
+    setDoctors(doctors);
     try {
       return JSON.parse(res);
     } catch {
@@ -821,38 +801,6 @@ Language: Hinglish (Hindi + English mix)
       // Stream the reply
       await streamText(reply);
 
-      // ✅ NOW SEARCH FOR MATCHING DOCTORS
-      const { specialty, urgency } = matchSpecialtyLocally(input);
-      console.log('Detected specialty:', specialty, 'Urgency:', urgency);
-
-      // Filter doctors by city and specialty
-      const matchedDoctors = allDoctors.filter(doctor => {
-        const cityMatch = doctor.city?.toLowerCase() === selectedCity.toLowerCase();
-        const specialtyMatch = matchesSpecialty(doctor.specialty, specialty);
-        return cityMatch && specialtyMatch;
-      });
-
-      console.log(`Found ${matchedDoctors.length} doctors in ${selectedCity} for ${specialty}`);
-
-      // Set doctors to display
-      setDoctors(matchedDoctors.slice(0, 6)); // Limit to 6 doctors
-
-      // Create AI result card data
-      const aiResultData = {
-        specialty,
-        urgency,
-        summary: `Based on your symptoms, a ${specialty} can best help you.`,
-        medicines: [],
-        advice: {
-          high: 'Please visit a doctor or emergency room immediately.',
-          medium: 'Book an appointment within the next 1-2 days.',
-          low: 'Schedule a consultation at your earliest convenience.',
-        }[urgency],
-        source: 'local',
-      };
-
-      setAiResult(aiResultData);
-      setStep(3); // Show results
     } catch (err) {
       console.error('handleQuery error:', err);
       setError('Kuch galat hua. Dobara koshish karein.');
@@ -882,30 +830,44 @@ Language: Hinglish (Hindi + English mix)
   return (
     <>
       <Helmet>
-        <title>AI Doctor Finder — DaanGuru</title>
-        <meta name="description" content="Describe your symptoms in any Indian language. Find nearby doctors instantly." />
+        <title>Free AI Doctor Online India — Symptom Checker in Bengali & English | Daanguru</title>
+        <meta name="description" content="Check your symptoms with Daanguru's free AI Doctor. Get instant health guidance in Bengali, Hindi and English. Find doctors near you by pincode. Available 24/7." />
+        <meta name="keywords" content="AI doctor free India, symptom checker India, online doctor West Bengal, AI health assistant India, free doctor online Bengali, symptom checker Bengali, AI doctor Jhargram, বিনামূল্যে অনলাইন ডাক্তার" />
+        <meta name="robots" content="index, follow" />
+        <meta name="geo.region" content="IN-WB" />
+        <meta name="geo.placename" content="Jhargram, West Bengal, India" />
+        <link rel="canonical" href="https://www.daanguru.in/ai-doctor/" />
+        <meta property="og:title" content="Free AI Doctor Online — Bengali & English | Daanguru" />
+        <meta property="og:description" content="Get instant AI health guidance. Find doctors near your pincode." />
+        <meta property="og:url" content="https://www.daanguru.in/ai-doctor/" />
+        <meta property="og:image" content="https://www.daanguru.in/logo.png" />
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebApplication",
+          "name": "Daanguru AI Doctor",
+          "url": "https://www.daanguru.in/ai-doctor/",
+          "applicationCategory": "HealthApplication",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" },
+          "availableLanguage": ["English", "Bengali", "Hindi"],
+          "areaServed": { "@type": "Country", "name": "India" }
+        })}</script>
       </Helmet>
 
       <style>{`
-        @keyframes fadeSlideUp {
-          from { opacity:0; transform:translateY(16px); }
-          to   { opacity:1; transform:translateY(0); }
-        }
-        @keyframes pulse-ring {
-          0%   { transform:scale(1);   opacity:0.6; }
-          100% { transform:scale(2.2); opacity:0; }
-        }
-        .mic-pulse::before {
-          content:''; position:absolute; inset:0; border-radius:50%;
-          background:rgba(29,158,117,0.4);
-          animation:pulse-ring 1.2s ease-out infinite;
-        }
-        @keyframes float {
-          from { transform:translateY(0px) rotate(0deg); }
-          to   { transform:translateY(-12px) rotate(8deg); }
-        }
+        @keyframes fadeSlideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes float { from{transform:translateY(0) rotate(0deg)} to{transform:translateY(-12px) rotate(8deg)} }
+        @keyframes pulse-ring { 0%{transform:scale(1);opacity:.6} 100%{transform:scale(2.2);opacity:0} }
+        .mic-pulse::before { content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(29,158,117,.4); animation:pulse-ring 1.2s ease-out infinite; }
       `}</style>
-
+      {/* ── MEDICAL DISCLAIMER BANNER ── */}
+      <div className="w-full px-4 py-3 flex items-start gap-3 text-xs"
+        style={{ background: '#FEF3C7', borderBottom: '3px solid #D97706' }}>
+        <span className="text-lg shrink-0">⚕️</span>
+        <p style={{ color: '#92400E' }}>
+          <strong>Medical Disclaimer:</strong> Daanguru AI Doctor provides general health information only.
+          It is <strong>not a substitute for professional medical advice.</strong> Always consult a qualified doctor. Emergency: <strong>Call 108</strong>.
+        </p>
+      </div>
       <div className="min-h-screen pb-16">
         <div className="mx-4 pt-6 lg:mx-auto lg:max-w-[680px]">
 
@@ -920,132 +882,154 @@ Language: Hinglish (Hindi + English mix)
             ))}
 
             <div className="relative z-10">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#8EF0CC]/60 mb-2">
-                BETA TESTING - Feedback welcome!
-              </p>
-              <h1 className="text-2xl font-extrabold text-white leading-tight mb-1">Apna Doctor (Mere bhai)</h1>
-              <p className="text-sm text-white/60 mb-5">
-                Symptoms बताओ — Hindi, Bengali, English में — सही doctor मिलेगा।
-              </p>
-
-              {/* ── Claude Toggle ────────────────────────────── */}
-              {/* <ClaudeToggle enabled={useClaudeAI} onToggle={setUseClaudeAI} /> */}
-
-              {/* ── City + Language ───────────────────────────── */}
-              <div className="flex gap-2 mb-4">
-                <div className="relative flex-1">
-                  <button onClick={() => { setShowCityMenu(v => !v); setShowLangMenu(false); }}
-                    className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-sm font-semibold text-white/80 transition-all"
-                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
-                    <span>📍 {selectedCity.charAt(0).toUpperCase() + selectedCity.slice(1)}</span>
-                    <ChevronDown className="w-3.5 h-3.5 opacity-50" />
-                  </button>
-                  {showCityMenu && (
-                    <div className="absolute top-full mt-1 left-0 right-0 rounded-xl overflow-auto z-30 max-h-48"
-                      style={{ background: 'rgba(15,32,39,0.98)', border: '1px solid rgba(142,240,204,0.2)', backdropFilter: 'blur(20px)' }}>
-                      {cities.map(c => (
-                        <button key={c} onClick={() => { setSelectedCity(c); setShowCityMenu(false); }}
-                          className="w-full text-left px-3 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
-                          style={{ color: c === selectedCity ? '#8EF0CC' : 'rgba(255,255,255,0.7)' }}>
-                          {c.charAt(0).toUpperCase() + c.slice(1)}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
+              <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 mb-4 text-xs font-bold uppercase tracking-widest text-[#8EF0CC]/80"
+                style={{ background: 'rgba(29,158,117,0.1)', border: '1px solid rgba(29,158,117,0.3)' }}>
+                <span className="w-2 h-2 rounded-full bg-[#8EF0CC] animate-pulse" />
+                AI · 24/7 · Free · Bengali + Hindi + English
               </div>
 
-              {/* ── Symptom Input ─────────────────────────────── */}
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight mb-1">
+                Apna AI Doctor 🩺
+              </h1>
+              <p className="text-sm text-white/55 mb-1">
+                Symptoms बताओ — Hindi, Bengali, English में — सही doctor मिलेगा।
+              </p>
+              <p className="text-sm text-white/35 mb-5" style={{ fontFamily: 'Noto Sans Bengali, sans-serif' }}>
+                আপনার লক্ষণ বলুন — কাছের ডাক্তার খুঁজে পাবেন।
+              </p>
+
+              {/* ── LOCATION BAR ── */}
+              <LocationBar
+                pincode={pincode}
+                city={city}
+                locating={locating}
+                onDetect={handleDetectLocation}
+                onManualChange={(v) => { setPincode(v); setCity(''); }}
+              />
+
+              {/* ── SYMPTOM TEXTAREA ── */}
               <div className="relative mb-3">
                 <textarea
                   value={symptomText}
                   onChange={e => setSymptomText(e.target.value)}
-                  placeholder={`अपने symptoms यहाँ लिखें या mic से बोलें...\nExample: "Mujhe 2 din se bukhaar hai aur sar dard ho raha hai"`}
+                  placeholder={`अपने symptoms यहाँ लिखें या mic से बोलें…\nExample: "Mujhe 2 din se bukhaar hai aur sar dard ho raha hai"\nবাংলা: "আমার দুই দিন ধরে জ্বর ও মাথাব্যথা হচ্ছে"`}
                   rows={3}
-                  className="w-full resize-none text-sm text-white placeholder:text-white/30 outline-none rounded-2xl px-4 py-3 pr-12 leading-relaxed"
+                  className="w-full resize-none text-sm text-white placeholder:text-white/30 outline-none rounded-2xl px-4 py-3 pr-10 leading-relaxed"
                   style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(142,240,204,0.2)' }}
+                  onKeyDown={e => { if (e.key === 'Enter' && e.ctrlKey) handleQuery(symptomText); }}
                 />
                 {symptomText && (
-                  <button onClick={() => setSymptomText('')}
-                    className="absolute top-3 right-3 text-white/30 hover:text-white/70 transition-colors">
+                  <button onClick={() => { setSymptomText(''); resetTranscript(); }}
+                    className="absolute top-3 right-3 text-white/30 hover:text-white/70">
                     <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
-              {/* ── Quick chips ────────────────────────────────── */}
+              {/* ── QUICK CHIPS ── */}
               <div className="flex flex-wrap gap-2 mb-4">
                 {QUICK_SYMPTOMS.map((s, i) => (
                   <button key={i} onClick={() => setSymptomText(s.text)}
-                    className="text-xs px-3 py-1.5 rounded-full font-medium transition-all hover:scale-105"
+                    className="text-xs px-3 py-1.5 rounded-full font-medium transition-all hover:scale-105 active:scale-95"
                     style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.7)' }}>
                     {s.label}
                   </button>
                 ))}
               </div>
 
-              {/* ── Mic + Search ──────────────────────────────── */}
-              <div className="flex gap-3">
-                <MicButton
-                  listening={listening}
-                  error={error}
-                  onStart={() => startListening(selectedLang)}
-                  onStop={stopListening}
-                  isOnline={isOnline}
-                  disabled={isSlowConnection || !isOnline}
-                />
+              {/* ── MIC + LANG + SEARCH ── */}
+              <div className="flex gap-2">
 
+                {/* Language selector */}
+                {/* <div className="relative">
+                  <button onClick={() => setShowLangMenu(v => !v)}
+                    className="h-12 px-3 rounded-xl flex items-center gap-1 text-xs font-bold text-white/70 transition-all hover:text-white"
+                    style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                    🌐 {LANG_OPTIONS.find(l => l.code === selectedLang)?.label}
+                    <ChevronDown className="w-3 h-3 opacity-50" />
+                  </button>
+                  {showLangMenu && (
+                    <div className="absolute bottom-full mb-1 left-0 rounded-xl overflow-hidden z-30 min-w-[110px]"
+                      style={{ background: 'rgba(15,32,39,0.98)', border: '1px solid rgba(142,240,204,0.2)', backdropFilter: 'blur(20px)' }}>
+                      {LANG_OPTIONS.map(l => (
+                        <button key={l.code} onClick={() => { setSelectedLang(l.code); setShowLangMenu(false); }}
+                          className="w-full text-left px-3 py-2 text-xs font-medium hover:bg-white/10 transition-colors"
+                          style={{ color: l.code === selectedLang ? '#8EF0CC' : 'rgba(255,255,255,0.7)' }}>
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div> */}
+
+                {/* Mic button */}
                 <button
-                  onClick={step === 3 ? handleReset : () => handleQuery(symptomText)}
+                  onClick={listening ? stopListening : () => startListening(selectedLang)}
+                  className="relative h-12 w-12 rounded-xl flex items-center justify-center transition-all hover:scale-105"
+                  style={{ background: listening ? 'rgba(239,68,68,0.25)' : 'rgba(29,158,117,0.2)', border: `1px solid ${listening ? 'rgba(239,68,68,0.5)' : 'rgba(29,158,117,0.5)'}` }}>
+                  {listening && <span className="mic-pulse absolute inset-0 rounded-xl" />}
+                  {listening
+                    ? <MicOff className="w-5 h-5 text-red-400 relative z-10" />
+                    : <Mic className="w-5 h-5 text-[#8EF0CC] relative z-10" />
+                  }
+                </button>
+
+                {/* Search / Reset */}
+                <button
+                  onClick={hasSearched ? handleReset : () => handleQuery(symptomText)}
                   disabled={isLoading}
                   className="flex-1 h-12 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 disabled:opacity-50"
                   style={{ background: 'linear-gradient(135deg,#1D9E75,#0f6e56)', boxShadow: '0 4px 20px rgba(29,158,117,0.35)' }}>
                   {isLoading
-                    ? <><Loader2 className="w-4 h-4 animate-spin" /> {useClaudeAI ? 'AI सोच रहा है...' : 'Dhundh raha hoon...'}</>
-                    : step === 3
-                      ? <><X className="w-4 h-4" /> Reset</>
+                    ? <><Loader2 className="w-4 h-4 animate-spin" /> AI सोच रहा है…</>
+                    : hasSearched
+                      ? <><RefreshCw className="w-4 h-4" /> नई खोज</>
                       : <><Search className="w-4 h-4" /> Doctor Dhundho</>
                   }
                 </button>
               </div>
-
-              {/* Error Message with Better Formatting */}
+              {/* Speech error */}
               {speechError && (
-                <div className="mt-3 p-3 rounded-xl"
+                <div className="mt-3 p-3 rounded-xl flex items-start gap-2"
                   style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)' }}>
-                  <p className="text-xs text-red-300 leading-relaxed flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                    <span>{speechError}</span>
-                  </p>
-                  <p className="text-xs text-red-200/60 mt-2 ml-6">
-                    💡 Tip: You can always type your symptoms instead of using the microphone.
-                  </p>
+                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-xs text-red-300">{speechError}</p>
+                    <p className="text-xs text-red-200/50 mt-1">💡 Type your symptoms instead — works just as well!</p>
+                  </div>
                 </div>
+              )}
+
+              {/* Error */}
+              {error && (
+                <p className="mt-3 text-xs text-red-400 flex items-center gap-1.5">
+                  <AlertCircle className="w-3.5 h-3.5" /> {error}
+                </p>
               )}
 
               {listening && (
                 <p className="text-xs text-[#8EF0CC] text-center mt-3 animate-pulse font-medium">
-                  🎙️ Listening... Please speak clearly
+                  🎙️ Listening… Speak clearly in {LANG_OPTIONS.find(l => l.code === selectedLang)?.label}
                 </p>
+              )}
+
+              {/* Pincode status */}
+              {pincode && (
+                <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full"
+                  style={{ background: 'rgba(29,158,117,0.1)', color: '#8EF0CC', border: '1px solid rgba(29,158,117,0.25)' }}>
+                  <CheckCircle2 className="w-3 h-3" />
+                  Searching near PIN: {pincode}{city ? ` · ${city}` : ''}
+                </div>
               )}
             </div>
           </div>
 
-          {
-            chat && (
-              <div className="mb-4 p-4 rounded-xl text-sm text-white/80 leading-relaxed"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  whiteSpace: 'pre-wrap',
-                  wordWrap: 'break-word',
-                  fontFamily: 'inherit'
-                }}>
-                {chat}
-              </div>
-            )
-          }
-          {/* ── AI RESULT ───────────────────────────────────────── */}
+
+
+          {/* AI streaming reply */}
+          {chat && (<ChatBox text={chat} />)}
+
+          {/* AI result card */}
           {aiResult && (
             <div style={{ animation: 'fadeSlideUp 0.4s ease' }}>
               <AIResultCard result={aiResult} />
@@ -1073,7 +1057,7 @@ Language: Hinglish (Hindi + English mix)
           )}
 
           {/* ── EMPTY / NO RESULTS ──────────────────────────────── */}
-          {step === 3 && doctors.length === 0 && (
+          {doctors.length === 0 && (
             <div className="mt-8 text-center">
               <p className="text-3xl">🔍</p>
               <p className="mt-2 text-sm font-bold text-white">Koi doctor nahi mila</p>
@@ -1081,30 +1065,84 @@ Language: Hinglish (Hindi + English mix)
             </div>
           )}
 
-          {/* ── HOW IT WORKS ────────────────────────────────────── */}
-          {step === 0 && (
-            <>
-              <div className="mt-4 text-center py-6">
-                <div className="text-5xl mb-3">🏥</div>
-                <p className="text-sm font-semibold text-white/60">Describe symptoms → Find doctors instantly</p>
-                <p className="text-xs text-white/35 mt-1">Works in Hindi, Bengali, English & more Indian languages</p>
+          {/* Features */}
+          <div className="mt-10 grid grid-cols-2 gap-3"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '2rem' }}>
+            <p className="col-span-2 text-xs font-bold uppercase tracking-widest text-[#8EF0CC]/60 mb-1">Why Daanguru AI Doctor</p>
+            {[
+              { icon: '🗣️', title: 'Bengali + Hindi + English', desc: 'Describe in any Indian language' },
+              { icon: '⚡', title: 'Instant Response', desc: 'AI guidance in seconds, 24/7' },
+              { icon: '📍', title: 'Pincode-wise Doctors', desc: 'Find doctors near your location' },
+              { icon: '🆓', title: 'Completely Free', desc: 'No subscription, no fees, ever' },
+            ].map((f, i) => (
+              <div key={i} className="glass-card rounded-2xl p-4 border border-white/10">
+                <div className="text-xl mb-2">{f.icon}</div>
+                <p className="text-xs font-bold text-white mb-1">{f.title}</p>
+                <p className="text-[11px] text-white/50 leading-relaxed">{f.desc}</p>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { icon: '🎤', title: 'Boliye ya Likhiye', desc: 'Any Indian language' },
-                  { icon: useClaudeAI ? '🤖' : '⚡', title: useClaudeAI ? 'Claude Samjhega' : 'Local Match', desc: useClaudeAI ? 'AI symptom analysis' : 'Instant, no API needed' },
-                  { icon: '📋', title: 'Doctor Milega', desc: 'With phone + timings' },
-                ].map((s, i) => (
-                  <div key={i} className="text-center p-3 rounded-2xl"
-                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <div className="text-2xl mb-1">{s.icon}</div>
-                    <p className="text-xs font-bold text-white">{s.title}</p>
-                    <p className="text-xs text-white/45 mt-0.5">{s.desc}</p>
-                  </div>
-                ))}
+            ))}
+          </div>
+
+          {/* Trust signals */}
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            {[
+              { icon: '⚕️', title: 'Medical Disclaimer', desc: 'AI guidance is general info only. Always see a real doctor.' },
+              { icon: '🔒', title: 'Privacy First', desc: 'Your health data is never stored or shared.' },
+              { icon: '🏥', title: 'Emergency: 108', desc: 'For emergencies in West Bengal, call 108 immediately.' },
+              { icon: '📋', title: 'About Daanguru', desc: 'West Bengal platform serving Jhargram, Midnapore & all districts.' },
+            ].map((t, i) => (
+              <div key={i} className="glass-card rounded-2xl p-4 border border-white/10 text-center">
+                <div className="text-2xl mb-2">{t.icon}</div>
+                <p className="text-xs font-bold text-white mb-1">{t.title}</p>
+                <p className="text-[11px] text-white/45 leading-relaxed">{t.desc}</p>
               </div>
-            </>
-          )}
+            ))}
+          </div>
+
+          {/* Disease quick links (SEO internal linking) */}
+          <div className="mt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '2rem' }}>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#8EF0CC]/60 mb-4">Health Conditions</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {[
+                { name: 'Diabetes / মধুমেহ', sub: 'Symptoms, diet, management', href: '/ai-doctor/diabetes/' },
+                { name: 'High Blood Pressure', sub: 'উচ্চ রক্তচাপ — Signs & care', href: '/ai-doctor/hypertension/' },
+                { name: 'Dengue / ডেঙ্গু', sub: 'Symptoms & when to see doctor', href: '/ai-doctor/dengue/' },
+                { name: 'Malaria / ম্যালেরিয়া', sub: 'Common in West Bengal — Guide', href: '/ai-doctor/malaria/' },
+                { name: 'Typhoid / টাইফয়েড', sub: 'Diet & treatment guide', href: '/ai-doctor/typhoid/' },
+                { name: 'বাংলায় জিজ্ঞাসা করুন', sub: 'Ask AI Doctor in Bengali', href: '/ai-doctor/bengali/', highlight: true },
+              ].map((d, i) => (
+                <a key={i} href={d.href}
+                  className="glass-card border rounded-xl p-3 transition-all hover:-translate-y-0.5 group"
+                  style={{ borderColor: d.highlight ? 'rgba(29,158,117,0.5)' : 'rgba(255,255,255,0.1)', background: d.highlight ? 'rgba(29,158,117,0.08)' : 'transparent' }}>
+                  <p className="text-xs font-bold text-white group-hover:text-[#8EF0CC] transition-colors">{d.name}</p>
+                  <p className="text-[10px] text-white/40 mt-0.5">{d.sub}</p>
+                  <span className="text-[10px] text-[#8EF0CC]/60 font-semibold mt-1 block">Learn more →</span>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* FAQ */}
+          <div className="mt-8 glass-card rounded-2xl px-5 py-2 border border-white/10"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+            <p className="text-xs font-bold uppercase tracking-widest text-[#8EF0CC]/60 pt-4 mb-1">FAQ</p>
+            <h2 className="text-lg font-bold text-white mb-4">Questions About AI Doctor</h2>
+            {FAQS.map((f, i) => <FaqItem key={i} q={f.q} a={f.a} />)}
+          </div>
+
+          {/* SEO text block */}
+          <div className="mt-8 glass-card rounded-2xl p-6 border border-white/10 text-sm text-white/50 leading-8 space-y-3">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#8EF0CC]/60 mb-2">About Daanguru AI Doctor</p>
+            <p>
+              Daanguru AI Doctor is one of India's first free AI-powered health tools available in <strong className="text-white/75">Bengali, Hindi and English</strong>, built for users in West Bengal — Jhargram, Midnapore, Bankura, Purulia and rural districts.
+            </p>
+            <p>
+              Describe symptoms → AI detects the right specialist → Doctors near your <strong className="text-white/75">pincode</strong> are shown instantly. Covers fever, dengue, diabetes, hypertension, bone pain, skin issues, child health and more.
+            </p>
+            <p className="font-semibold text-white/60">
+              ⚕️ For emergencies always call 108. AI Doctor is for guidance only, not diagnosis.
+            </p>
+          </div>
 
         </div>
       </div>
