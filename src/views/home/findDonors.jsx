@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '../../utils/supabaseClient';
 import { Helmet } from 'react-helmet';
 import { useNavigate } from 'react-router-dom';
+import WestBengalBloodMap from '../../components/DonorMapComp';
 
 /* ── Constants ─────────────────────────────────────────────────────────── */
 const DONORS_PER_PAGE = 5; // ← change this to show more/fewer per page
@@ -48,7 +49,7 @@ const CITIES = [
     { name: 'Kharagpur', donors: '67', dist: 'Paschim Medinipur', href: '/digital-blood-bank/find?city=kharagpur' },
     { name: 'Bankura', donors: '45', dist: 'Bankura District', href: '/digital-blood-bank/find?city=bankura' },
     { name: 'Purulia', donors: '38', dist: 'Purulia District', href: '/digital-blood-bank/find?city=purulia' },
-    { name: 'All of West Bengal', donors: '500+', dist: 'Search all districts →', href: '/digital-blood-bank/find' },
+    { name: 'All of West Bengal', donors: '4000+', dist: 'Search all districts →', href: '/digital-blood-bank/find' },
 ];
 
 const STEPS = [
@@ -157,15 +158,15 @@ function DonorCard({ donor, index }) {
             </div>
 
             {/* Time + days strip */}
-            <div className="px-4 pb-3 flex items-center gap-3 flex-wrap border-t" style={{ borderColor: bgCfg.border + '80' }}>
+            {days && <div className="px-4 pb-3 flex items-center gap-3 flex-wrap border-t" style={{ borderColor: bgCfg.border + '80' }}>
                 <div className="flex items-center gap-1.5 pt-2.5">
                     <Clock className="h-3.5 w-3.5" style={{ color: bgCfg.color }} />
                     <span className="text-xs font-semibold text-white/70">
                         {donor.start_time} – {donor.end_time}
                     </span>
                 </div>
-                {days && <div className="pt-2.5 text-xs text-white/40 font-medium">{days}</div>}
-            </div>
+                <div className="pt-2.5 text-xs text-white/40 font-medium">{days}</div>
+            </div>}
 
             {/* Expanded contact */}
             <AnimatePresence>
@@ -194,12 +195,12 @@ function DonorCard({ donor, index }) {
                                     <span className="ml-auto text-xs opacity-60">Alt. Number</span>
                                 </a>
                             )}
-                            <a href={`mailto:${donor.email}`}
+                            {donor.email && <a href={`mailto:${donor.email}`}
                                 className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium border transition-all hover:opacity-80"
                                 style={{ color: '#fff', borderColor: bgCfg.border }}>
                                 <Mail className="h-4 w-4" style={{ color: bgCfg.color }} />
                                 {donor.email}
-                            </a>
+                            </a>}
                             {donor.notes && (
                                 <div className="rounded-xl px-3 py-2.5 text-xs text-white/60 border" style={{ borderColor: bgCfg.border }}>
                                     <span className="font-bold text-white/80">Note: </span>{donor.notes}
@@ -501,7 +502,7 @@ export default function FindDonorsPage() {
                 {/* ── STATS ── */}
                 <div className="mx-4 mt-4 lg:mx-auto lg:max-w-[1100px]">
                     <div className="rounded-2xl px-6 py-6 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center" style={{ background: '#E63946' }}>
-                        {[{ num: '500+', label: 'Registered Donors' }, { num: '12+', label: 'Districts Covered' }, { num: '8', label: 'Blood Groups' }, { num: '100%', label: 'Free Service' }].map((s, i) => (
+                        {[{ num: '4000+', label: 'Registered Donors' }, { num: '12+', label: 'Districts Covered' }, { num: '8', label: 'Blood Groups' }, { num: '100%', label: 'Free Service' }].map((s, i) => (
                             <div key={i}>
                                 <div className="text-3xl font-extrabold text-white leading-none">{s.num}</div>
                                 <div className="text-xs text-white/75 mt-1 font-medium">{s.label}</div>
@@ -526,7 +527,6 @@ export default function FindDonorsPage() {
                         ))}
                     </div>
                 </div>
-
                 {/* ══════════════════════════════════════════════════════════════
                     SEARCH + RESULTS PANEL
                 ══════════════════════════════════════════════════════════════ */}
@@ -710,9 +710,10 @@ export default function FindDonorsPage() {
                         </Link>
                     </motion.div>
                 </div>
+                {/* <WestBengalBloodMap /> */}
 
                 {/* ── CITIES ── */}
-                <div className="mx-4 mt-12 lg:mx-auto lg:max-w-[1100px]"
+                {/* <div className="mx-4 mt-12 lg:mx-auto lg:max-w-[1100px]"
                     style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: '2.5rem' }}>
                     <p className="text-xs font-bold uppercase tracking-widest text-red-400 mb-2">Find by Location</p>
                     <h2 className="text-2xl font-extrabold text-white mb-1">Blood Donors by City</h2>
@@ -728,7 +729,7 @@ export default function FindDonorsPage() {
                             </Link>
                         ))}
                     </div>
-                </div>
+                </div> */}
 
                 {/* ── HOW IT WORKS ── */}
                 <div className="mx-4 mt-12 lg:mx-auto lg:max-w-[1100px]">
@@ -803,7 +804,7 @@ export default function FindDonorsPage() {
                         style={{ border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.06)' }}>
                         <div>
                             <p className="text-base font-extrabold text-white mb-1">Be a Hero — Register as a Blood Donor</p>
-                            <p className="text-xs text-white/50">Your one donation can save up to 3 lives. Join 500+ donors across West Bengal.</p>
+                            <p className="text-xs text-white/50">Your one donation can save up to 3 lives. Join 4000+ donors across West Bengal.</p>
                         </div>
                         <button onClick={() => navigate('/digital-blood-bank')}
                             className="shrink-0 inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5"
