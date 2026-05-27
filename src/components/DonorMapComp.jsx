@@ -103,10 +103,11 @@ export default function WestBengalBloodMap({ onCitySelect }) {
         setCityData({});   // clear stale data immediately
 
         let query = supabase
-            .from('blood_donors')
-            .select('city, blood_group')
-            .eq('is_available', true);
-        if (bg !== 'All') query = query.eq('blood_group', bg);
+            .from('blood_group_distribution')
+            .select('city,blood_group_counts,latitude,longitude,total_donors')
+
+
+        // if (bg !== 'All') query = query.eq('blood_group', bg);
 
         const { data, error } = await query;
 
@@ -116,7 +117,6 @@ export default function WestBengalBloodMap({ onCitySelect }) {
         }
 
         const agg = {};
-        console.log('raw data', data);
         data?.forEach(row => {
             if (!row.city) return;
 
@@ -125,23 +125,12 @@ export default function WestBengalBloodMap({ onCitySelect }) {
 
             agg[row.city] = {
                 display: row.city.trim().replace(/\b\w/g, c => c.toUpperCase()),
-                total: 0,
-                bgBreakdown: {},
+                total: row?.total_donors || 0,
+                bgBreakdown: row?.blood_group_counts || {},
                 lat: Number(row?.latitude),
                 lng: Number(row?.longitude),
             };
-
-
-            agg[row.city].total += 1;
-
-            const rowBG = row.blood_group?.trim();
-
-            if (rowBG) {
-                agg[row.city].bgBreakdown[rowBG] =
-                    (agg[row.city].bgBreakdown[rowBG] || 0) + 1;
-            }
         });
-        console.log('Aggregated city data:', agg);
         setCityData(agg);
         setLoading(false);
     }, []);
@@ -338,7 +327,7 @@ export default function WestBengalBloodMap({ onCitySelect }) {
                 </p>
 
                 {/* Blood group filter */}
-                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 10 }}>
+                {/* <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginBottom: 10 }}>
                     {BLOOD_GROUPS.map(bg => {
                         const c = BG_COLORS[bg];
                         const active = selectedBG === bg;
@@ -357,7 +346,7 @@ export default function WestBengalBloodMap({ onCitySelect }) {
                             </button>
                         );
                     })}
-                </div>
+                </div> */}
 
                 {/* Stats strip */}
                 <div style={{

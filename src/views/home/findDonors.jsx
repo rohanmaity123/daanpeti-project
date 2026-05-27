@@ -710,7 +710,7 @@ export default function FindDonorsPage() {
                         </Link>
                     </motion.div>
                 </div>
-                {/* <WestBengalBloodMap /> */}
+                <WestBengalBloodMap />
 
                 {/* ── CITIES ── */}
                 {/* <div className="mx-4 mt-12 lg:mx-auto lg:max-w-[1100px]"
