@@ -58,7 +58,7 @@ export function AppHeader() {
         <nav className="hidden lg:flex items-center gap-6">
           {[
             { to: '/', label: 'Home' },
-            { to: '/post-item', label: 'Donate Item' },
+            { to: '/products', label: 'Products' },
             { to: '/support', label: 'Support Us' },
             { to: '/fund-usage', label: 'Transparency' },
             { to: '/blog', label: 'Blogs' },

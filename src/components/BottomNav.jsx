@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 
 const navItems = [
   { to: '/', icon: Home, label: 'Home', labelHi: 'होम' },
-  { to: '/post-item', icon: PlusCircle, label: 'Donate', labelHi: 'दान करो' },
+  { to: '/products', icon: PlusCircle, label: 'Donate', labelHi: 'दान करो' },
   { to: '/digital-blood-bank/find', icon: BloodtypeTwoTone, label: 'Blood Bank', labelHi: 'रक्तदान' },
   { to: '/my-items', icon: Package, label: 'My Items', labelHi: 'मेरा सामान' },
   { to: '/profile', icon: User, label: 'Profile', labelHi: 'प्रोफ़ाइल' },

@@ -12,6 +12,7 @@ import { OnboardingScreen } from "../../components/OnboardingScreen";
 const MainLayout = ({ children }) => {
   const location = useLocation();
   const isItemDetail = location.pathname.startsWith('/items/');
+  const isHomePage = location.pathname === '/';
   const [showOnboarding, setShowOnboarding] = useState(false);
   const isBot = /googlebot|bot|crawler|spider|crawling/i.test(navigator.userAgent);
   useEffect(() => {
@@ -35,7 +36,7 @@ const MainLayout = ({ children }) => {
         {children}
         <AppFooter />
       </main>
-      {!isItemDetail && <BottomNav />}
+      {!isItemDetail && !isHomePage && <BottomNav />}
     </div>
   );
 };
