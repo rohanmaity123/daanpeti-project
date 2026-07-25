@@ -7,11 +7,15 @@ import {
   X, Image, Smile, Send, Bookmark, Flag,
   AlertTriangle, Dog, Gift, Wrench, Star, PenSquare,
   Eye, EyeOff, Mail, Lock, User, ArrowRight, LogOut,
-  CheckCircle, AlertCircle, Loader
+  CheckCircle, AlertCircle, Loader, Trash2, Reply,
+  Link2, CornerDownRight
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { supabase } from "../../utils/supabaseClient";
 import { Avatar } from "@mui/material";
+import { BloodtypeRounded } from "@mui/icons-material";
+import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -68,6 +72,23 @@ function getCategoryMeta(categoryId) {
   return CATEGORIES_POST.find(c => c.id === categoryId) || CATEGORIES_POST[2];
 }
 
+function getPostShareUrl(postId) {
+  if (typeof window === "undefined") return "";
+  return `${window.location.origin}/post/${postId}`;
+}
+
+function buildShareTargets(post) {
+  const url = getPostShareUrl(post.id);
+  const text = (post.content || "Check this out on Padosi").slice(0, 140);
+  return {
+    url,
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`,
+    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+    telegram: `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
+  };
+}
+
 // ─── CATEGORY BADGE ──────────────────────────────────────────────────────────
 function CategoryBadge({ icon, label, color }) {
   return (
@@ -95,6 +116,135 @@ function Toast({ message, type, visible }) {
       boxShadow: "0 4px 20px rgba(0,0,0,0.3)"
     }}>
       {type === "success" ? "✓ " : type === "error" ? "✗ " : "ℹ "}{message}
+    </div>
+  );
+}
+
+// ─── CONFIRM DIALOG (used for delete post) ────────────────────────────────────
+function ConfirmDialog({ title, message, confirmLabel = "Delete", onConfirm, onCancel, danger = true }) {
+  return (
+    <div
+      onClick={e => { if (e.target === e.currentTarget) onCancel(); }}
+      style={{
+        position: "fixed", inset: 0, zIndex: 150,
+        background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)",
+        display: "flex", alignItems: "center", justifyContent: "center", padding: 16
+      }}
+    >
+      <div style={{
+        width: "100%", maxWidth: 360, background: "#14231b",
+        border: "1px solid rgba(255,255,255,0.1)", borderRadius: 18, padding: 20
+      }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: "#fff", marginBottom: 6 }}>{title}</div>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", lineHeight: 1.5, marginBottom: 18 }}>{message}</p>
+        <div style={{ display: "flex", gap: 10 }}>
+          <button onClick={onCancel} style={{
+            flex: 1, padding: "10px 0", borderRadius: 99, border: "1px solid rgba(255,255,255,0.1)",
+            background: "none", color: "rgba(255,255,255,0.6)", fontSize: 13, fontWeight: 700,
+            cursor: "pointer", fontFamily: "inherit"
+          }}>Cancel</button>
+          <button onClick={onConfirm} style={{
+            flex: 1, padding: "10px 0", borderRadius: 99, border: "none",
+            background: danger ? "#ef4444" : "#1D9E75", color: "#fff", fontSize: 13, fontWeight: 800,
+            cursor: "pointer", fontFamily: "inherit"
+          }}>{confirmLabel}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SHARE MENU ────────────────────────────────────────────────────────────────
+function ShareMenu({ post, onClose, showToast }) {
+  const targets = buildShareTargets(post);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(targets.url);
+      showToast("Link copied ✓", "success");
+    } catch {
+      showToast("Couldn't copy link", "error");
+    }
+    onClose();
+  };
+
+  const handleNativeShare = async () => {
+    try {
+      await navigator.share({
+        title: "Padosi",
+        text: (post.content || "").slice(0, 140),
+        url: targets.url,
+      });
+      onClose();
+    } catch {
+      // user cancelled or unsupported — leave menu open
+    }
+  };
+
+  const OPTIONS = [
+    { label: "WhatsApp", icon: "💬", href: targets.whatsapp },
+    { label: "X / Twitter", icon: "🐦", href: targets.twitter },
+    { label: "Facebook", icon: "📘", href: targets.facebook },
+    { label: "Telegram", icon: "✈️", href: targets.telegram },
+  ];
+
+  return (
+    <div
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: "fixed", inset: 0, zIndex: 150,
+        background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)",
+        display: "flex", alignItems: "flex-end", justifyContent: "center"
+      }}
+    >
+      <div style={{
+        width: "100%", maxWidth: 420, background: "#14231b",
+        border: "1px solid rgba(255,255,255,0.1)", borderRadius: "20px 20px 0 0", padding: "18px 18px 26px"
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+          <span style={{ fontSize: 14, fontWeight: 800, color: "#fff" }}>Share post</span>
+          <button onClick={onClose} style={{
+            background: "rgba(255,255,255,0.07)", border: "none", borderRadius: 99,
+            width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", color: "rgba(255,255,255,0.5)"
+          }}><X size={14} /></button>
+        </div>
+
+        {typeof navigator !== "undefined" && navigator.share && (
+          <button onClick={handleNativeShare} style={{
+            width: "100%", display: "flex", alignItems: "center", gap: 10,
+            background: "#1D9E75", border: "none", borderRadius: 14, padding: "12px 14px",
+            color: "#fff", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit",
+            marginBottom: 12
+          }}>
+            <Share2 size={16} /> Share via…
+          </button>
+        )}
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8, marginBottom: 12 }}>
+          {OPTIONS.map(opt => (
+            <a key={opt.label} href={opt.href} target="_blank" rel="noopener noreferrer"
+              onClick={onClose}
+              style={{
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 6,
+                padding: "12px 4px", borderRadius: 14, background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.08)", textDecoration: "none", color: "rgba(255,255,255,0.7)"
+              }}>
+              <span style={{ fontSize: 20 }}>{opt.icon}</span>
+              <span style={{ fontSize: 10, fontWeight: 700, textAlign: "center" }}>{opt.label}</span>
+            </a>
+          ))}
+        </div>
+
+        <button onClick={handleCopy} style={{
+          width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 12, padding: "10px 0", color: "rgba(255,255,255,0.75)",
+          fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit"
+        }}>
+          <Link2 size={14} /> Copy link
+        </button>
+      </div>
     </div>
   );
 }
@@ -129,7 +279,6 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
   const textRef = useRef(null);
   const fileRef = useRef(null);
 
-  // Districts filtered by selected state
   const filteredDistricts = selectedStateId
     ? districts.filter(d => d.states?.id === selectedStateId || d.state_id === selectedStateId)
     : districts;
@@ -201,7 +350,6 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
         maxHeight: "90vh", overflowY: "auto",
       }}>
 
-        {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Avatar src={currentUser?.user_metadata?.avatar_url} size={36}>
@@ -224,7 +372,6 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
           }}><X size={15} /></button>
         </div>
 
-        {/* Text area */}
         <div style={{ position: "relative", marginBottom: 4 }}>
           <textarea
             ref={textRef} value={text}
@@ -246,7 +393,6 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
         </div>
         {errors.text && <p style={{ fontSize: 12, color: "#f87171", margin: "4px 0 10px 2px" }}>⚠ {errors.text}</p>}
 
-        {/* ── STATE PICKER ─────────────────────────────────────────── */}
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)", marginBottom: 8, letterSpacing: "0.06em" }}>
             🗺 STATE {errors.state && <span style={{ color: "#f87171" }}> — {errors.state}</span>}
@@ -258,7 +404,7 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
                 <button key={s.id}
                   onClick={() => {
                     setStateId(active ? null : s.id);
-                    setDistrictId(null); // reset district when state changes
+                    setDistrictId(null);
                     setErrors(p => ({ ...p, state: "", district: "" }));
                   }}
                   style={{
@@ -277,7 +423,6 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
           </div>
         </div>
 
-        {/* ── DISTRICT PICKER (cascades from state) ────────────────── */}
         {selectedStateId && (
           <div style={{ marginBottom: 14 }}>
             <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)", marginBottom: 8, letterSpacing: "0.06em" }}>
@@ -306,7 +451,6 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
           </div>
         )}
 
-        {/* Image upload */}
         <div onDrop={e => { e.preventDefault(); addImages(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/"))); }}
           onDragOver={e => e.preventDefault()} style={{ marginBottom: 14 }}>
           <input ref={fileRef} type="file" accept="image/*" multiple style={{ display: "none" }}
@@ -356,7 +500,6 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
           )}
         </div>
 
-        {/* Category picker */}
         <div style={{ marginBottom: 14 }}>
           <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.4)", marginBottom: 8, letterSpacing: "0.06em" }}>
             CATEGORY {errors.category && <span style={{ color: "#f87171" }}>— {errors.category}</span>}
@@ -420,23 +563,205 @@ function PostModal({ onClose, onPost, currentUser, states, districts }) {
   );
 }
 
+// ─── SINGLE COMMENT (with like + reply) ───────────────────────────────────────
+function CommentItem({ comment, isReply, isLoggedIn, currentUserId, onLikeComment, onReplyClick, onDeleteComment }) {
+  return (
+    <div style={{ display: "flex", gap: 8, marginTop: isReply ? 10 : 12, marginLeft: isReply ? 30 : 0 }}>
+      {isReply && <CornerDownRight size={13} color="rgba(255,255,255,0.2)" style={{ marginTop: 8, flexShrink: 0 }} />}
+      <Avatar src={comment.avatar_url} name={comment.author} size={isReply ? 24 : 28} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{
+          background: "rgba(255,255,255,0.05)", borderRadius: 14, padding: "8px 12px",
+          display: "inline-block", maxWidth: "100%"
+        }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "#fff", marginBottom: 2 }}>{comment.author}</div>
+          <div style={{ fontSize: 13, color: "rgba(255,255,255,0.8)", lineHeight: 1.5, wordBreak: "break-word" }}>
+            {comment.content}
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4, paddingLeft: 4 }}>
+          <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{timeAgo(comment.created_at)}</span>
+          <button
+            onClick={() => isLoggedIn && onLikeComment(comment.id)}
+            style={{
+              background: "none", border: "none", cursor: isLoggedIn ? "pointer" : "default",
+              display: "flex", alignItems: "center", gap: 3, padding: 0,
+              color: comment.liked_by_me ? "#f87171" : "rgba(255,255,255,0.4)",
+              fontSize: 11, fontWeight: 700, fontFamily: "inherit"
+            }}>
+            <Heart size={11} fill={comment.liked_by_me ? "#f87171" : "none"} />
+            {comment.likes_count > 0 ? comment.likes_count : "Like"}
+          </button>
+          {!isReply && (
+            <button
+              onClick={() => onReplyClick(comment.id)}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 3, padding: 0,
+                color: "rgba(255,255,255,0.4)", fontSize: 11, fontWeight: 700, fontFamily: "inherit"
+              }}>
+              <Reply size={11} /> Reply
+            </button>
+          )}
+          {currentUserId && comment.user_id === currentUserId && (
+            <button
+              onClick={() => onDeleteComment(comment.id)}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 3, padding: 0,
+                color: "rgba(239,68,68,0.6)", fontSize: 11, fontWeight: 700, fontFamily: "inherit"
+              }}>
+              <Trash2 size={11} /> Delete
+            </button>
+          )}
+        </div>
+
+        {comment.replies?.map(reply => (
+          <CommentItem
+            key={reply.id} comment={reply} isReply
+            isLoggedIn={isLoggedIn} currentUserId={currentUserId}
+            onLikeComment={onLikeComment} onReplyClick={onReplyClick}
+            onDeleteComment={onDeleteComment}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── COMMENTS SECTION ──────────────────────────────────────────────────────────
+function CommentsSection({ post, isLoggedIn, onAuthRequired, commentsState, onAddComment, onLikeComment, onDeleteComment }) {
+  const [input, setInput] = useState("");
+  const [replyTo, setReplyTo] = useState(null); // comment id being replied to
+  const inputRef = useRef(null);
+
+  const items = commentsState?.items || [];
+  const loading = commentsState?.loading;
+
+  const submit = () => {
+    if (!input.trim()) return;
+    onAddComment(post.id, input.trim(), replyTo);
+    setInput("");
+    setReplyTo(null);
+  };
+
+  const replyTarget = replyTo ? items.find(c => c.id === replyTo) : null;
+
+  if (!isLoggedIn) {
+    return (
+      <div style={{
+        marginTop: 12, padding: "12px 14px",
+        background: "rgba(29,158,117,0.07)", borderRadius: 12,
+        border: "1px solid rgba(29,158,117,0.15)",
+        textAlign: "center"
+      }}>
+        <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 8 }}>
+          Sign in to read and write comments
+        </p>
+        <button onClick={onAuthRequired} style={{
+          background: "#1D9E75", border: "none", borderRadius: 99, padding: "7px 18px",
+          color: "#fff", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit"
+        }}>Sign In</button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+      {loading && (
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+          <Loader size={12} style={{ animation: "spin 1s linear infinite" }} /> Loading comments…
+        </div>
+      )}
+
+      {!loading && items.length === 0 && (
+        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.3)", marginBottom: 4 }}>No comments yet — be the first!</div>
+      )}
+
+      {!loading && items.map(c => (
+        <CommentItem
+          key={c.id} comment={c} isLoggedIn={isLoggedIn}
+          currentUserId={commentsState.currentUserId}
+          onLikeComment={id => onLikeComment(post.id, id)}
+          onReplyClick={id => { setReplyTo(id); inputRef.current?.focus(); }}
+          onDeleteComment={id => onDeleteComment(post.id, id)}
+        />
+      ))}
+
+      <div style={{ marginTop: 12 }}>
+        {replyTarget && (
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            background: "rgba(29,158,117,0.08)", borderRadius: 10, padding: "5px 10px", marginBottom: 6
+          }}>
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }}>
+              Replying to <b style={{ color: "#8EF0CC" }}>{replyTarget.author}</b>
+            </span>
+            <button onClick={() => setReplyTo(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.4)" }}>
+              <X size={12} />
+            </button>
+          </div>
+        )}
+        <div style={{ display: "flex", gap: 8 }}>
+          <Avatar name="You" size={30} />
+          <div style={{
+            flex: 1, display: "flex", alignItems: "center", gap: 8,
+            background: "rgba(255,255,255,0.05)", borderRadius: 99,
+            padding: "6px 14px", border: "1px solid rgba(255,255,255,0.08)"
+          }}>
+            <input
+              ref={inputRef}
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && submit()}
+              placeholder={replyTarget ? `Reply to ${replyTarget.author}…` : "Add a comment…"}
+              style={{
+                flex: 1, background: "none", border: "none", outline: "none",
+                color: "#fff", fontSize: 13, fontFamily: "inherit"
+              }}
+            />
+            {input && (
+              <button onClick={submit} style={{
+                background: "#1D9E75", border: "none", borderRadius: 99,
+                padding: "4px 10px", color: "#fff", fontSize: 12,
+                fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
+                display: "flex", alignItems: "center"
+              }}>
+                <Send size={12} />
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 // ─── POST CARD ────────────────────────────────────────────────────────────────
-function PostCard({ post, onLike, onSave, onComment, isLoggedIn, onAuthRequired }) {
+function PostCard({
+  post, onLike, onSave, isLoggedIn, onAuthRequired, currentUserId,
+  commentsState, onToggleComments, onAddComment, onLikeComment, onDeleteComment,
+  onDeletePost, showToast,
+}) {
   const [showMenu, setShowMenu] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [comment, setComment] = useState("");
+  const [showShare, setShowShare] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const guard = (fn) => {
     if (!isLoggedIn) { onAuthRequired(); return; }
     fn();
   };
 
-  const handleComment = () => {
-    if (!comment.trim()) return;
-    onComment(post.id, comment.trim());
-    setComment("");
+  const toggleComments = () => {
+    if (!isLoggedIn) { onAuthRequired(); return; }
+    const next = !showComments;
+    setShowComments(next);
+    if (next) onToggleComments(post.id);
   };
+
+  const isOwnPost = currentUserId && post.user_id === currentUserId;
 
   return (
     <div style={{
@@ -459,7 +784,7 @@ function PostCard({ post, onLike, onSave, onComment, isLoggedIn, onAuthRequired 
       {/* Header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Avatar name={post.author || post.avatar_initial} color={post.avatar_color || "#1D9E75"} size={40} />
+          <Avatar name={post?.author} src={post?.avatar_url} color={post?.avatar_color || "#1D9E75"} size={40} />
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
               <span style={{ fontWeight: 800, fontSize: 14, color: "#fff" }}>{post.author}</span>
@@ -488,18 +813,18 @@ function PostCard({ post, onLike, onSave, onComment, isLoggedIn, onAuthRequired 
             <div style={{
               position: "absolute", right: 0, top: 28, zIndex: 10,
               background: "#1a2a22", border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 12, padding: 6, minWidth: 140,
+              borderRadius: 12, padding: 6, minWidth: 160,
               boxShadow: "0 8px 32px rgba(0,0,0,0.4)"
             }}>
               {[
                 ["🔖 Save post", () => guard(() => onSave(post.id))],
-                ["🚩 Report", () => guard(() => { })],
-                ["❌ Hide", () => { }],
-              ].map(([label, fn]) => (
+
+                ...(isOwnPost ? [["🗑️ Delete post", () => { setConfirmDelete(true); }, true]] : []),
+              ].map(([label, fn, danger]) => (
                 <button key={label} onClick={() => { fn(); setShowMenu(false); }} style={{
                   display: "block", width: "100%", textAlign: "left",
                   background: "none", border: "none", padding: "7px 10px",
-                  fontSize: 13, color: "rgba(255,255,255,0.7)", cursor: "pointer",
+                  fontSize: 13, color: danger ? "#f87171" : "rgba(255,255,255,0.7)", cursor: "pointer",
                   borderRadius: 8, fontFamily: "inherit"
                 }}
                   onMouseEnter={e => e.target.style.background = "rgba(255,255,255,0.06)"}
@@ -516,13 +841,19 @@ function PostCard({ post, onLike, onSave, onComment, isLoggedIn, onAuthRequired 
         {post.content}
       </p>
 
-      {/* Emoji visual */}
-      <div style={{
-        background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)",
-        borderRadius: 14, padding: "20px 16px", textAlign: "center", marginBottom: 14, fontSize: 48
-      }}>
-        {post.emoji || "📢"}
-      </div>
+      {post.images?.length > 0 && (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: post.images.length === 1 ? "1fr" : "1fr 1fr",
+          gap: 6, marginBottom: 12,
+        }}>
+          {post.images.map((src, idx) => (
+            <div key={idx} style={{ position: "relative", borderRadius: 12, overflow: "hidden", aspectRatio: post.images.length === 1 ? "16/9" : "1/1" }}>
+              <img src={src} alt={`p${idx}`} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Actions */}
       <div style={{ display: "flex", alignItems: "center", gap: 4, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
@@ -539,7 +870,7 @@ function PostCard({ post, onLike, onSave, onComment, isLoggedIn, onAuthRequired 
           {post.likes ?? 0}
         </button>
 
-        <button onClick={() => guard(() => setShowComments(v => !v))} style={{
+        <button onClick={toggleComments} style={{
           display: "flex", alignItems: "center", gap: 5,
           background: showComments ? "rgba(29,158,117,0.12)" : "none",
           border: "1px solid transparent", borderRadius: 99, padding: "6px 12px",
@@ -551,9 +882,7 @@ function PostCard({ post, onLike, onSave, onComment, isLoggedIn, onAuthRequired 
           {post.comments ?? 0}
         </button>
 
-        <button onClick={() => guard(() => {
-          navigator.clipboard?.writeText(window.location.href).catch(() => { });
-        })} style={{
+        <button onClick={() => guard(() => setShowShare(true))} style={{
           display: "flex", alignItems: "center", gap: 5,
           background: "none", border: "1px solid transparent",
           borderRadius: 99, padding: "6px 12px", cursor: "pointer",
@@ -573,57 +902,30 @@ function PostCard({ post, onLike, onSave, onComment, isLoggedIn, onAuthRequired 
         </button>
       </div>
 
-      {/* Guest notice on comments area */}
-      {showComments && !isLoggedIn && (
-        <div style={{
-          marginTop: 12, padding: "12px 14px",
-          background: "rgba(29,158,117,0.07)", borderRadius: 12,
-          border: "1px solid rgba(29,158,117,0.15)",
-          textAlign: "center"
-        }}>
-          <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginBottom: 8 }}>
-            Sign in to read and write comments
-          </p>
-          <button onClick={onAuthRequired} style={{
-            background: "#1D9E75", border: "none", borderRadius: 99, padding: "7px 18px",
-            color: "#fff", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit"
-          }}>Sign In</button>
-        </div>
+      {showComments && (
+        <CommentsSection
+          post={post}
+          isLoggedIn={isLoggedIn}
+          onAuthRequired={onAuthRequired}
+          commentsState={commentsState}
+          onAddComment={onAddComment}
+          onLikeComment={onLikeComment}
+          onDeleteComment={onDeleteComment}
+        />
       )}
 
-      {/* Comment input (logged-in only) */}
-      {showComments && isLoggedIn && (
-        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-          <div style={{ display: "flex", gap: 8 }}>
-            <Avatar name="R" size={30} />
-            <div style={{
-              flex: 1, display: "flex", alignItems: "center", gap: 8,
-              background: "rgba(255,255,255,0.05)", borderRadius: 99,
-              padding: "6px 14px", border: "1px solid rgba(255,255,255,0.08)"
-            }}>
-              <input
-                value={comment}
-                onChange={e => setComment(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleComment()}
-                placeholder="Add a comment…"
-                style={{
-                  flex: 1, background: "none", border: "none", outline: "none",
-                  color: "#fff", fontSize: 13, fontFamily: "inherit"
-                }}
-              />
-              {comment && (
-                <button onClick={handleComment} style={{
-                  background: "#1D9E75", border: "none", borderRadius: 99,
-                  padding: "4px 10px", color: "#fff", fontSize: 12,
-                  fontWeight: 700, cursor: "pointer", fontFamily: "inherit",
-                  display: "flex", alignItems: "center"
-                }}>
-                  <Send size={12} />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+      {showShare && (
+        <ShareMenu post={post} onClose={() => setShowShare(false)} showToast={showToast} />
+      )}
+
+      {confirmDelete && (
+        <ConfirmDialog
+          title="Delete this post?"
+          message="This can't be undone. Your post, its comments and likes will be permanently removed."
+          confirmLabel="Delete"
+          onCancel={() => setConfirmDelete(false)}
+          onConfirm={() => { setConfirmDelete(false); onDeletePost(post.id); }}
+        />
       )}
     </div>
   );
@@ -696,31 +998,41 @@ function TypewriterSearch() {
 // ─── MAIN COMPONENT ────────────────────────────────────────────────────────────
 export default function CommunityFeed() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState("for-you");
   const [activeNav, setActiveNav] = useState("community");
   const [showPost, setShowPost] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
   const [toast, setToast] = useState({ message: "", type: "info", visible: false });
-  // ─── LOCATION STATE ──────────────────────────────────────────────────────────
-  // (add these inside CommunityFeed, near top of component)
   const [states, setStates] = useState([]);
   const [districts, setDistricts] = useState([]);
-  const [activeDistrict, setActiveDistrict] = useState(null); // { id, code, name }
-  const [activeState, setActiveState] = useState(null); // { id, code, name }
-  // Toast helper
+  const [commentsByPost, setCommentsByPost] = useState({}); // { [postId]: { loading, items, currentUserId } }
+
   const showToast = (message, type = "info", ms = 3000) => {
     setToast({ message, type, visible: true });
     setTimeout(() => setToast(t => ({ ...t, visible: false })), ms);
   };
 
-  // ── Boot: check Supabase session ──────────────────────────────────────────
   useEffect(() => {
     loadLocationData(setStates, setDistricts);
     loadPosts();
   }, []);
 
-  // ─── LOAD STATES + DISTRICTS FROM SUPABASE ───────────────────────────────────
+  const activePage = useCallback(() => {
+    if (activeNav === "blood") {
+      navigate("/digital-blood-bank/find");
+    } else if (activeNav === "community") {
+      navigate("/");
+    } else if (activeNav === "profile") {
+      navigate("/profile");
+    }
+  }, [activeNav]);
+
+  useEffect(() => {
+    activePage();
+  }, [activePage]);
+
   async function loadLocationData(setStates, setDistricts) {
     const [{ data: statesData }, { data: distData }] = await Promise.all([
       supabase.from("states").select("*").order("name"),
@@ -729,14 +1041,14 @@ export default function CommunityFeed() {
     if (statesData) setStates(statesData);
     if (distData) setDistricts(distData);
   }
+
   const loadPosts = async (districtId = null, stateId = null) => {
     let query = supabase
       .from("posts")
       .select(`
       *,
-      profiles (full_name, neighborhood, avatar_url),
-      districts (id, code, name),
-      states    (id, code, name)
+      districts ( id, code, name ),
+      states    ( id, code, name )
     `)
       .order("created_at", { ascending: false });
 
@@ -746,32 +1058,68 @@ export default function CommunityFeed() {
     const { data, error } = await query;
     if (error) { console.error(error.message); return; }
 
-    if (data?.length) {
-      setPosts(data.map(row => {
-        const cat = getCategoryMeta(row.category);
-        return {
-          ...row,
-          author: row.profiles?.full_name || "Anonymous",
-          avatar_initial: (row.profiles?.full_name || "A")[0],
-          avatar_color: "#1D9E75",
-          location: row.districts?.name || row.states?.name || "Nearby",
-          district_label: row.districts?.name,
-          district_code: row.districts?.code,
-          state_label: row.states?.name,
-          category_label: cat.label,
-          category_icon: cat.icon,
-          category_color: cat.color,
-          emoji: cat.icon,
-          liked: false,
-          saved: false,
-          urgent: row.category === "alert" || row.category === "need-help",
-        };
-      }));
-    } else {
-      setPosts(SEED_POSTS); // fallback
-    }
-  };
+    if (!data?.length) { setPosts([]); return; }
 
+    const postIds = data.map(row => row.id);
+
+    // Batch-fetch all needed profiles in ONE query instead of one per post
+    const userIds = [...new Set(data.map(row => row.user_id).filter(Boolean))];
+    let profilesById = {};
+    if (userIds.length) {
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, full_name, avatar_url")
+        .in("id", userIds);
+      if (profilesError) console.error(profilesError.message);
+      profilesById = Object.fromEntries((profilesData || []).map(p => [p.id, p]));
+    }
+
+    // Real like / comment counts (posts table has no stored counter columns)
+    const [{ data: allLikes }, { data: allComments }] = await Promise.all([
+      supabase.from("likes").select("post_id").in("post_id", postIds),
+      supabase.from("comments").select("post_id").in("post_id", postIds),
+    ]);
+    const likeCountByPost = {};
+    (allLikes || []).forEach(l => { likeCountByPost[l.post_id] = (likeCountByPost[l.post_id] || 0) + 1; });
+    const commentCountByPost = {};
+    (allComments || []).forEach(c => { commentCountByPost[c.post_id] = (commentCountByPost[c.post_id] || 0) + 1; });
+
+    // fetch which posts current user has liked
+    let likedPostIds = new Set();
+    if (user) {
+      const { data: likedData } = await supabase
+        .from("likes")
+        .select("post_id")
+        .eq("user_id", user.id);
+      likedPostIds = new Set((likedData || []).map(l => l.post_id));
+    }
+
+    setPosts(data.map(row => {
+      const cat = getCategoryMeta(row.category);
+      const author = profilesById[row.user_id];
+      return {
+        ...row,
+        author: author?.full_name || row.profiles?.email?.split("@")[0] || "Anonymous",
+        avatar_url: author?.avatar_url || null,
+        avatar_initial: (author?.full_name || row.profiles?.email || "A")[0].toUpperCase(),
+        avatar_color: "#1D9E75",
+        is_own_post: user ? row.user_id === user.id : false,
+        location: row.districts?.name || row.states?.name || "Nearby",
+        district_label: row.districts?.name,
+        district_code: row.districts?.code,
+        state_label: row.states?.name,
+        category_label: cat.label,
+        category_icon: cat.icon,
+        category_color: cat.color,
+        emoji: cat.icon,
+        liked: likedPostIds.has(row.id),
+        likes: likeCountByPost[row.id] ?? 0,
+        comments: commentCountByPost[row.id] ?? 0,
+        saved: false,
+        urgent: row.category === "alert" || row.category === "need-help",
+      };
+    }));
+  };
 
   // ── Like / Save (optimistic UI) ────────────────────────────────────────────
   const handleLike = async (id) => {
@@ -796,12 +1144,162 @@ export default function CommunityFeed() {
     );
   };
 
-  const handleComment = (postId, text) => {
-    setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments: p.comments + 1 } : p));
-    if (user) {
-      supabase.from("comments").insert({ post_id: postId, user_id: user.id, content: text });
+  // ── Delete post ────────────────────────────────────────────────────────────
+  const handleDeletePost = async (postId) => {
+    const prevPosts = posts;
+    setPosts(prev => prev.filter(p => p.id !== postId));
+    if (!user) return;
+    const { error } = await supabase.from("posts").delete().eq("id", postId).eq("user_id", user.id);
+    if (error) {
+      console.error("Delete post error:", error.message);
+      setPosts(prevPosts); // revert on failure
+      showToast("Couldn't delete post", "error");
+    } else {
+      showToast("Post deleted", "success");
+      setCommentsByPost(prev => {
+        const next = { ...prev };
+        delete next[postId];
+        return next;
+      });
     }
-    showToast("Comment posted ✓", "success");
+  };
+
+  // ── Comments: load / add / like / delete ────────────────────────────────────
+  const loadComments = async (postId) => {
+    setCommentsByPost(prev => ({
+      ...prev,
+      [postId]: { ...(prev[postId] || {}), loading: true, currentUserId: user?.id || null }
+    }));
+
+    const { data: rows, error } = await supabase
+      .from("comments")
+      .select("*")
+      .eq("post_id", postId)
+      .order("created_at", { ascending: true });
+
+    if (error) {
+      console.error(error.message);
+      setCommentsByPost(prev => ({ ...prev, [postId]: { loading: false, items: [], currentUserId: user?.id || null } }));
+      return;
+    }
+
+    const commentIds = (rows || []).map(r => r.id);
+    const userIds = [...new Set((rows || []).map(r => r.user_id).filter(Boolean))];
+
+    const [{ data: profilesData }, { data: likesData }] = await Promise.all([
+      userIds.length
+        ? supabase.from("profiles").select("id, full_name, avatar_url").in("id", userIds)
+        : Promise.resolve({ data: [] }),
+      commentIds.length
+        ? supabase.from("comment_likes").select("comment_id, user_id").in("comment_id", commentIds)
+        : Promise.resolve({ data: [] }),
+    ]);
+
+    const profilesById = Object.fromEntries((profilesData || []).map(p => [p.id, p]));
+    const likeCountByComment = {};
+    const likedByMeSet = new Set();
+    (likesData || []).forEach(l => {
+      likeCountByComment[l.comment_id] = (likeCountByComment[l.comment_id] || 0) + 1;
+      if (user && l.user_id === user.id) likedByMeSet.add(l.comment_id);
+    });
+
+    const enriched = (rows || []).map(r => {
+      const p = profilesById[r.user_id];
+      return {
+        ...r,
+        author: p?.full_name || "Neighbor",
+        avatar_url: p?.avatar_url || null,
+        likes_count: likeCountByComment[r.id] || 0,
+        liked_by_me: likedByMeSet.has(r.id),
+        replies: [],
+      };
+    });
+
+    // Build 1-level thread: top-level comments with nested replies
+    const byId = Object.fromEntries(enriched.map(c => [c.id, c]));
+    const topLevel = [];
+    enriched.forEach(c => {
+      if (c.parent_comment_id && byId[c.parent_comment_id]) {
+        byId[c.parent_comment_id].replies.push(c);
+      } else {
+        topLevel.push(c);
+      }
+    });
+
+    setCommentsByPost(prev => ({
+      ...prev,
+      [postId]: { loading: false, items: topLevel, currentUserId: user?.id || null }
+    }));
+  };
+
+  const handleAddComment = async (postId, content, parentCommentId = null) => {
+    if (!user) { setShowAuth(true); return; }
+
+    const { error } = await supabase.from("comments").insert({
+      post_id: postId,
+      user_id: user.id,
+      content,
+      parent_comment_id: parentCommentId || null,
+    });
+
+    if (error) {
+      console.error("Insert comment error:", error.message);
+      showToast("Couldn't post comment", "error");
+      return;
+    }
+
+    setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments: (p.comments ?? 0) + 1 } : p));
+    showToast(parentCommentId ? "Reply posted ✓" : "Comment posted ✓", "success");
+    loadComments(postId);
+  };
+
+  const handleLikeComment = async (postId, commentId) => {
+    if (!user) { setShowAuth(true); return; }
+
+    // optimistic toggle
+    setCommentsByPost(prev => {
+      const state = prev[postId];
+      if (!state) return prev;
+      const toggle = (list) => list.map(c => {
+        if (c.id === commentId) {
+          const liked = !c.liked_by_me;
+          return { ...c, liked_by_me: liked, likes_count: c.likes_count + (liked ? 1 : -1) };
+        }
+        return { ...c, replies: c.replies ? toggle(c.replies) : c.replies };
+      });
+      return { ...prev, [postId]: { ...state, items: toggle(state.items) } };
+    });
+
+    // figure out whether it was liked (post-toggle) to decide insert/delete
+    const state = commentsByPost[postId];
+    const findComment = (list) => {
+      for (const c of list) {
+        if (c.id === commentId) return c;
+        if (c.replies) { const found = findComment(c.replies); if (found) return found; }
+      }
+      return null;
+    };
+    const wasLiked = state ? !findComment(state.items)?.liked_by_me : false; // pre-toggle value
+
+    if (wasLiked) {
+      await supabase.from("comment_likes").delete().match({ comment_id: commentId, user_id: user.id });
+    } else {
+      const { error } = await supabase.from("comment_likes").insert({ comment_id: commentId, user_id: user.id });
+      if (error && error.code !== "23505") console.error("Like comment error:", error.message);
+    }
+  };
+
+  const handleDeleteComment = async (postId, commentId) => {
+    if (!user) return;
+    const { error } = await supabase.from("comments").delete().eq("id", commentId).eq("user_id", user.id);
+    if (error) {
+      console.error("Delete comment error:", error.message);
+      showToast("Couldn't delete comment", "error");
+      return;
+    }
+    setPosts(prev => prev.map(p => p.id === postId ? { ...p, comments: Math.max((p.comments ?? 1) - 1, 0) } : p));
+    showToast("Comment deleted", "success");
+    loadComments(postId);
   };
 
   // ── Create Post ────────────────────────────────────────────────────────────
@@ -844,6 +1342,7 @@ export default function CommunityFeed() {
         images,
       });
       if (error) console.error("Insert error:", error.message);
+      else loadPosts(); // pick up the real DB id so delete/comments work against it
     }
   };
 
@@ -1005,9 +1504,16 @@ export default function CommunityFeed() {
                 post={post}
                 onLike={handleLike}
                 onSave={handleSave}
-                onComment={handleComment}
                 isLoggedIn={!!user}
                 onAuthRequired={() => setShowAuth(true)}
+                currentUserId={user?.id || null}
+                commentsState={commentsByPost[post.id]}
+                onToggleComments={loadComments}
+                onAddComment={handleAddComment}
+                onLikeComment={handleLikeComment}
+                onDeleteComment={handleDeleteComment}
+                onDeletePost={handleDeletePost}
+                showToast={showToast}
               />
             </div>
           ))}
@@ -1099,7 +1605,6 @@ export default function CommunityFeed() {
         borderRadius: 99,
         boxShadow: "0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.08)",
         border: "1px solid rgba(0,0,0,0.07)",
-        // Removed display: "flex" from here to prevent style overriding Tailwind
         alignItems: "center",
         padding: "6px 8px",
         gap: 0,
@@ -1109,7 +1614,7 @@ export default function CommunityFeed() {
       }} className="flex lg:hidden backdrop-blur-md mobile-nav supports-[backdrop-filter]:bg-black/30">
         {[
           { id: "home", icon: <Home size={20} />, label: "Home" },
-          { id: "search", icon: <Search size={20} />, label: "Search" },
+          { id: "blood", icon: <BloodtypeRounded size={20} />, label: "Blood" },
         ].map(item => (
           <button key={item.id} onClick={() => setActiveNav(item.id)} style={{
             flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
