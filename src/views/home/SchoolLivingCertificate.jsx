@@ -551,8 +551,8 @@ export default function SchoolLeavingCertificate() {
                                         type="button"
                                         onClick={() => setCertificateType(key)}
                                         className={`rounded-xl border px-3 py-2 text-xs font-bold transition-all ${certificateType === key
-                                                ? 'text-white'
-                                                : 'border-input text-muted-foreground hover:bg-muted'
+                                            ? 'text-white'
+                                            : 'border-input text-muted-foreground hover:bg-muted'
                                             }`}
                                         style={certificateType === key ? { background: 'linear-gradient(135deg,#132848,#2c4a7c)', borderColor: 'transparent' } : {}}
                                     >
@@ -832,7 +832,7 @@ export default function SchoolLeavingCertificate() {
             {/* Delete confirmation */}
             {deleteTarget && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+                    <div className="bg-black rounded-2xl shadow-2xl w-full max-w-sm p-6">
                         <h3 className="text-base font-extrabold text-foreground mb-2">Delete this student?</h3>
                         <p className="text-sm text-muted-foreground mb-5">
                             This will permanently remove <strong>{titleCase(deleteTarget.student_name)}</strong>'s record. This action cannot be undone.
