@@ -37,6 +37,7 @@ import DoctorFinderPage from "./views/home/DoctorFinderPage";
 import BloodDonorCityPage from "./views/home/BloodDonorCityPage";
 import AddDoctorPage from "./views/home/createDoctor";
 import CommunityFeed from "./views/home/CommunityFeed";
+import SchoolLeavingCertificate from "./views/home/SchoolLivingCertificate";
 
 
 // ==================
@@ -101,6 +102,7 @@ export default function RenderRoutes() {
           <Route path="/fund-usage" element={<FundUsagePage />} />
           <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/certificate-generator" element={<CertificateGenerator />} />
+          <Route path="/school-leaving-certificate" element={<SchoolLeavingCertificate />} />
           <Route path="/certificate/verify/:certId" element={<CertificateVerify />} />
           <Route path="/digital-blood-bank" element={<BloodBankPage />} />
           <Route path="/digital-blood-bank/find" element={<FindDonorsPage />} />
