@@ -1023,7 +1023,7 @@ export default function CommunityFeed() {
     if (activeNav === "blood") {
       navigate("/digital-blood-bank/find");
     } else if (activeNav === "community") {
-      navigate("/");
+      navigate("/community");
     } else if (activeNav === "profile") {
       navigate("/profile");
     }
@@ -1660,7 +1660,7 @@ export default function CommunityFeed() {
         ))}
 
         {/* Avatar / Profile */}
-        <button onClick={() => user ? setActiveNav("profile") : setShowAuth(true)} style={{
+        <button onClick={() => navigate("/profile")} style={{
           flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
           gap: 2, background: "none", border: "none", cursor: "pointer",
           padding: "7px 4px", borderRadius: 99

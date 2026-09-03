@@ -547,7 +547,7 @@ export default function SchoolLeavingCertificate() {
                         <p className="text-sm text-white/80 mb-6 max-w-md mx-auto leading-relaxed">
                             U-DISE {SCHOOL.udise}
                         </p>
-
+                        <img src={SCHOOL.logoUrl} alt="School Logo" className="mx-auto h-16 w-16 object-contain mb-4" />
                     </div>
                 </div>
             </div>
@@ -663,9 +663,9 @@ export default function SchoolLeavingCertificate() {
                         {subjects.length > 0 && (
                             <div className="flex flex-wrap gap-1.5 mt-2">
                                 {subjects.map((s) => (
-                                    <span key={s} className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold" style={{ background: 'rgba(19,40,72,0.08)', color: '#132848' }}>
+                                    <span key={s} className="rounded-full bg-[#25d366cc] px-4 py-2 text-sm font-bold text-white shadow">
                                         {s}
-                                        <button type="button" onClick={() => removeSubject(s)} className="hover:text-red-600"><X className="h-3 w-3" /></button>
+                                        <button type="button" onClick={() => removeSubject(s)} className="hover:text-red-600 pl-1"><X className="h-3 w-3" /></button>
                                     </span>
                                 ))}
                             </div>

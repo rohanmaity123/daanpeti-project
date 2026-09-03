@@ -38,6 +38,7 @@ import BloodDonorCityPage from "./views/home/BloodDonorCityPage";
 import AddDoctorPage from "./views/home/createDoctor";
 import CommunityFeed from "./views/home/CommunityFeed";
 import SchoolLeavingCertificate from "./views/home/SchoolLivingCertificate";
+import ServicesLanding from "./views/home/landingPage";
 
 
 // ==================
@@ -87,7 +88,7 @@ export default function RenderRoutes() {
           <Route path="/:city/donate-items" element={<CityPage type="donate" />} />
           <Route path="/blog" element={<BlogListPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
-          <Route path="/" element={<CommunityFeed />} />
+          <Route path="/community" element={<CommunityFeed />} />
           <Route path="/products" element={<HomePage />} />
           <Route path="/items/:itemId" element={<ItemDetailPage />} />
           <Route path="/my-items" element={<MyItemsPage />} />
@@ -115,7 +116,7 @@ export default function RenderRoutes() {
         {/* ================= 404 ================= */}
         <Route path="/404" element={<Page404 />} />
         <Route path="*" element={<Navigate to="/404" />} />
-
+        <Route path="/" element={<ServicesLanding />} />
       </Routes>
     </Suspense>
   );
