@@ -37,8 +37,8 @@ import DoctorFinderPage from "./views/home/DoctorFinderPage";
 import BloodDonorCityPage from "./views/home/BloodDonorCityPage";
 import AddDoctorPage from "./views/home/createDoctor";
 import CommunityFeed from "./views/home/CommunityFeed";
-import SchoolLeavingCertificate from "./views/home/SchoolLivingCertificate";
 import ServicesLanding from "./views/home/landingPage";
+import SchoolLeavingCertificatePage from "./views/home/SchoolLivingCertificate";
 
 
 // ==================
@@ -103,7 +103,6 @@ export default function RenderRoutes() {
           <Route path="/fund-usage" element={<FundUsagePage />} />
           <Route path="/rewards" element={<RewardsPage />} />
           <Route path="/certificate-generator" element={<CertificateGenerator />} />
-          <Route path="/school-leaving-certificate" element={<SchoolLeavingCertificate />} />
           <Route path="/certificate/verify/:certId" element={<CertificateVerify />} />
           <Route path="/digital-blood-bank" element={<BloodBankPage />} />
           <Route path="/digital-blood-bank/find" element={<FindDonorsPage />} />
@@ -117,6 +116,8 @@ export default function RenderRoutes() {
         <Route path="/404" element={<Page404 />} />
         <Route path="*" element={<Navigate to="/404" />} />
         <Route path="/" element={<ServicesLanding />} />
+        <Route path="/school-leaving-certificate" element={<SchoolLeavingCertificatePage />} />
+
       </Routes>
     </Suspense>
   );
