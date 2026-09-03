@@ -166,7 +166,7 @@ function Row({ num, label, children }) {
 }
 
 function SchoolLeavingCertificateLayout({ data }) {
-    const address = [data.village, data.po].filter(Boolean).join(', P.O.-');
+    // const address = [data.village, data.po].filter(Boolean).join(', P.O.-');
     return (
         <>
             <CertTitle>School Leaving Certificate</CertTitle>
@@ -336,6 +336,7 @@ export default function SchoolLeavingCertificate() {
     const [classFilter, setClassFilter] = useState('');
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [certificateType, setCertificateType] = useState('character');
+    const [typeFilter, setTypeFilter] = useState('');
     // Preview modal state — also used as the "render target" for PNG/PDF/print actions
     const [previewStudent, setPreviewStudent] = useState(null);
     const [pendingAction, setPendingAction] = useState(null); // 'png' | 'pdf' | 'print' | null
@@ -480,9 +481,10 @@ export default function SchoolLeavingCertificate() {
         return students.filter((s) => {
             const matchesSearch = !search || s.student_name?.toLowerCase().includes(search.toLowerCase()) || s.father_name?.toLowerCase().includes(search.toLowerCase());
             const matchesClass = !classFilter || s.class === classFilter;
-            return matchesSearch && matchesClass;
+            const matchesType = !typeFilter || (s.certificate_type || 'character') === typeFilter;
+            return matchesSearch && matchesClass && matchesType;
         });
-    }, [students, search, classFilter]);
+    }, [students, search, classFilter, typeFilter]);
 
     const classOptions = useMemo(() => [...new Set(students.map(s => s.class).filter(Boolean))], [students]);
 
@@ -535,33 +537,40 @@ export default function SchoolLeavingCertificate() {
     return (
         <div className="mx-auto max-w-6xl px-4 lg:px-6 py-6">
             {/* Header */}
+            <div className="mx-4 mt-8 mb-6 lg:mx-auto lg:max-w-[1200px]">
+                <div className="rounded-2xl p-8 text-center relative overflow-hidden"
+                    style={{ background: 'linear-gradient(135deg,#15803D,#1D9E75)' }}>
+                    <div className="absolute inset-0 pointer-events-none"
+                        style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 120%,rgba(0,0,0,0.2),transparent)' }} />
+                    <div className="relative z-10">
+                        <h2 className="text-xl font-extrabold text-white mb-2">{SCHOOL.name}</h2>
+                        <p className="text-sm text-white/80 mb-6 max-w-md mx-auto leading-relaxed">
+                            U-DISE {SCHOOL.udise}
+                        </p>
+
+                    </div>
+                </div>
+            </div>
             <div className="glass-card p-6 lg:p-8 mb-6 relative overflow-hidden">
                 <div className="absolute top-0 left-0 right-0 h-1" style={{ background: 'linear-gradient(90deg,#132848,#c9a227)' }} />
-                <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(19,40,72,0.08)' }}>
-                        <GraduationCap className="h-5 w-5" style={{ color: '#132848' }} />
-                    </div>
-                    <div>
-                        <div className="sm:col-span-2 mb-1">
-                            <label className="text-xs font-bold text-foreground block mb-1.5">Certificate Type</label>
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                {Object.entries(CERTIFICATE_TYPES).map(([key, cfg]) => (
-                                    <button
-                                        key={key}
-                                        type="button"
-                                        onClick={() => setCertificateType(key)}
-                                        className={`rounded-xl border px-3 py-2 text-xs font-bold transition-all ${certificateType === key
-                                            ? 'text-white'
-                                            : 'border-input text-muted-foreground hover:bg-muted'
-                                            }`}
-                                        style={certificateType === key ? { background: 'linear-gradient(135deg,#132848,#2c4a7c)', borderColor: 'transparent' } : {}}
-                                    >
-                                        {cfg.short} — {cfg.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                        <p className="mt-0.5 text-sm text-muted-foreground">{SCHOOL.name} · U-DISE {SCHOOL.udise}</p>
+
+                <div className="sm:col-span-2 mb-1 mt-1">
+                    {/* <label className="text-xs font-bold text-foreground block mb-1.5">Certificate Type</label> */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {Object.entries(CERTIFICATE_TYPES).map(([key, cfg]) => (
+                            <button
+                                key={key}
+                                type="button"
+                                onClick={() => setCertificateType(key)}
+                                className={`rounded-full bg-muted  px-4 py-2 text-sm font-bold  shadow hover:scale-105 transition ${certificateType === key
+                                    ? 'text-white bg-[#1D9E75]'
+                                    : 'border-input  text-muted-foreground hover:bg-muted'
+                                    }`}
+                                style={certificateType === key ? { background: 'linear-gradient(135deg,#132848,#2c4a7c)', borderColor: 'transparent' } : {}}
+                            >
+                                {cfg.short} — {cfg.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
@@ -716,18 +725,38 @@ export default function SchoolLeavingCertificate() {
                 </form>
             </div>
 
-            {/* Search / filter */}
-            <div className="flex flex-col sm:flex-row gap-2 mb-3">
-                <div className="relative flex-1">
-                    <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <input type="text" placeholder="Search by student or father name..." value={search} onChange={(e) => setSearch(e.target.value)}
-                        className="input pl-9" />
+            <div className="flex flex-wrap mb-3 gap-2  justify-between w-full">
+                <div className="relative">
+                    <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                    <input
+                        type="text"
+                        placeholder="Search by student or father name..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className='h-11 w-[300px] border pl-[31px] rounded-[10px] border-solid;'
+                    />
                 </div>
-                <select value={classFilter} onChange={(e) => setClassFilter(e.target.value)} className="input sm:w-44">
-                    <option value="">All Classes</option>
-                    {classOptions.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <div className="flex flex-wrap gap-2 justify-between">
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <span>Filter by:</span>
+                    </div>
+                    <select value={classFilter} onChange={(e) => setClassFilter(e.target.value)} className="input sm:w-44 shrink-0"
+                        style={{ maxWidth: '40%' }}
+                    >
+                        <option value="">All Classes</option>
+                        {classOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="input sm:w-56 shrink-0"
+                        style={{ maxWidth: '40%' }}
+                    >
+                        <option value="">All Certificate Types</option>
+                        {Object.entries(CERTIFICATE_TYPES).map(([key, cfg]) => (
+                            <option key={key} value={key}>{cfg.short} — {cfg.label}</option>
+                        ))}
+                    </select>
+                </div>
             </div>
+
 
             {/* Student list */}
             <div className="glass-card overflow-hidden">
