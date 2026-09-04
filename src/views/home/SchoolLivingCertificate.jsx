@@ -515,9 +515,10 @@ function SchoolLeavingCertificate({ session, school }) {
                             {/* Logo */}
                             <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border border-white/20 bg-white/10 p-2 shadow-xl backdrop-blur-md">
                                 <img
-                                    src={SCHOOL.logoUrl}
+                                    src={school?.logo}
                                     alt="School Logo"
                                     className="h-full w-full object-contain"
+                                    style={{ borderRadius: '0.5rem' }}
                                 />
                             </div>
 
