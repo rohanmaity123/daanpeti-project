@@ -11,6 +11,7 @@ import { Facebook, LinkedIn, YouTube, Instagram } from "@mui/icons-material";
 import "../../scss/landing.scss";
 import CustomCursor from "../../components/Ui/Customcursor";
 import Hero3D from "../../components/Ui/HeroSection";
+import logo from "../../assets/images/logo.png";
 
 // Staggered scroll-in for the services grid — each card separates from the
 // group with its own delay, echoing the objects "settling" out of the hero orb.
@@ -291,7 +292,7 @@ function LandingFooter() {
         <footer className="tl3d-footer">
             <div className="tl3d-footer-statement">
                 <h2>Build useful. Build local.<br />Build for <span>people</span>.</h2>
-                <div className="tl3d-footer-brand">MAITY'S<br />TECH LAB</div>
+                <div className="tl3d-footer-brand"><img src={logo} alt="Maity's Tech Lab" className="tl3d-footer-logo" /></div>
             </div>
 
             <div className="tl3d-footer-grid">
@@ -361,9 +362,7 @@ export default function ServicesLanding() {
             </div>
 
             <CustomCursor />
-
             <Hero3D services={SERVICES} stats={HERO_STATS} />
-
             <Marquee />
 
             {/* ── SERVICES ─────────────────────────────────────────────── */}

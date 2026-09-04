@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap');
 /* ── TOKENS ──────────────────────────────────────────────────────────── */
 .tl3d-page {
   --bg: #050505;
@@ -681,3 +681,63 @@
 @media (hover: none) {
   .tl3d-cursor { display: none; }
 }
+.tl3d-footer-logo {
+    width: 96px;
+    height: 96px;
+    border-radius: 20px;
+    object-fit: cover;
+    margin-top: 24px;
+}
+.hero3d-brand {
+    display: flex;
+    // align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+.hero3d-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    margin-bottom: 10px;
+}
+.hero3d-brand-text {
+    perspective: 400px;
+}
+.hero3d-brand-text span {
+    display: inline-block;
+    font-family: "Orbitron", var(--font-display), sans-serif;
+    font-weight: 800;
+    font-size: clamp(20px, 2.6vw, 30px);
+    letter-spacing: 0.08em;
+    line-height: 1.15;
+    color: var(--ink);
+    text-shadow:
+        0 1px 0 rgba(255,255,255,0.15),
+        0 2px 0 rgba(0,0,0,0.5),
+        0 3px 0 rgba(0,0,0,0.4),
+        0 4px 6px rgba(0,0,0,0.6);
+    transform-style: preserve-3d;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .hero3d-brand-text span {
+        animation: tl3dBrandFloat 5s ease-in-out infinite;
+    }
+}
+@keyframes tl3dBrandFloat {
+    0%, 100% { transform: rotateX(0deg) rotateY(0deg) translateZ(0); }
+    50% { transform: rotateX(6deg) rotateY(-4deg) translateZ(6px); }
+}
+
+.hero3d-brand-accent {
+    color: var(--brand) !important;
+    text-shadow:
+        0 1px 0 rgba(150,255,220,0.4),
+        0 2px 0 rgba(4,30,20,0.7),
+        0 3px 0 rgba(4,30,20,0.6),
+        0 0 18px rgba(29,158,117,0.65),
+        0 4px 10px rgba(0,0,0,0.6) !important;
+}
+.hero3d-brand-accent { color: var(--brand); }

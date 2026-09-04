@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
     motion, useMotionValue, useSpring, useTransform, useScroll, useReducedMotion,
 } from "framer-motion";
-
+import logo from "../../assets/images/logo.png";
 // Fixed, hand-placed offsets so the five service objects never collide with
 // the orb or each other — no trigonometry, no runtime collision checks needed.
 // [dx, dy, depth(translateZ), floatDuration]
@@ -51,8 +51,11 @@ export default function Hero3D({ services, stats }) {
             <div className="hero3d-inner">
                 <div className="hero3d-copy">
                     <div className="hero3d-brand">
-                        <span>MAITY'S</span>
-                        <span className="hero3d-brand-accent">TECH LAB</span>
+                        <img src={logo} alt="Maity's Tech Lab" className="hero3d-logo" />
+                        <div className="hero3d-brand-text">
+                            <span>MAITY'S <span className="hero3d-brand-accent">TECH LAB</span></span>
+
+                        </div>
                     </div>
 
                     <div className="hero3d-status">

@@ -68,7 +68,7 @@ function CornerFlourish({ flipX, flipY }) {
         </svg>
     );
 }
-function CertificatePage({ children, captureId = 'slc-preview' }) {
+function CertificatePage({ children, captureId = 'slc-preview', school }) {
     return (
         <div id={captureId} style={{
             width: '297mm', minHeight: '210mm', margin: '0 auto', background: '#fdfcf9',
@@ -83,11 +83,11 @@ function CertificatePage({ children, captureId = 'slc-preview' }) {
                 <OrnamentDivider />
                 <div style={{ textAlign: 'center', marginTop: '5mm' }}>
                     <div style={{ fontWeight: 800, fontSize: 22, color: '#132848', letterSpacing: 0.3, lineHeight: 1.25 }}>
-                        {SCHOOL.name}
+                        {school?.school_name}
                     </div>
                 </div>
                 <div style={{ textAlign: 'center', margin: '4mm 0' }}>
-                    <img src={SCHOOL.logoUrl} alt="School Logo" style={{ height: 64, width: 64, objectFit: 'contain', display: 'inline-block' }}
+                    <img src={school?.logo} alt="School Logo" style={{ height: 64, width: 64, objectFit: 'contain', display: 'inline-block' }}
                         onError={(e) => { e.target.style.display = 'none'; }} />
                 </div>
                 {children}
@@ -112,7 +112,7 @@ function SignatureBlock({ school, data }) {
                     <div style={{ borderTop: '1.4px solid #333', width: '50mm', margin: '2mm auto' }} />
                 )}
                 <div style={{ fontSize: 11.5, fontStyle: 'italic', color: '#1c3fa0', fontWeight: 600 }}>{SCHOOL.signatoryRole}</div>
-                <div style={{ fontSize: 11.5, color: '#1c3fa0', fontWeight: 700, marginTop: '0.5mm' }}>{SCHOOL.name}</div>
+                <div style={{ fontSize: 11.5, color: '#1c3fa0', fontWeight: 700, marginTop: '0.5mm' }}>{school?.school_name}</div>
             </div>
         </div>
     );
@@ -155,7 +155,7 @@ function CharacterCertificateLayout({ data, school }) {
                 is <Val>{formatDate(data.date_of_birth)}</Val>.
                 {data.subjects?.length ? <> They studied the following subjects: <Val>{data.subjects.join(', ')}</Val>.</> : null}
                 {' '}They have passed the <Val>{data.level || 'Secondary'}</Val> <Val>{data.exam_type || 'Annual'}</Val> examination
-                conducted by the Jharkhand Academic Council, Ranchi, in the year <Val>{data.passing_year || '—'}</Val>.
+                conducted by the {school?.council}, in the year <Val>{data.passing_year || '—'}</Val>.
                 {' '}To the best of our knowledge, their character has been <Val>{data.character || 'Good'}</Val>.
                 {data.address ? <> Address: <Val>{data.address}</Val>.</> : null}
                 <br /><br />
@@ -191,7 +191,7 @@ function SchoolLeavingCertificateLayout({ data, school }) {
                 <Row num={4} label="Village">{data.village}</Row>
                 <Row label="P.S. / District">{[data.ps, data.district].filter(Boolean).join(' / ')}</Row>
                 <Row num={5} label="Date of Birth">{formatDate(data.date_of_birth)}</Row>
-                <Row num={6} label="Year of Passing (Jharkhand Academic Council, Ranchi)">{data.passing_year}</Row>
+                <Row num={6} label={`Year of Passing ${school?.council}`}>{data.passing_year}</Row>
                 <Row num={7} label="Result">{data.result}</Row>
                 <Row num={8} label="Character">{data.character}</Row>
                 <Row num={9} label="Subjects">{data.subjects?.join(', ')}</Row>
@@ -223,14 +223,72 @@ function BonafideCertificateLayout({ data, school }) {
         </>
     );
 }
+function TcRow({ label, children, wide }) {
+    return (
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, fontSize: 14, marginBottom: '5mm' }}>
+            <span style={{ whiteSpace: 'nowrap' }}>{label}</span>
+            <span style={{
+                flex: wide ? 1 : 'none',
+                minWidth: wide ? undefined : '55mm',
+                borderBottom: '1px solid #333',
+                paddingBottom: 1,
+                textAlign: 'center',
+            }}>
+                <Val>{children || '\u00A0'}</Val>
+            </span>
+        </div>
+    );
+}
+
 function TransferCertificateLayout({ data, school }) {
     return (
         <>
             <CertTitle>Transfer Certificate</CertTitle>
-            <div style={{ textAlign: 'center', color: '#999', fontSize: 13, marginTop: '10mm' }}>
-                Transfer Certificate format not yet configured — using placeholder layout.
+            <div style={{ padding: '8mm 14mm 0', fontSize: 14, lineHeight: 1.9 }}>
+                <TcRow label="This is to certify that" wide>{titleCase(data.student_name)}</TcRow>
+                <TcRow label="Student's Name" wide>{titleCase(data.student_name)}</TcRow>
+                <TcRow label="son/daughter of" wide>{titleCase(data.father_name)}</TcRow>
+
+                <div style={{ display: 'flex', gap: '10mm', flexWrap: 'wrap' }}>
+                    <TcRow label="with Admission Number">{data.admission_number}</TcRow>
+                    <TcRow label="studied in Class & Section">
+                        {data.class || '—'}{data.section ? ` - ${data.section}` : ''}
+                    </TcRow>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10mm', flexWrap: 'wrap' }}>
+                    <TcRow label="born on">{formatDate(data.date_of_birth)}</TcRow>
+                    <TcRow label="and is leaving the school on">{formatDate(data.leaving_date)}</TcRow>
+                </div>
+
+                <TcRow label="Reason for Leaving" wide>{data.reason_for_leaving}</TcRow>
+
+                <TcRow label="Date of Issue">{formatDate(data.issue_date)}</TcRow>
             </div>
-            <SchoolLeavingCertificateLayout data={data} school={school} />
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '10mm', padding: '0 14mm 0 6mm' }}>
+                <div style={{
+                    width: '26mm', height: '26mm', borderRadius: '50%', border: '1.5px solid #999',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    textAlign: 'center', fontSize: 10, color: '#999', lineHeight: 1.3,
+                }}>
+                    School<br />Seal
+                </div>
+                <div style={{ textAlign: 'center', minWidth: '58mm' }}>
+                    {school?.signature_url && data?.signature ? (
+                        <img
+                            src={school.signature_url}
+                            alt="Signature"
+                            style={{ height: 40, objectFit: 'contain', display: 'block', margin: '0 auto 2mm' }}
+                            crossOrigin="anonymous"
+                        />
+                    ) : (
+                        <div style={{ borderTop: '1.4px solid #333', width: '50mm', margin: '2mm auto' }} />
+                    )}
+                    <div style={{ fontSize: 12, fontWeight: 600 }}>Signature</div>
+                    <div style={{ fontSize: 12, fontWeight: 600 }}>Principal</div>
+                </div>
+            </div>
         </>
     );
 }
@@ -244,7 +302,7 @@ const CERT_LAYOUTS = {
 function CertificateDocument({ data, captureId, school }) {
     const Layout = CERT_LAYOUTS[data.certificate_type] || CharacterCertificateLayout;
     return (
-        <CertificatePage captureId={captureId}>
+        <CertificatePage captureId={captureId} school={school}>
             <Layout data={data} school={school} />
         </CertificatePage>
     );
@@ -313,6 +371,7 @@ function SchoolLeavingCertificate({ session, school }) {
         date_of_birth: '', address: '', issue_date: '', character: 'Good',
         roll_code_no: '', roll_no: '', village: '', po: '', ps: '', district: '',
         result: 'Pass', additional_subjects: '', ref_no: '', gender: 'He',
+        admission_number: '', section: '', leaving_date: '', reason_for_leaving: '',
     };
     const { register, handleSubmit, reset, watch, formState: { errors } } = useForm({
         defaultValues: DEFAULT_FORM_VALUES,
@@ -374,10 +433,16 @@ function SchoolLeavingCertificate({ session, school }) {
         setExamType(s.exam_type || 'Annual');
         setLevel(s.level || 'Secondary');
         setPassingYear(s.passing_year || '');
+        setCertificateType(s.certificate_type || 'character');
         reset({
             student_name: s.student_name, father_name: s.father_name, mother_name: s.mother_name,
             class: s.class, stream: s.stream || '', session: s.session, date_of_birth: s.date_of_birth,
             address: s.address || '', issue_date: s.issue_date, character: s.character || 'Good',
+            roll_code_no: s.roll_code_no || '', roll_no: s.roll_no || '', village: s.village || '',
+            additional_subjects: s.additional_subjects || '', po: s.po || '', ps: s.ps || '',
+            district: s.district || '', result: s.result || 'Pass', ref_no: s.ref_no || '',
+            gender: s.gender || 'He', admission_number: s.admission_number || '', section: s.section || '',
+            leaving_date: s.leaving_date || '', reason_for_leaving: s.reason_for_leaving || '',
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -388,10 +453,8 @@ function SchoolLeavingCertificate({ session, school }) {
         setExamType('Annual');
         setLevel('Secondary');
         setPassingYear('');
-        reset({
-            student_name: '', father_name: '', mother_name: '', class: '', stream: '', session: '',
-            date_of_birth: '', address: '', issue_date: '', character: 'Good',
-        });
+        setCertificateType('character');
+        reset(DEFAULT_FORM_VALUES);
     };
 
     // ── Delete ──
@@ -730,7 +793,15 @@ function SchoolLeavingCertificate({ session, school }) {
                                     </Field>
                                 </>
                             )}
-                            <div className="sm:col-span-2">
+                            {certificateType === 'tc' && (
+                                <>
+                                    <Field label="Admission Number"><input type="text" {...register('admission_number')} className="input" /></Field>
+                                    <Field label="Section"><input type="text" placeholder="e.g. A" {...register('section')} className="input" /></Field>
+                                    <Field label="Leaving Date"><input type="date" {...register('leaving_date')} className="input" /></Field>
+                                    <Field label="Reason for Leaving"><input type="text" placeholder="e.g. Family relocation" {...register('reason_for_leaving')} className="input" /></Field>
+                                </>
+                            )}
+                            {certificateType !== 'tc' && <div className="sm:col-span-2">
                                 <label className="text-xs font-bold text-foreground block mb-1.5">Subjects</label>
                                 <div className="flex gap-2">
                                     <input type="text" placeholder="Type a subject and press Enter" value={subjectInput}
@@ -749,7 +820,7 @@ function SchoolLeavingCertificate({ session, school }) {
                                         ))}
                                     </div>
                                 )}
-                            </div>
+                            </div>}
                             <div className="sm:col-span-2">
                                 <label className="flex items-center gap-2.5 cursor-pointer mb-4">
                                     <input
