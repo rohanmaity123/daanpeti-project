@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import AuthGate from '../../guards/AuthGate/AuthGate';
 import { Link } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
+import SignaturePad from '../../components/Signature/SignatureCapture';
 
 // ── School config ─────────────────────────────────────────────────────────────
 const SCHOOL = {
@@ -96,11 +97,20 @@ function CertificatePage({ children, captureId = 'slc-preview' }) {
     );
 }
 
-function SignatureBlock() {
+function SignatureBlock({ school, data }) {
     return (
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '8mm', padding: '0 6mm' }}>
             <div style={{ textAlign: 'center', minWidth: '58mm' }}>
-                <div style={{ borderTop: '1.4px solid #333', width: '50mm', margin: '2mm auto' }} />
+                {(data?.signature && school?.signature_url) ? (
+                    <img
+                        src={school.signature_url}
+                        alt="Signature"
+                        style={{ height: 40, objectFit: 'contain', display: 'block', margin: '0 auto 2mm' }}
+                        crossOrigin="anonymous"
+                    />
+                ) : (
+                    <div style={{ borderTop: '1.4px solid #333', width: '50mm', margin: '2mm auto' }} />
+                )}
                 <div style={{ fontSize: 11.5, fontStyle: 'italic', color: '#1c3fa0', fontWeight: 600 }}>{SCHOOL.signatoryRole}</div>
                 <div style={{ fontSize: 11.5, color: '#1c3fa0', fontWeight: 700, marginTop: '0.5mm' }}>{SCHOOL.name}</div>
             </div>
@@ -131,7 +141,7 @@ function OrnamentDivider() {
         </div>
     );
 }
-function CharacterCertificateLayout({ data }) {
+function CharacterCertificateLayout({ data, school }) {
     return (
         <>
             <CertTitle>Character Certificate</CertTitle>
@@ -154,7 +164,7 @@ function CharacterCertificateLayout({ data }) {
             <div style={{ fontSize: 11.5, color: '#666', marginTop: '5mm', padding: '0 6mm' }}>
                 Date: <strong style={{ color: '#333' }}>{formatDate(data.issue_date)}</strong>
             </div>
-            <SignatureBlock />
+            <SignatureBlock school={school} data={data} />
         </>
     );
 }
@@ -168,7 +178,7 @@ function Row({ num, label, children }) {
     );
 }
 
-function SchoolLeavingCertificateLayout({ data }) {
+function SchoolLeavingCertificateLayout({ data, school }) {
     // const address = [data.village, data.po].filter(Boolean).join(', P.O.-');
     return (
         <>
@@ -188,11 +198,11 @@ function SchoolLeavingCertificateLayout({ data }) {
                 <Row label="Additional Subjects">{data.additional_subjects}</Row>
                 <Row label="Date of Issue">{formatDate(data.issue_date)}</Row>
             </div>
-            <SignatureBlock />
+            <SignatureBlock school={school} data={data} />
         </>
     );
 }
-function BonafideCertificateLayout({ data }) {
+function BonafideCertificateLayout({ data, school }) {
     return (
         <>
             <div style={{ textAlign: 'center', fontSize: 11, marginTop: '3mm' }}>
@@ -209,18 +219,18 @@ function BonafideCertificateLayout({ data }) {
                 <br /><br />
                 I wish {data.gender === 'She' ? 'her' : 'him'} a bright future.
             </div>
-            <SignatureBlock />
+            <SignatureBlock school={school} data={data} />
         </>
     );
 }
-function TransferCertificateLayout({ data }) {
+function TransferCertificateLayout({ data, school }) {
     return (
         <>
             <CertTitle>Transfer Certificate</CertTitle>
             <div style={{ textAlign: 'center', color: '#999', fontSize: 13, marginTop: '10mm' }}>
                 Transfer Certificate format not yet configured — using placeholder layout.
             </div>
-            <SchoolLeavingCertificateLayout data={data} />
+            <SchoolLeavingCertificateLayout data={data} school={school} />
         </>
     );
 }
@@ -231,11 +241,11 @@ const CERT_LAYOUTS = {
     bonafide: BonafideCertificateLayout,
 };
 
-function CertificateDocument({ data, captureId }) {
+function CertificateDocument({ data, captureId, school }) {
     const Layout = CERT_LAYOUTS[data.certificate_type] || CharacterCertificateLayout;
     return (
         <CertificatePage captureId={captureId}>
-            <Layout data={data} />
+            <Layout data={data} school={school} />
         </CertificatePage>
     );
 }
@@ -256,6 +266,7 @@ function SchoolLeavingCertificate({ session, school }) {
     const [previewStudent, setPreviewStudent] = useState(null);
     const [pendingAction, setPendingAction] = useState(null); // 'png' | 'pdf' | 'print' | null
     const [busy, setBusy] = useState(false);
+    const [wantsSignature, setWantsSignature] = useState(!!school.signature_url);
 
     // Responsive scaling for the preview modal — declared AFTER previewStudent so the effect below can reference it safely
     const [modalWidth, setModalWidth] = useState(0);
@@ -297,14 +308,14 @@ function SchoolLeavingCertificate({ session, school }) {
     const [level, setLevel] = useState('Secondary');
     const [passingYear, setPassingYear] = useState('');
 
+    const DEFAULT_FORM_VALUES = {
+        student_name: '', father_name: '', mother_name: '', class: '', stream: '', session: '',
+        date_of_birth: '', address: '', issue_date: '', character: 'Good',
+        roll_code_no: '', roll_no: '', village: '', po: '', ps: '', district: '',
+        result: 'Pass', additional_subjects: '', ref_no: '', gender: 'He',
+    };
     const { register, handleSubmit, reset, watch, formState: { errors } } = useForm({
-        defaultValues: {
-            student_name: '', father_name: '', mother_name: '', class: '', stream: '', session: '',
-            date_of_birth: '', address: '', issue_date: '', character: 'Good',
-            // new — SLC / Bonafide specific
-            roll_code_no: '', roll_no: '', village: '', po: '', ps: '', district: '',
-            result: 'Pass', additional_subjects: '', ref_no: '', gender: 'He',
-        },
+        defaultValues: DEFAULT_FORM_VALUES,
     });
     const selectedClass = watch('class');
 
@@ -331,6 +342,7 @@ function SchoolLeavingCertificate({ session, school }) {
             certificate_type: certificateType,
             stream: form.class === 'XII' ? form.stream : null,
             subjects,
+            signature: wantsSignature,
             passed: true,
             exam_type: examType,
             level: level,
@@ -347,7 +359,7 @@ function SchoolLeavingCertificate({ session, school }) {
             if (error) return toast.error('Unable to save student. Please try again.');
             toast.success('Student saved successfully.');
         }
-        reset();
+        reset(DEFAULT_FORM_VALUES);
         setSubjects([]);
         setExamType('Annual');
         setLevel('Secondary');
@@ -737,7 +749,40 @@ function SchoolLeavingCertificate({ session, school }) {
                                     </div>
                                 )}
                             </div>
+                            <div className="sm:col-span-2">
+                                <label className="flex items-center gap-2.5 cursor-pointer mb-4">
+                                    <input
+                                        type="checkbox"
+                                        checked={wantsSignature}
+                                        onChange={(e) => setWantsSignature(e.target.checked)}
+                                        className="h-4 w-4 rounded border-white/20 accent-[#20d8ff]"
+                                    />
+                                    <span className="text-sm font-semibold text-slate-300">Do you want to attach a signature?</span>
+                                </label>
+                                {wantsSignature && (
+                                    <div className="mb-6 rounded-3xl border border-white/10 bg-white/[0.06] p-5 shadow-xl backdrop-blur-2xl sm:p-6">
+                                        <div className="mb-4">
+                                            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Optional</p>
+                                            <h2 className="mt-1 text-lg font-bold text-white">Digital Signature</h2>
+                                            <p className="mt-1 text-xs text-slate-500">
+                                                Add a signature to appear on generated certificates, or leave it off to use a blank signature line.
+                                            </p>
+                                        </div>
+                                        <>
+                                            {school.signature_url && (
+                                                <div className="mb-4 flex items-center gap-3">
+                                                    <span className="text-xs text-slate-500">Current signature:</span>
+                                                    <img src={school.signature_url} alt="Current signature" className="h-12 border border-white/10 rounded-lg bg-white p-1" />
+                                                </div>
+                                            )}
 
+                                            <SignaturePad
+                                                school={school}
+                                                onSaved={(url) => { school.signature_url = url; }}
+                                            />
+                                        </>
+                                    </div>)}
+                            </div>
                             <div className="sm:col-span-2">
                                 <label className="text-xs font-bold text-foreground block mb-1.5">Examination</label>
                                 <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-foreground rounded-xl border border-input px-3.5 py-2.5">
@@ -919,7 +964,7 @@ function SchoolLeavingCertificate({ session, school }) {
                             <div className="p-4 overflow-auto flex justify-center items-start flex-1" ref={modalBodyRef}>
                                 <div style={{ width: certWidthPx * scale, height: certHeightPx * scale, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
                                     <div style={{ position: 'absolute', top: 0, left: 0, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-                                        <CertificateDocument data={previewStudent} />
+                                        <CertificateDocument data={previewStudent} school={school} />
                                     </div>
                                 </div>
                             </div>
@@ -949,7 +994,7 @@ function SchoolLeavingCertificate({ session, school }) {
     fixed/transformed ancestor, so html2canvas measures and renders it reliably */}
                 {previewStudent && (
                     <div style={{ position: 'absolute', top: 0, left: 0, height: 0, overflow: 'hidden', zIndex: -1 }} aria-hidden="true">
-                        <CertificateDocument data={previewStudent} captureId="slc-capture" />
+                        <CertificateDocument data={previewStudent} school={school} captureId="slc-capture" />
                     </div>
                 )}
 
