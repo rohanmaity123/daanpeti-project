@@ -96,7 +96,7 @@ const SignaturePad = ({ school, onSaved }) => {
                 <SignatureCanvas
                     ref={sigRef}
                     penColor="#132848"
-                    canvasProps={{ width: 400, height: 150, className: 'sigCanvas', style: { borderRadius: 12 } }}
+                    canvasProps={{ width: 290, height: 150, className: 'sigCanvas', style: { borderRadius: 12 } }}
                     onEnd={() => setIsEmpty(sigRef.current?.isEmpty() ?? true)}
                 />
             </div>

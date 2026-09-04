@@ -880,7 +880,7 @@ function SchoolLeavingCertificate({ session, school }) {
                                         </label>
                                     ))}
 
-                                    <span>examination conducted by the Jharkhand Academic Council, Ranchi.</span>
+                                    <span>examination conducted by the {school?.council}.</span>
 
                                     <span className="flex items-center gap-1.5 font-semibold">
                                         Year:
