@@ -44,7 +44,14 @@ function BengaliMusicPlayer() {
         const sec = Math.floor(s % 60);
         return `${m}:${sec < 10 ? "0" : ""}${sec}`;
     };
-
+    function getRandomIndex(currentIndex, length) {
+        if (length <= 1) return 0;
+        let idx;
+        do {
+            idx = Math.floor(Math.random() * length);
+        } while (idx === currentIndex);
+        return idx;
+    }
     // ── Fetch the playlist from Supabase on mount ───────────────────────────
     useEffect(() => {
         let cancelled = false;
@@ -65,9 +72,11 @@ function BengaliMusicPlayer() {
 
                 if (ids.length > 0) {
                     songsRef.current = ids;
+                    songIndexRef.current = Math.floor(Math.random() * ids.length); // random start
                     setSongs(ids);
                 } else {
                     songsRef.current = FALLBACK_SONGS;
+                    songIndexRef.current = Math.floor(Math.random() * FALLBACK_SONGS.length);
                     setSongs(FALLBACK_SONGS);
                 }
             } catch (err) {
@@ -163,7 +172,8 @@ function BengaliMusicPlayer() {
                             setIsPlaying(false);
                         } else if (e.data === YT.PlayerState.ENDED) {
                             setIsPlaying(false);
-                            goToTrack(songIndexRef.current + 1, true);
+                            const list = songsRef.current;
+                            goToTrack(getRandomIndex(songIndexRef.current, list.length), true);
                         } else {
                             updateTrackData();
                         }
@@ -194,7 +204,10 @@ function BengaliMusicPlayer() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [songs]);
 
-    const nextTrack = () => goToTrackRef.current(songIndexRef.current + 1, true);
+    const nextTrack = () => {
+        const list = songsRef.current;
+        goToTrackRef.current(getRandomIndex(songIndexRef.current, list.length), true);
+    };
     const prevTrack = () => goToTrackRef.current(songIndexRef.current - 1, true);
 
     const togglePlay = () => {
