@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
     Droplet, Stethoscope, Users, Gift, GraduationCap,
     ArrowUpRight, ArrowRight, MapPin, Calendar, ChevronDown,
+    Disc3,
 } from "lucide-react";
 import { BlogWidget } from "../../components/blog/BlogWidget";
 import { TestimonialSection } from "../../components/Testimonial";
@@ -79,6 +80,16 @@ const SERVICES = [
         title: "Certificate Generator",
         desc: "Fill in a few details and download a school leaving certificate, ready to print.",
         stat: "Takes under 2 minutes",
+    },
+    {
+        id: "retro-music",
+        to: "/volta-dar-dokan",
+        icon: Disc3,
+        color: "#ec4899",
+        tag: "📻 Nostalgia",
+        title: "Retro Bengali Music Player",
+        desc: "Adda-ready playlists of golden-era Bengali music — Hemanta, Kishore, Manna Dey — no ads, no login.",
+        stat: "500+ retro tracks",
     },
 ];
 

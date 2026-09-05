@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { GraduationCap, Search, Eye, Pencil, Trash2, Download, Printer, X, ImageIcon, FileText } from 'lucide-react';
-import { supabase } from '../../utils/supabaseClient';
+import { supabase } from '../../../utils/supabaseClient';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import AuthGate from '../../guards/AuthGate/AuthGate';
+import AuthGate from '../../../guards/AuthGate/AuthGate';
 import { Link } from 'react-router-dom';
 import { LogOut } from 'lucide-react';
-import SignaturePad from '../../components/Signature/SignatureCapture';
+import SignaturePad from '../../../components/Signature/SignatureCapture';
 
 // ── School config ─────────────────────────────────────────────────────────────
 const SCHOOL = {
@@ -170,35 +170,99 @@ function CharacterCertificateLayout({ data, school }) {
 }
 function Row({ num, label, children }) {
     return (
-        <div style={{ display: 'flex', gap: 6, fontSize: 13, lineHeight: 2.1, borderBottom: '1px dotted #999', paddingBottom: 1 }}>
-            {num && <span style={{ fontWeight: 700, width: 16 }}>{num}.</span>}
-            <span style={{ minWidth: 190, fontWeight: 700 }}>{label}</span>
-            <span style={{ flex: 1 }}><Val>{children || '—'}</Val></span>
+        <div style={{
+            display: 'grid',
+            gridTemplateColumns: '7mm 66mm 1fr',
+            columnGap: '3mm',
+            fontSize: 13,
+            lineHeight: 1.6,
+            borderBottom: '1px dotted #999',
+            paddingBottom: '1.5mm',
+            marginBottom: '1.5mm',
+            alignItems: 'end',
+        }}>
+            <span style={{ fontWeight: 700 }}>{num ? `${num}.` : ''}</span>
+            <span style={{ fontWeight: 700, whiteSpace: 'normal' }}>{label}</span>
+            <span><Val>{children || '—'}</Val></span>
         </div>
     );
 }
+function SlcSignatureFooter({ school, data }) {
+    return (
+        <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '6mm',
+            marginTop: '10mm',
+            padding: '0 6mm',
+            textAlign: 'center',
+        }}>
+            {/* Date of Issue */}
+            <div>
+                <div style={{ fontSize: 12, marginBottom: '3mm' }}>
+                    <Val>{formatDate(data.issue_date)}</Val>
+                </div>
+                <div style={{ borderTop: '1.4px solid #333', margin: '0 auto 2mm', width: '80%' }} />
+                <div style={{ fontSize: 11.5, fontWeight: 600, color: '#333' }}>Date of Issue</div>
+            </div>
 
+            {/* Clerk signature */}
+            <div>
+                {school?.clerk_signature_url && data?.signature ? (
+                    <img
+                        src={school.clerk_signature_url}
+                        alt="Clerk Signature"
+                        style={{ height: 34, objectFit: 'contain', display: 'block', margin: '0 auto 2mm' }}
+                        crossOrigin="anonymous"
+                    />
+                ) : (
+                    <div style={{ height: '8mm' }} />
+                )}
+                <div style={{ borderTop: '1.4px solid #333', margin: '0 auto 2mm', width: '80%' }} />
+                <div style={{ fontSize: 11.5, fontWeight: 600, color: '#333' }}>Sig. of Clerk</div>
+            </div>
+
+            {/* Headmaster signature */}
+            <div>
+                {school?.signature_url && data?.signature ? (
+                    <img
+                        src={school.signature_url}
+                        alt="Signature"
+                        style={{ height: 34, objectFit: 'contain', display: 'block', margin: '0 auto 2mm' }}
+                        crossOrigin="anonymous"
+                    />
+                ) : (
+                    <div style={{ height: '8mm' }} />
+                )}
+                <div style={{ borderTop: '1.4px solid #333', margin: '0 auto 2mm', width: '80%' }} />
+                <div style={{ fontSize: 11.5, fontStyle: 'italic', color: '#1c3fa0', fontWeight: 600 }}>{school?.signatory_role || 'Incharge Headmaster'}</div>
+                <div style={{ fontSize: 11, color: '#1c3fa0', fontWeight: 700 }}>{school?.school_name || SCHOOL.name}</div>
+            </div>
+        </div>
+    );
+}
 function SchoolLeavingCertificateLayout({ data, school }) {
-    // const address = [data.village, data.po].filter(Boolean).join(', P.O.-');
     return (
         <>
             <CertTitle>School Leaving Certificate</CertTitle>
-            <div style={{ padding: '4mm 10mm 0', display: 'flex', flexDirection: 'column', gap: '1mm' }}>
+            <div style={{ padding: '5mm 12mm 0', display: 'flex', flexDirection: 'column' }}>
                 <Row num={1} label="Pupil's Name">{titleCase(data.student_name)}</Row>
-                <Row label={`Roll Code No. ${data.roll_code_no || '—'}   Roll No.`}>{data.roll_no}</Row>
+                <Row label="Roll Code No.">{data.roll_code_no}</Row>
+                <Row label="Roll No.">{data.roll_no}</Row>
                 <Row num={2} label="Mother's Name">{titleCase(data.mother_name)}</Row>
                 <Row num={3} label="Father's Name">{titleCase(data.father_name)}</Row>
                 <Row num={4} label="Village">{data.village}</Row>
                 <Row label="P.S. / District">{[data.ps, data.district].filter(Boolean).join(' / ')}</Row>
                 <Row num={5} label="Date of Birth">{formatDate(data.date_of_birth)}</Row>
-                <Row num={6} label={`Year of Passing ${school?.council}`}>{data.passing_year}</Row>
+                <Row num={6} label={`Year of Passing ${school?.council || ''}`}>{data.passing_year}</Row>
                 <Row num={7} label="Result">{data.result}</Row>
                 <Row num={8} label="Character">{data.character}</Row>
                 <Row num={9} label="Subjects">{data.subjects?.join(', ')}</Row>
                 <Row label="Additional Subjects">{data.additional_subjects}</Row>
-                <Row label="Date of Issue">{formatDate(data.issue_date)}</Row>
+                {/* <Row label="Date of Issue">{formatDate(data.issue_date)}</Row> */}
             </div>
-            <SignatureBlock school={school} data={data} />
+            {/* <SignatureBlock school={school} data={data} /> */}
+            <SlcSignatureFooter school={school} data={data} />
         </>
     );
 }

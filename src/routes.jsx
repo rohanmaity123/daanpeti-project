@@ -38,7 +38,8 @@ import BloodDonorCityPage from "./views/home/BloodDonorCityPage";
 import AddDoctorPage from "./views/home/createDoctor";
 import CommunityFeed from "./views/home/CommunityFeed";
 import ServicesLanding from "./views/home/landingPage";
-import SchoolLeavingCertificatePage from "./views/home/SchoolLivingCertificate";
+import SchoolLeavingCertificatePage from "./views/home/school-certificate/SchoolLivingCertificate";
+import VoltaDarDokanPage from "./views/home/retro-audio/retroAudio";
 
 
 // ==================
@@ -117,7 +118,7 @@ export default function RenderRoutes() {
         <Route path="*" element={<Navigate to="/404" />} />
         <Route path="/" element={<ServicesLanding />} />
         <Route path="/school-leaving-certificate" element={<SchoolLeavingCertificatePage />} />
-
+        <Route path="/volta-dar-dokan" element={<VoltaDarDokanPage />} />
       </Routes>
     </Suspense>
   );
